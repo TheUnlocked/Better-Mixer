@@ -10,11 +10,6 @@ let extinit;
 
 let customEmotes = {};
 
-// Mixer username (case sensitive) - Twitch username sync (lowercase only)
-let userSync = {
-    "Unlocked": "the_unlocked"
-};
-
 function textLiteral(text){
     return `<span class="textComponent">${text}</span>`;
 }
@@ -25,15 +20,17 @@ function emoteLiteral(img, alt, size){
 }
 
 function addUserEmotes(username){
-    console.log(`Added emotes for ${username}`);
-    $.getJSON(`https://api.frankerfacez.com/v1/room/${userSync[username]}`, function(data){
-        let userEmotes = {};
-        for (let emoteSet in data["sets"]){
-            for (let emote of data["sets"][emoteSet]["emoticons"]){
-                userEmotes[emote["name"]] = [emote["urls"]["1"], emote["height"]];
+    $.getJSON("https://raw.githubusercontent.com/TheUnlocked/Better-Mixer/master/Info/ffzsync.json", function(userSync){
+        $.getJSON(`https://api.frankerfacez.com/v1/room/${userSync[username]}`, function(data){
+            let userEmotes = {};
+            for (let emoteSet in data["sets"]){
+                for (let emote of data["sets"][emoteSet]["emoticons"]){
+                    userEmotes[emote["name"]] = [emote["urls"]["1"], emote["height"]];
+                }
             }
-        }
-        Object.assign(customEmotes, userEmotes);
+            Object.assign(customEmotes, userEmotes);
+            console.log(`Added emotes for ${username}`);
+        });
     });
 }
 
