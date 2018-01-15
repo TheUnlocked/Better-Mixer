@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a7218e97-c048-4501-947e-3d40ebf017cd" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/Extension/manifest.json" afterPath="$PROJECT_DIR$/Extension/manifest.json" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/Extension/chatcontent.js" afterPath="$PROJECT_DIR$/Extension/chatcontent.js" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -17,25 +18,25 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="chatcontent.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="chatcontent.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Extension/chatcontent.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="419">
-              <caret line="30" column="52" lean-forward="false" selection-start-line="30" selection-start-column="52" selection-end-line="30" selection-end-column="52" />
+            <state relative-caret-position="657">
+              <caret line="122" column="26" lean-forward="false" selection-start-line="122" selection-start-column="26" selection-end-line="122" selection-end-column="26" />
               <folding>
                 <element signature="n#!!doc" expanded="true" />
-                <marker date="1515988316212" expanded="true" signature="819:855" ph="..." />
-                <marker date="1515988316212" expanded="true" signature="918:970" ph="..." />
+                <marker date="1515996317230" expanded="true" signature="819:855" ph="..." />
+                <marker date="1515996317230" expanded="true" signature="918:970" ph="..." />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="manifest.json" pinned="false" current-in-tab="true">
+      <file leaf-file-name="manifest.json" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Extension/manifest.json">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="646">
-              <caret line="38" column="69" lean-forward="true" selection-start-line="38" selection-start-column="69" selection-end-line="38" selection-end-column="69" />
+              <caret line="38" column="69" lean-forward="false" selection-start-line="38" selection-start-column="69" selection-end-line="38" selection-end-column="69" />
               <folding />
             </state>
           </provider>
@@ -69,8 +70,8 @@
         <option value="$PROJECT_DIR$/Extension/background.js" />
         <option value="$PROJECT_DIR$/Info/ffzsync.json" />
         <option value="$PROJECT_DIR$/Info/README.md" />
-        <option value="$PROJECT_DIR$/Extension/chatcontent.js" />
         <option value="$PROJECT_DIR$/Extension/manifest.json" />
+        <option value="$PROJECT_DIR$/Extension/chatcontent.js" />
       </list>
     </option>
   </component>
@@ -461,12 +462,12 @@
       <workItem from="1515886227439" duration="33996000" />
       <workItem from="1515983381966" duration="1386000" />
       <workItem from="1515987182703" duration="32000" />
-      <workItem from="1515987225738" duration="1721000" />
+      <workItem from="1515987225738" duration="4551000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="37135000" />
+    <option name="totallyTimeSpent" value="39965000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -511,8 +512,8 @@
           <caret line="86" column="40" lean-forward="false" selection-start-line="86" selection-start-column="40" selection-end-line="86" selection-end-column="40" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
-            <marker date="1515988316212" expanded="true" signature="819:855" ph="..." />
-            <marker date="1515988316212" expanded="true" signature="918:970" ph="..." />
+            <marker date="1515996317230" expanded="true" signature="819:855" ph="..." />
+            <marker date="1515996317230" expanded="true" signature="918:970" ph="..." />
           </folding>
         </state>
       </provider>
@@ -531,8 +532,8 @@
           <caret line="86" column="40" lean-forward="false" selection-start-line="86" selection-start-column="40" selection-end-line="86" selection-end-column="40" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
-            <marker date="1515988316212" expanded="true" signature="819:855" ph="..." />
-            <marker date="1515988316212" expanded="true" signature="918:970" ph="..." />
+            <marker date="1515996317230" expanded="true" signature="819:855" ph="..." />
+            <marker date="1515996317230" expanded="true" signature="918:970" ph="..." />
           </folding>
         </state>
       </provider>
@@ -558,8 +559,8 @@
           <caret line="95" column="7" lean-forward="true" selection-start-line="95" selection-start-column="7" selection-end-line="95" selection-end-column="7" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
-            <marker date="1515988316212" expanded="true" signature="819:855" ph="..." />
-            <marker date="1515988316212" expanded="true" signature="918:970" ph="..." />
+            <marker date="1515996317230" expanded="true" signature="819:855" ph="..." />
+            <marker date="1515996317230" expanded="true" signature="918:970" ph="..." />
           </folding>
         </state>
       </provider>
@@ -627,23 +628,23 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Extension/chatcontent.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="419">
-          <caret line="30" column="52" lean-forward="false" selection-start-line="30" selection-start-column="52" selection-end-line="30" selection-end-column="52" />
-          <folding>
-            <element signature="n#!!doc" expanded="true" />
-            <marker date="1515988316212" expanded="true" signature="819:855" ph="..." />
-            <marker date="1515988316212" expanded="true" signature="918:970" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Extension/manifest.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="646">
-          <caret line="38" column="69" lean-forward="true" selection-start-line="38" selection-start-column="69" selection-end-line="38" selection-end-column="69" />
+          <caret line="38" column="69" lean-forward="false" selection-start-line="38" selection-start-column="69" selection-end-line="38" selection-end-column="69" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Extension/chatcontent.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="657">
+          <caret line="122" column="26" lean-forward="false" selection-start-line="122" selection-start-column="26" selection-end-line="122" selection-end-column="26" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+            <marker date="1515996317230" expanded="true" signature="819:855" ph="..." />
+            <marker date="1515996317230" expanded="true" signature="918:970" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
