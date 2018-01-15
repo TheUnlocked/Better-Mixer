@@ -21,12 +21,12 @@
       <file leaf-file-name="chatcontent.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Extension/chatcontent.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="657">
-              <caret line="122" column="26" lean-forward="false" selection-start-line="122" selection-start-column="26" selection-end-line="122" selection-end-column="26" />
+            <state relative-caret-position="323">
+              <caret line="19" column="1" lean-forward="true" selection-start-line="19" selection-start-column="1" selection-end-line="19" selection-end-column="1" />
               <folding>
                 <element signature="n#!!doc" expanded="true" />
-                <marker date="1515996317230" expanded="true" signature="819:855" ph="..." />
-                <marker date="1515996317230" expanded="true" signature="918:970" ph="..." />
+                <marker date="1515999627883" expanded="true" signature="819:855" ph="..." />
+                <marker date="1515999627883" expanded="true" signature="933:985" ph="..." />
               </folding>
             </state>
           </provider>
@@ -462,12 +462,12 @@
       <workItem from="1515886227439" duration="33996000" />
       <workItem from="1515983381966" duration="1386000" />
       <workItem from="1515987182703" duration="32000" />
-      <workItem from="1515987225738" duration="4551000" />
+      <workItem from="1515987225738" duration="5657000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="39965000" />
+    <option name="totallyTimeSpent" value="41071000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -512,8 +512,8 @@
           <caret line="86" column="40" lean-forward="false" selection-start-line="86" selection-start-column="40" selection-end-line="86" selection-end-column="40" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
-            <marker date="1515996317230" expanded="true" signature="819:855" ph="..." />
-            <marker date="1515996317230" expanded="true" signature="918:970" ph="..." />
+            <marker date="1515999627883" expanded="true" signature="819:855" ph="..." />
+            <marker date="1515999627883" expanded="true" signature="933:985" ph="..." />
           </folding>
         </state>
       </provider>
@@ -532,8 +532,8 @@
           <caret line="86" column="40" lean-forward="false" selection-start-line="86" selection-start-column="40" selection-end-line="86" selection-end-column="40" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
-            <marker date="1515996317230" expanded="true" signature="819:855" ph="..." />
-            <marker date="1515996317230" expanded="true" signature="918:970" ph="..." />
+            <marker date="1515999627883" expanded="true" signature="819:855" ph="..." />
+            <marker date="1515999627883" expanded="true" signature="933:985" ph="..." />
           </folding>
         </state>
       </provider>
@@ -559,8 +559,8 @@
           <caret line="95" column="7" lean-forward="true" selection-start-line="95" selection-start-column="7" selection-end-line="95" selection-end-column="7" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
-            <marker date="1515996317230" expanded="true" signature="819:855" ph="..." />
-            <marker date="1515996317230" expanded="true" signature="918:970" ph="..." />
+            <marker date="1515999627883" expanded="true" signature="819:855" ph="..." />
+            <marker date="1515999627883" expanded="true" signature="933:985" ph="..." />
           </folding>
         </state>
       </provider>
@@ -638,12 +638,12 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Extension/chatcontent.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="657">
-          <caret line="122" column="26" lean-forward="false" selection-start-line="122" selection-start-column="26" selection-end-line="122" selection-end-column="26" />
+        <state relative-caret-position="323">
+          <caret line="19" column="1" lean-forward="true" selection-start-line="19" selection-start-column="1" selection-end-line="19" selection-end-column="1" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
-            <marker date="1515996317230" expanded="true" signature="819:855" ph="..." />
-            <marker date="1515996317230" expanded="true" signature="918:970" ph="..." />
+            <marker date="1515999627883" expanded="true" signature="819:855" ph="..." />
+            <marker date="1515999627883" expanded="true" signature="933:985" ph="..." />
           </folding>
         </state>
       </provider>
