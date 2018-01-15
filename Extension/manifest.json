@@ -1,0 +1,35 @@
+{
+  "manifest_version": 2,
+
+  "name": "Better Mixer",
+  "version": "0.1",
+
+  "icons": {"128": "Icons/icon.png"},
+
+  "short_name": "Better Mixer",
+  "description": "Improvements to Mixer.com",
+
+  "author": "Unlocked",
+
+  "options_ui": {
+    "page": "Options/options.html",
+    "chrome_style": true
+  },
+
+  "permissions": [
+    "tabs",
+    "storage",
+    "https://mixer.com/*"
+  ],
+
+  "content_scripts": [
+    {
+      "matches": ["https://mixer.com/*"],
+      "js": ["jquery-3.1.1.min.js", "chatcontent.js"]
+    }
+  ],
+
+  "background": {
+      "scripts": ["jquery-3.1.1.min.js", "background.js"]
+  }
+}
