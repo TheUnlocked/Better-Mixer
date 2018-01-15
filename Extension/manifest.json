@@ -30,6 +30,11 @@
   ],
 
   "background": {
-      "scripts": ["jquery-3.1.1.min.js", "background.js"]
-  }
+    "scripts": [
+      "jquery-3.1.1.min.js",
+      "background.js"
+    ]
+  },
+
+  "update_url":"https://github.com/TheUnlocked/Better-Mixer/releases"
 }
