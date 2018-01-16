@@ -16,7 +16,7 @@ function textLiteral(text){
 
 function emoteLiteral(img, alt, size){
     return `<div style="height: ${size}px; width: ${size}px;" _ngcontent-c72 _ngcontent-c46 _ngcontent-c106 _ngcontent-c30 class="graphic">
-            <img src="${img}" alt="${alt}" /></div>`;
+            <img src="${img}" alt="${alt}" title="${alt}" /></div>`;
 }
 
 function getMixerUsername(){
