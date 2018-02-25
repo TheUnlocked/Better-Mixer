@@ -2,7 +2,7 @@
   "manifest_version": 2,
 
   "name": "Better Mixer",
-  "version": "0.3",
+  "version": "0.3.1",
 
   "icons": {"128": "Icons/icon.png"},
 

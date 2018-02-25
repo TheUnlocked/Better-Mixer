@@ -47,8 +47,8 @@ function addUserEmotes(username) {
                 }
                 Object.assign(customEmotes, userEmotes);
                 console.log(`Added emotes for ${username}`);
-                resolve();
-            });
+            })
+            .always((_, __) => resolve());
         });
     });
 }
