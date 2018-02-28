@@ -40,9 +40,9 @@ function addUserEmotes(username) {
         $.getJSON("https://raw.githubusercontent.com/TheUnlocked/Better-Mixer/master/Info/ffzsync.json", function (userSync) {
             $.getJSON(`https://api.frankerfacez.com/v1/room/${userSync[username]}`, function (data) {
                 let userEmotes = {};
-                for (let emoteSet in data["sets"]) {
-                    for (let emote of data["sets"][emoteSet]["emoticons"]) {
-                        userEmotes[emote["name"]] = [emote["urls"]["1"], emote["height"]];
+                for (let emoteSet in data.sets) {
+                    for (let emote of data.sets[emoteSet].emoticons) {
+                        userEmotes[emote.name] = [emote.urls["1"], emote.height];
                     }
                 }
                 Object.assign(customEmotes, userEmotes);
@@ -78,7 +78,7 @@ function ext() {
 
     let emotesStyle = addClass('bettermixer-emotes', 'position: relative; display: inline-flex; align-items: center; justify-content: center; margin: -6px 2px 0; top: 5px;');
 
-    let botColor = '#ff8f20'
+    let botColor = '#ff8f20';
     let botsStyleAvatar = addClass('bettermixer-bots .image', `background-color: ${botColor} !important;`);
     let botsStyleUsername = addClass('bettermixer-bots .username', `color: ${botColor} !important;`);
 
