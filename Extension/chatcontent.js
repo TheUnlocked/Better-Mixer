@@ -22,7 +22,7 @@ function emoteLiteral(img, alt, size) {
 function getMixerUsername() {
     return new Promise(function (resolve, reject) {
         // Get username or user ID
-        let usernameOrID = /\/[0-z]*(?=$)/gi.exec(window.location.href)[0].slice(1); // Sadly this won't work for co-streams.
+        let usernameOrID = window.location.pathname.substring(1).toLowerCase(); // Sadly this won't work for co-streams.
         // If the retrieved identifier is the user ID, get their username.
         let userID = parseInt(usernameOrID);
         if (userID) {
@@ -38,6 +38,8 @@ function getMixerUsername() {
 function addUserEmotes(username) {
     return new Promise(function (resolve, reject) {
         $.getJSON("https://raw.githubusercontent.com/TheUnlocked/Better-Mixer/master/Info/ffzsync.json", function (userSync) {
+            if (userSync[username] == null)
+                userSync[username] = userSync[username].toLowerCase();
             $.getJSON(`https://api.frankerfacez.com/v1/room/${userSync[username]}`, function (data) {
                 let userEmotes = {};
                 for (let emoteSet in data.sets) {
