@@ -38,8 +38,13 @@ function getMixerUsername() {
 function addUserEmotes(username) {
     return new Promise(function (resolve, reject) {
         $.getJSON("https://raw.githubusercontent.com/TheUnlocked/Better-Mixer/master/Info/ffzsync.json", function (userSync) {
-            if (userSync[username] == null)
-                userSync[username] = userSync[username].toLowerCase();
+            // Backpatching
+            for (let key of Object.keys(userSync)){
+                userSync[key.toLowerCase()] = userSync[key];
+            }
+            
+            if (!userSync[username])
+                userSync[username.toLowerCase()] = userSync[username];
             $.getJSON(`https://api.frankerfacez.com/v1/room/${userSync[username]}`, function (data) {
                 let userEmotes = {};
                 for (let emoteSet in data.sets) {
