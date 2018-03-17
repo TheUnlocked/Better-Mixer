@@ -28,10 +28,10 @@ function getMixerUsername() {
         if (userID) {
             $.getJSON(`https://mixer.com/api/v1/channels/${userID}/details`, function (data) {
                 resolve(data.token);
+                return;
             });
-        } else {
-            resolve(usernameOrID);
         }
+        resolve(usernameOrID);
     });
 }
 
@@ -54,15 +54,14 @@ function addUserEmotes(username) {
                 }
                 Object.assign(customEmotes, userEmotes);
                 console.log(`Added emotes for ${username}`);
-            })
-            .always((_, __) => resolve());
-        });
+            });
+        }).always((_, __) => resolve());
     });
 }
 
 function resetEmotes() {
     customEmotes = {
-        "TestEmote": ["https://i.imgur.com/Fm8qROA.png", 28]
+//        "TestEmote": ["https://i.imgur.com/Fm8qROA.png", 28]
     };
 }
 
@@ -74,11 +73,11 @@ function addClass(name, def) {
     return def;
 }
 
-let observer;
+let messageObserver;
 
 function ext() {
-    if (observer) {
-        observer.disconnect();
+    if (messageObserver) {
+        messageObserver.disconnect();
     }
 
     resetEmotes();
@@ -93,46 +92,39 @@ function ext() {
         .then(addUserEmotes)
         .then(function () {
             // Search for new chat messages
-            observer = new MutationObserver(function (mutations) {
+            messageObserver = new MutationObserver(function (mutations) {
                 for (let mutation of mutations) {
                     if (mutation.addedNodes.length == 1) {
                         let addedElement = mutation.addedNodes[0];
                         for (let addedMsg of addedElement.getElementsByTagName("b-channel-chat-message")) {
-
-                            // Bot fading
-                            if (addedElement.getElementsByClassName("username")[0].innerText.toLowerCase().includes("bot")){
-                                addedElement.getElementsByTagName("b-channel-chat-author")[0].classList.add('bettermixer-bots');
+                            for (let patch of messagePatches){
+                                patch(addedMsg);
                             }
+                        }
+                    }
+                }
+            });
 
-                            // Emotes
-                            for (let msgText of addedMsg.getElementsByClassName("textComponent")) {
-                                if (msgText) {
-                                    // Break it up into text pieces, and check each piece for an emote
-                                    let segmented = msgText.innerHTML.trim().split(" ");
-                                    let segmentedNew = [];
-                                    // Buffer used to retain non-emote text
-                                    let textBuffer = "";
-                                    for (let segment of segmented) {
-                                        let emote = customEmotes[segment];
-                                        if (emote) {
-                                            // End the text element if you find an emote
-                                            if (textBuffer) {
-                                                segmentedNew.push(textLiteral(textBuffer));
-                                                textBuffer = "";
-                                            }
-                                            // Push the emote
-                                            segmentedNew.push(emoteLiteral(emote[0], segment, emote[1]));
-                                        } else {
-                                            textBuffer += ` ${segment}`;
-                                        }
-                                    }
-                                    // Finish the text buffer, if one exists
-                                    if (textBuffer) {
-                                        segmentedNew.push(textLiteral(textBuffer));
-                                    }
-                                    // Replace the text element with the new text/emote elements
-                                    $(msgText).replaceWith(segmentedNew.join(" "));
+            let emoteBoxObserver = new MutationObserver(function (mutations) {
+                if (Object.keys(customEmotes).length !== 0){
+                    for (let mutation of mutations) {
+                        if (mutation.addedNodes.length == 1) {
+                            for (let emotePanel of mutation.addedNodes[0].getElementsByTagName("bui-dialog-content")){
+                                let customTiles = emotePanel.children[0].cloneNode();
+                                let tile = emotePanel.children[0].children[0];
+                                emotePanel.insertBefore(customTiles, emotePanel.children[0]);
+                                for (let emoteName of Object.keys(customEmotes)){
+                                    let emote = customEmotes[emoteName];
+                                    let emoteTile = tile.cloneNode();
+                                    emoteTile.innerHTML = emoteLiteral(emote[0], emoteName, emote[1]);
+                                    customTiles.appendChild(emoteTile);
                                 }
+                                customTiles.innerHTML = `<div style="font-style: italic; font-size: 10pt; text-align: left;">
+                                                                Clicking custom emotes is currently not supported. Hover over them to get their name.
+                                                            </div>
+                                                            <br />
+                                                            ${customTiles.innerHTML}
+                                                            <hr />`;
                             }
                         }
                     }
@@ -140,10 +132,53 @@ function ext() {
             });
 
             // Execute the observer
-            observer.observe(document.getElementsByClassName("message-container")[0], {
+            messageObserver.observe(document.getElementsByClassName("message-container")[0], {
+                "childList": true
+            });
+            
+            emoteBoxObserver.observe(document.getElementsByTagName("b-channel-chat")[0], {
                 "childList": true
             });
         });
+}
+
+let messagePatches = [patchMessageEmotes, patchMessageBotColor];
+
+function patchMessageEmotes(message){
+    for (let msgText of message.getElementsByClassName("textComponent")) {
+        if (msgText) {
+            // Break it up into text pieces, and check each piece for an emote
+            let segmented = msgText.innerHTML.trim().split(" ");
+            let segmentedNew = [];
+            // Buffer used to retain non-emote text
+            let textBuffer = "";
+            for (let segment of segmented) {
+                let emote = customEmotes[segment];
+                if (emote) {
+                    // End the text element if you find an emote
+                    if (textBuffer) {
+                        segmentedNew.push(textLiteral(textBuffer));
+                        textBuffer = "";
+                    }
+                    // Push the emote
+                    segmentedNew.push(emoteLiteral(emote[0], segment, emote[1]));
+                } else {
+                    textBuffer += ` ${segment}`;
+                }
+            }
+            // Finish the text buffer, if one exists
+            if (textBuffer) {
+                segmentedNew.push(textLiteral(textBuffer));
+            }
+            // Replace the text element with the new text/emote elements
+            $(msgText).replaceWith(segmentedNew.join(" "));
+        }
+    }
+}
+function patchMessageBotColor(message){
+    if (message.getElementsByClassName("username")[0].innerText.toLowerCase().includes("bot")){
+        message.getElementsByTagName("b-channel-chat-author")[0].classList.add('bettermixer-bots');
+    }
 }
 
 // Initiate script
