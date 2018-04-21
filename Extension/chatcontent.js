@@ -110,7 +110,7 @@ css = `
 }
 
 .bettermixer-emotes {
-    position: fixed;
+    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
