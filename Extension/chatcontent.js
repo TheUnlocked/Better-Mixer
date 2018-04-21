@@ -16,7 +16,9 @@ function textLiteral(text) {
 
 function emoteLiteral(img, alt, size) {
     return `<div class="graphic bettermixer-emotes" style="height: ${size}px; width: ${size}px;">
-            <img src="${img}" alt="${alt}" title="${alt}" /></div>`;
+                <img src="${img}" alt="${alt}" title="${alt}" />
+                <span class="bettermixer-emote-tooltip">${alt}</span>
+            </div>`;
 }
 
 function getMixerUsername() {
@@ -65,12 +67,68 @@ function resetEmotes() {
     };
 }
 
+// import "emotes.css";
+css = `
+
+.bettermixer-emotes .bettermixer-emote-tooltip {
+	visibility: hidden;
+    width: 120px;
+    background-color: rgb(32, 32, 32);
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 99;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -60px;
+}
+
+.bettermixer-emotes .bettermixer-emote-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: rgb(32, 32, 32) transparent transparent transparent;
+}
+
+.bettermixer-emotes:hover .bettermixer-emote-tooltip {
+    visibility: visible;
+    position:absolute;
+    animation-name: bettermixer-tooltip-anim;
+    animation-duration: 0.15s;
+    animation-timing-function: ease-out;
+}
+
+@keyframes bettermixer-tooltip-anim{
+	from {bottom: 0%; transform: scale(0); opacity: 0%; visibility: hidden;}
+    to {bottom: 100%;  transform: scale(1); opacity: 100%; visibility: visible;}
+}
+
+.bettermixer-emotes {
+    position: fixed;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: -6px 2px 0;
+    top: 5px;
+}
+`;
+
 function addClass(name, def) {
+    injectCss(`.${name}{${def}}`);
+    return def;
+}
+
+function injectCss(css){
     let styleEmotes = document.createElement('style');
     styleEmotes.type = 'text/css';
-    styleEmotes.innerHTML = `.${name}{${def}}`;
-    document.getElementsByTagName('body')[0].appendChild(styleEmotes);
-    return def;
+    styleEmotes.innerHTML = css;
+    document.getElementsByTagName('head')[0].appendChild(styleEmotes);
 }
 
 let messageObserver;
@@ -82,7 +140,7 @@ function ext() {
 
     resetEmotes();
 
-    let emotesStyle = addClass('bettermixer-emotes', 'position: relative; display: inline-flex; align-items: center; justify-content: center; margin: -6px 2px 0; top: 5px;');
+    injectCss(css);
 
     let botColor = '#ff8f20';
     let botsStyleAvatar = addClass('bettermixer-bots .image', `background-color: ${botColor} !important;`);
@@ -117,14 +175,12 @@ function ext() {
                                     let emote = customEmotes[emoteName];
                                     let emoteTile = tile.cloneNode();
                                     emoteTile.innerHTML = emoteLiteral(emote[0], emoteName, emote[1]);
+                                    emoteTile.addEventListener('click', () => document
+                                                                            .getElementById('better-mixer-injection-script')
+                                                                            .dispatchEvent(new CustomEvent('addToChat', {detail:emoteName + " "})));
                                     customTiles.appendChild(emoteTile);
                                 }
-                                customTiles.innerHTML = `<div style="font-style: italic; font-size: 10pt; text-align: left;">
-                                                                Clicking custom emotes is currently not supported. Hover over them to get their name.
-                                                            </div>
-                                                            <br />
-                                                            ${customTiles.innerHTML}
-                                                            <hr />`;
+                                customTiles.appendChild(document.createElement('hr'));
                             }
                         }
                     }
@@ -140,6 +196,20 @@ function ext() {
                 "childList": true
             });
         });
+    
+    let injectionScript = document.createElement('script');
+    injectionScript.id = 'better-mixer-injection-script';
+    injectionScript.innerHTML = `
+    function addToChat(text) {
+        let codeMirrorDoc = document.getElementsByClassName('CodeMirror')[0].CodeMirror.getDoc();
+        let preparedNew = codeMirrorDoc.getValue();
+        if (preparedNew != '' && !preparedNew.endsWith(' '))
+            preparedNew += ' ';
+        codeMirrorDoc.setValue(\`\${preparedNew}\${text}\`);
+    }
+    document.getElementById('better-mixer-injection-script').addEventListener('addToChat', (event) => addToChat(event.detail));`;
+    document.head.appendChild(injectionScript);
+    
 }
 
 let messagePatches = [patchMessageEmotes, patchMessageBotColor];
