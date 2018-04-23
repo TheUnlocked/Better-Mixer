@@ -260,6 +260,7 @@ function makeEmoteTooltip(emoteElement, emoteName){
         tooltip.classList.add('bettermixer-emote-tooltip');
         tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.clientWidth / 2) + "px";
         tooltip.style.top = rect.top - 22 + "px";
+        tooltip.style.pointerEvents = "none";
         function mouseoutEvent() {
             document.body.removeChild(tooltip);
             emoteElement.removeEventListener('mouseout', mouseoutEvent);
