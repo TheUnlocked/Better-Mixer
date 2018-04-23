@@ -17,7 +17,6 @@ function textLiteral(text) {
 function emoteLiteral(img, alt, size) {
     return `<div class="graphic bettermixer-emotes" style="height: ${size}px; width: ${size}px;">
                 <img src="${img}" alt="${alt}" title="${alt}" />
-                <span class="bettermixer-emote-tooltip">${alt}</span>
             </div>`;
 }
 
@@ -70,22 +69,24 @@ function resetEmotes() {
 // import "emotes.css";
 css = `
 
-.bettermixer-emotes .bettermixer-emote-tooltip {
-	visibility: hidden;
-    width: 120px;
-    background-color: rgb(32, 32, 32);
+.bettermixer-emote-tooltip {
+	visibility: visible;
+    animation-name: bettermixer-tooltip-anim;
+    animation-duration: 0.15s;
+    animation-timing-function: ease-out;
+    width: auto;
+    height: 22px;
+    background-color: #32384b;
     color: #fff;
+    font-size: 10.5pt;
     text-align: center;
     border-radius: 6px;
-    padding: 5px 0;
+    padding: 5px 5px;
     position: absolute;
     z-index: 99;
-    bottom: 100%;
-    left: 50%;
-    margin-left: -60px;
 }
 
-.bettermixer-emotes .bettermixer-emote-tooltip::after {
+.bettermixer-emote-tooltip::after {
     content: "";
     position: absolute;
     top: 100%;
@@ -93,20 +94,12 @@ css = `
     margin-left: -5px;
     border-width: 5px;
     border-style: solid;
-    border-color: rgb(32, 32, 32) transparent transparent transparent;
-}
-
-.bettermixer-emotes:hover .bettermixer-emote-tooltip {
-    visibility: visible;
-    position:absolute;
-    animation-name: bettermixer-tooltip-anim;
-    animation-duration: 0.15s;
-    animation-timing-function: ease-out;
+    border-color: #32384b transparent transparent transparent;
 }
 
 @keyframes bettermixer-tooltip-anim{
-	from {bottom: 0%; transform: scale(0); opacity: 0%; visibility: hidden;}
-    to {bottom: 100%;  transform: scale(1); opacity: 100%; visibility: visible;}
+	from {transform: scale(0); opacity: 0%;}
+    to {transform: scale(1); opacity: 100%;}
 }
 
 .bettermixer-emotes {
@@ -171,10 +164,12 @@ function ext() {
                                 let customTiles = emotePanel.children[0].cloneNode();
                                 let tile = emotePanel.children[0].children[0];
                                 emotePanel.insertBefore(customTiles, emotePanel.children[0]);
+                                emotePanel.style.overflow = "hidden";
                                 for (let emoteName of Object.keys(customEmotes)){
                                     let emote = customEmotes[emoteName];
                                     let emoteTile = tile.cloneNode();
                                     emoteTile.innerHTML = emoteLiteral(emote[0], emoteName, emote[1]);
+                                    makeEmoteTooltip(emoteTile, emoteName);
                                     emoteTile.addEventListener('click', () => document
                                                                             .getElementById('better-mixer-injection-script')
                                                                             .dispatchEvent(new CustomEvent('addToChat', {detail:emoteName + " "})));
@@ -242,13 +237,35 @@ function patchMessageEmotes(message){
             }
             // Replace the text element with the new text/emote elements
             $(msgText).replaceWith(segmentedNew.join(" "));
+            
+            for (let emote of message.querySelectorAll('.graphic.bettermixer-emotes > img')){
+                makeEmoteTooltip(emote, emote.alt);
+            }
         }
     }
 }
 function patchMessageBotColor(message){
-    if (message.getElementsByClassName("username")[0].innerText.toLowerCase().includes("bot")){
+    let username = message.getElementsByClassName("username")[0].innerText;
+    if (username.includes("Bot") || username.toLowerCase().endsWith("bot")){
         message.getElementsByTagName("b-channel-chat-author")[0].classList.add('bettermixer-bots');
     }
+}
+
+function makeEmoteTooltip(emoteElement, emoteName){
+    emoteElement.addEventListener('mouseover', function() {
+        let tooltip = document.createElement('div');
+        document.body.appendChild(tooltip);
+        tooltip.innerHTML = emoteName;
+        let rect = emoteElement.getBoundingClientRect();
+        tooltip.classList.add('bettermixer-emote-tooltip');
+        tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.clientWidth / 2) + "px";
+        tooltip.style.top = rect.top - 22 + "px";
+        function mouseoutEvent() {
+            document.body.removeChild(tooltip);
+            emoteElement.removeEventListener('mouseout', mouseoutEvent);
+        }
+        emoteElement.addEventListener('mouseout', mouseoutEvent);
+    });
 }
 
 // Initiate script
