@@ -1,0 +1,41 @@
+.bettermixer-emote-tooltip {
+	visibility: visible;
+    animation-name: bettermixer-tooltip-anim;
+    animation-duration: 0.15s;
+    animation-timing-function: ease-out;
+    width: auto;
+    height: 24px;
+    background-color: #32384b;
+    color: #fff;
+    font-size: 10.5pt;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 10px 5px 10px;
+    position: absolute;
+    z-index: 99;
+}
+
+.bettermixer-emote-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #32384b transparent transparent transparent;
+}
+
+@keyframes bettermixer-tooltip-anim{
+	from {transform: scale(0); opacity: 0%;}
+    to {transform: scale(1); opacity: 100%;}
+}
+
+.bettermixer-emotes {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: -6px 2px 0;
+    top: 5px;
+}

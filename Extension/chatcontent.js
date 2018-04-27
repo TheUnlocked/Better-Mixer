@@ -66,52 +66,6 @@ function resetEmotes() {
     };
 }
 
-// import "emotes.css";
-css = `
-
-.bettermixer-emote-tooltip {
-	visibility: visible;
-    animation-name: bettermixer-tooltip-anim;
-    animation-duration: 0.15s;
-    animation-timing-function: ease-out;
-    width: auto;
-    height: 22px;
-    background-color: #32384b;
-    color: #fff;
-    font-size: 10.5pt;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px 5px;
-    position: absolute;
-    z-index: 99;
-}
-
-.bettermixer-emote-tooltip::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: #32384b transparent transparent transparent;
-}
-
-@keyframes bettermixer-tooltip-anim{
-	from {transform: scale(0); opacity: 0%;}
-    to {transform: scale(1); opacity: 100%;}
-}
-
-.bettermixer-emotes {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin: -6px 2px 0;
-    top: 5px;
-}
-`;
-
 function addClass(name, def) {
     injectCss(`.${name}{${def}}`);
     return def;
@@ -133,9 +87,9 @@ function ext() {
 
     resetEmotes();
 
-    injectCss(css);
+    injectCss(chrome.extension.getURL('lib/inject.css'));
 
-    let botColor = '#ff8f20';
+    let botColor = '#ba5c00';
     let botsStyleAvatar = addClass('bettermixer-bots .image', `background-color: ${botColor} !important;`);
     let botsStyleUsername = addClass('bettermixer-bots .username', `color: ${botColor} !important;`);
 
@@ -259,7 +213,7 @@ function makeEmoteTooltip(emoteElement, emoteName){
         let rect = emoteElement.getBoundingClientRect();
         tooltip.classList.add('bettermixer-emote-tooltip');
         tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.clientWidth / 2) + "px";
-        tooltip.style.top = rect.top - 22 + "px";
+        tooltip.style.top = rect.top - 24 + "px";
         tooltip.style.pointerEvents = "none";
         function mouseoutEvent() {
             document.body.removeChild(tooltip);

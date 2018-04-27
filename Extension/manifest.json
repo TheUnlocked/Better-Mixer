@@ -25,7 +25,8 @@
   "content_scripts": [
     {
       "matches": ["https://mixer.com/*"],
-      "js": ["jquery-3.3.1.min.js", "chatcontent.js"]
+      "js": ["jquery-3.3.1.min.js", "chatcontent.js"],
+      "css": ["inject.css"]
     }
   ],
 
