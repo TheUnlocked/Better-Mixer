@@ -3,5 +3,5 @@ b-channel-chat-message .image{
 }
 
 b-channel-chat-message{
-    padding-left: 12px !important;
+    padding: 2px 6px 2px 12px !important;
 }
