@@ -139,12 +139,12 @@ function ext() {
             });
 
             let dialogObserver = new MutationObserver(function (mutations) {
-                if (Object.keys(customEmotes).length !== 0){
-                    for (let mutation of mutations) {
-                        if (mutation.addedNodes.length == 1) {
-                            for (let addedNode of mutation.addedNodes){
-                                switch (addedNode.tagName){
-                                    case "B-CHANNEL-CHAT-EMOTE-DIALOG":
+                for (let mutation of mutations) {
+                    if (mutation.addedNodes.length == 1) {
+                        for (let addedNode of mutation.addedNodes){
+                            switch (addedNode.tagName){
+                                case "B-CHANNEL-CHAT-EMOTE-DIALOG":
+                                    if (Object.keys(customEmotes).length !== 0){
                                         let emotePanel = addedNode.getElementsByTagName("bui-dialog-content")[0];
                                         let customTiles = emotePanel.children[0].cloneNode();
                                         let tile = emotePanel.children[0].children[0];
@@ -161,44 +161,43 @@ function ext() {
                                             customTiles.appendChild(emoteTile);
                                         }
                                         customTiles.appendChild(document.createElement('hr'));
-                                        break;
-                                    
-                                    case "B-CHANNEL-CHAT-PREFERENCES-DIALOG":
-                                        let preferencesPanel = addedNode.getElementsByTagName("bui-dialog-content")[0];
-                                        let personalSection = preferencesPanel.children[1];
-                                        let customSection = personalSection.cloneNode();
-                                        let customLabel = personalSection.children[0].cloneNode();
-                                        customLabel.innerHTML = "Better Mixer Preferences";
-                                        customSection.appendChild(customLabel);
+                                    }
+                                    break;
+                                case "B-CHANNEL-CHAT-PREFERENCES-DIALOG":
+                                    let preferencesPanel = addedNode.getElementsByTagName("bui-dialog-content")[0];
+                                    let sampleSection = preferencesPanel.children[0];
+                                    let customSection = sampleSection.cloneNode();
+                                    let customLabel = sampleSection.children[0].cloneNode();
+                                    customLabel.innerHTML = "Better Mixer Preferences";
+                                    customSection.appendChild(customLabel);
 
-                                        let botcolorToggle = personalSection.getElementsByTagName('bui-toggle')[0].cloneNode(true);
-                                        botcolorToggle.children[0].children[2].innerHTML = "Change Bot Colors";
-                                        if (config.botcolor_enabled){
-                                            if (!botcolorToggle.classList.contains('bui-toggle-checked')){
-                                                botcolorToggle.classList.add('bui-toggle-checked');
-                                            }
+                                    let botcolorToggle = sampleSection.getElementsByTagName('bui-toggle')[0].cloneNode(true);
+                                    botcolorToggle.children[0].children[2].innerHTML = "Change Bot Colors";
+                                    if (config.botcolor_enabled){
+                                        if (!botcolorToggle.classList.contains('bui-toggle-checked')){
+                                            botcolorToggle.classList.add('bui-toggle-checked');
                                         }
-                                        else{
-                                            if (botcolorToggle.classList.contains('bui-toggle-checked')){
-                                                botcolorToggle.classList.remove('bui-toggle-checked');
-                                            }
+                                    }
+                                    else{
+                                        if (botcolorToggle.classList.contains('bui-toggle-checked')){
+                                            botcolorToggle.classList.remove('bui-toggle-checked');
                                         }
+                                    }
 
-                                        botcolorToggle.addEventListener('click', (e) => {
-                                            botcolorToggle.classList.toggle('bui-toggle-checked');
-                                            toggleAttribute(botColorInjection, 'href');
-                                            e.preventDefault();
-                                            config.botcolor_enabled = !config.botcolor_enabled;
-                                            chrome.storage.sync.set({'botcolor_enabled': config.botcolor_enabled});
-                                        });
+                                    botcolorToggle.addEventListener('click', (e) => {
+                                        botcolorToggle.classList.toggle('bui-toggle-checked');
+                                        toggleAttribute(botColorInjection, 'href');
+                                        e.preventDefault();
+                                        config.botcolor_enabled = !config.botcolor_enabled;
+                                        chrome.storage.sync.set({'botcolor_enabled': config.botcolor_enabled});
+                                    });
 
-                                        customSection.appendChild(botcolorToggle);
-                                        preferencesPanel.appendChild(customSection);
-                                        break;
-                                    default:
-                                        break;
- 
-                                }
+                                    customSection.appendChild(botcolorToggle);
+                                    preferencesPanel.appendChild(customSection);
+                                    break;
+                                default:
+                                    break;
+
                             }
                         }
                     }
