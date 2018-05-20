@@ -40,11 +40,6 @@ function getMixerUsername() {
 function addUserEmotes(username) {
     return new Promise(function (resolve, reject) {
         $.getJSON("https://raw.githubusercontent.com/TheUnlocked/Better-Mixer/master/Info/ffzsync.json", function (userSync) {
-            // Backpatching
-            for (let key of Object.keys(userSync)){
-                userSync[key.toLowerCase()] = userSync[key];
-            }
-            
             console.log(username);
             $.getJSON(`https://api.frankerfacez.com/v1/room/${userSync[username]}`, function (data) {
                 let userEmotes = {};
@@ -60,22 +55,51 @@ function addUserEmotes(username) {
     });
 }
 
+function getBetterMixerConfig() {
+    return new Promise(function (resolve, reject) {
+        chrome.storage.sync.get(['botcolor_enabled'], (data) => {
+            if (data.botcolor_enabled === undefined){
+                data.botcolor_enabled = true;
+                chrome.storage.sync.set({'botcolor_enabled': true});
+            }
+            resolve(data);
+        });
+    });
+}
+
 function resetEmotes() {
-    customEmotes = {
-//        "TestEmote": ["https://i.imgur.com/Fm8qROA.png", 28]
-    };
+    customEmotes = {};
 }
 
-function addClass(name, def) {
-    injectCss(`.${name}{${def}}`);
-    return def;
+function injectFile(rel, url, loc=document.getElementsByTagName('head')[0]){
+    let injection = document.createElement('link');
+    injection.rel = rel;
+    injection.href = url;
+    loc.appendChild(injection);
+    return injection;
 }
 
-function injectCss(css){
-    let styleEmotes = document.createElement('style');
-    styleEmotes.type = 'text/css';
-    styleEmotes.innerHTML = css;
-    document.getElementsByTagName('head')[0].appendChild(styleEmotes);
+function injectFileExtension(rel, url, callback, loc=document.getElementsByTagName('head')[0]){
+    chrome.runtime.sendMessage({request: "geturl", data: url}, function (response) {
+        let injection = document.createElement('link');
+        injection.rel = rel;
+        injection.href = response;
+        loc.appendChild(injection);
+        callback(injection);
+    });
+}
+
+function toggleAttribute(element, attribute){
+    if (!element["__togglemem_" + attribute]){
+        element["__togglemem_" + attribute] = element[attribute];
+    }
+    if (element[attribute]){
+        element["__togglemem_" + attribute] = element[attribute];
+        element.removeAttribute(attribute);
+    }
+    else{
+        element[attribute] = element["__togglemem_" + attribute];
+    }
 }
 
 let messageObserver;
@@ -87,15 +111,19 @@ function ext() {
 
     resetEmotes();
 
-    injectCss(chrome.extension.getURL('lib/inject.css'));
-
-    let botColor = '#ba5c00';
-    let botsStyleAvatar = addClass('bettermixer-bots .image', `background-color: ${botColor} !important;`);
-    let botsStyleUsername = addClass('bettermixer-bots .username', `color: ${botColor} !important;`);
-
+    let cssInjection;
+    injectFileExtension('stylesheet', 'lib/inject.css', (result) => cssInjection = result);
+    let botColorInjection;
+    injectFileExtension('stylesheet', 'lib/botcolor.css', (result) => botColorInjection = result);
+    
     getMixerUsername()
         .then(addUserEmotes)
-        .then(function () {
+        .then(getBetterMixerConfig)
+        .then(function (config) {
+            if (!config.botcolor_enabled){
+                toggleAttribute(botColorInjection, 'href');
+            }
+
             // Search for new chat messages
             messageObserver = new MutationObserver(function (mutations) {
                 for (let mutation of mutations) {
@@ -137,9 +165,36 @@ function ext() {
                                     
                                     case "B-CHANNEL-CHAT-PREFERENCES-DIALOG":
                                         let preferencesPanel = addedNode.getElementsByTagName("bui-dialog-content")[0];
-                                        let personal = preferencesPanel.children[1];
-                                        break;
+                                        let personalSection = preferencesPanel.children[1];
+                                        let customSection = personalSection.cloneNode();
+                                        let customLabel = personalSection.children[0].cloneNode();
+                                        customLabel.innerHTML = "Better Mixer Preferences";
+                                        customSection.appendChild(customLabel);
 
+                                        let botcolorToggle = personalSection.getElementsByTagName('bui-toggle')[0].cloneNode(true);
+                                        botcolorToggle.children[0].children[2].innerHTML = "Change Bot Colors";
+                                        if (config.botcolor_enabled){
+                                            if (!botcolorToggle.classList.contains('bui-toggle-checked')){
+                                                botcolorToggle.classList.add('bui-toggle-checked');
+                                            }
+                                        }
+                                        else{
+                                            if (botcolorToggle.classList.contains('bui-toggle-checked')){
+                                                botcolorToggle.classList.remove('bui-toggle-checked');
+                                            }
+                                        }
+
+                                        botcolorToggle.addEventListener('click', (e) => {
+                                            botcolorToggle.classList.toggle('bui-toggle-checked');
+                                            toggleAttribute(botColorInjection, 'href');
+                                            e.preventDefault();
+                                            config.botcolor_enabled = !config.botcolor_enabled;
+                                            chrome.storage.sync.set({'botcolor_enabled': config.botcolor_enabled});
+                                        });
+
+                                        customSection.appendChild(botcolorToggle);
+                                        preferencesPanel.appendChild(customSection);
+                                        break;
                                     default:
                                         break;
  
@@ -172,7 +227,6 @@ function ext() {
     }
     document.getElementById('better-mixer-injection-script').addEventListener('addToChat', (event) => addToChat(event.detail));`;
     document.head.appendChild(injectionScript);
-    
 }
 
 let messagePatches = [patchMessageEmotes, patchMessageBotColor];
