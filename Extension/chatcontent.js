@@ -23,14 +23,15 @@ function emoteLiteral(img, alt, size) {
 function getMixerUsername() {
     return new Promise(function (resolve, reject) {
         // Get username or user ID
-        let usernameOrID = window.location.pathname.substring(1).toLowerCase(); // Sadly this won't work for co-streams.
+        let usernameOrID = window.location.pathname.split('/').pop().toLowerCase(); // Sadly this won't work for co-streams.
         // If the retrieved identifier is the user ID, get their username.
         let userID = parseInt(usernameOrID);
         if (userID) {
             $.getJSON(`https://mixer.com/api/v1/channels/${userID}/details`, function (data) {
-                resolve(data.token);
-                return;
+                console.log(data);
+                resolve(data.token.toLowerCase());
             });
+            return;
         }
         resolve(usernameOrID);
     });
@@ -44,8 +45,7 @@ function addUserEmotes(username) {
                 userSync[key.toLowerCase()] = userSync[key];
             }
             
-            if (!userSync[username])
-                userSync[username.toLowerCase()] = userSync[username];
+            console.log(username);
             $.getJSON(`https://api.frankerfacez.com/v1/room/${userSync[username]}`, function (data) {
                 let userEmotes = {};
                 for (let emoteSet in data.sets) {
@@ -110,26 +110,40 @@ function ext() {
                 }
             });
 
-            let emoteBoxObserver = new MutationObserver(function (mutations) {
+            let dialogObserver = new MutationObserver(function (mutations) {
                 if (Object.keys(customEmotes).length !== 0){
                     for (let mutation of mutations) {
                         if (mutation.addedNodes.length == 1) {
-                            for (let emotePanel of mutation.addedNodes[0].getElementsByTagName("bui-dialog-content")){
-                                let customTiles = emotePanel.children[0].cloneNode();
-                                let tile = emotePanel.children[0].children[0];
-                                emotePanel.insertBefore(customTiles, emotePanel.children[0]);
-                                emotePanel.style.overflow = "hidden";
-                                for (let emoteName of Object.keys(customEmotes)){
-                                    let emote = customEmotes[emoteName];
-                                    let emoteTile = tile.cloneNode();
-                                    emoteTile.innerHTML = emoteLiteral(emote[0], emoteName, emote[1]);
-                                    makeEmoteTooltip(emoteTile, emoteName);
-                                    emoteTile.addEventListener('click', () => document
-                                                                            .getElementById('better-mixer-injection-script')
-                                                                            .dispatchEvent(new CustomEvent('addToChat', {detail:emoteName + " "})));
-                                    customTiles.appendChild(emoteTile);
+                            for (let addedNode of mutation.addedNodes){
+                                switch (addedNode.tagName){
+                                    case "B-CHANNEL-CHAT-EMOTE-DIALOG":
+                                        let emotePanel = addedNode.getElementsByTagName("bui-dialog-content")[0];
+                                        let customTiles = emotePanel.children[0].cloneNode();
+                                        let tile = emotePanel.children[0].children[0];
+                                        emotePanel.insertBefore(customTiles, emotePanel.children[0]);
+                                        emotePanel.style.overflow = "hidden";
+                                        for (let emoteName of Object.keys(customEmotes)){
+                                            let emote = customEmotes[emoteName];
+                                            let emoteTile = tile.cloneNode();
+                                            emoteTile.innerHTML = emoteLiteral(emote[0], emoteName, emote[1]);
+                                            makeEmoteTooltip(emoteTile, emoteName);
+                                            emoteTile.addEventListener('click', () => document
+                                                                                    .getElementById('better-mixer-injection-script')
+                                                                                    .dispatchEvent(new CustomEvent('addToChat', {detail:emoteName + " "})));
+                                            customTiles.appendChild(emoteTile);
+                                        }
+                                        customTiles.appendChild(document.createElement('hr'));
+                                        break;
+                                    
+                                    case "B-CHANNEL-CHAT-PREFERENCES-DIALOG":
+                                        let preferencesPanel = addedNode.getElementsByTagName("bui-dialog-content")[0];
+                                        let personal = preferencesPanel.children[1];
+                                        break;
+
+                                    default:
+                                        break;
+ 
                                 }
-                                customTiles.appendChild(document.createElement('hr'));
                             }
                         }
                     }
@@ -141,7 +155,7 @@ function ext() {
                 "childList": true
             });
             
-            emoteBoxObserver.observe(document.getElementsByTagName("b-channel-chat")[0], {
+            dialogObserver.observe(document.getElementsByTagName("b-channel-chat")[0], {
                 "childList": true
             });
         });
