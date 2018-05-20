@@ -1,0 +1,7 @@
+b-channel-chat-message .image{
+    visibility: hidden !important;
+}
+
+b-channel-chat-message{
+    padding-left: 12px !important;
+}

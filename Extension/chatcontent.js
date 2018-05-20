@@ -56,11 +56,18 @@ function addUserEmotes(username) {
 }
 
 function getBetterMixerConfig() {
+    let config_defaults = {
+        'botcolor_enabled':     true,
+        'hide_avatars':         false,
+    };
+
     return new Promise(function (resolve, reject) {
-        chrome.storage.sync.get(['botcolor_enabled'], (data) => {
-            if (data.botcolor_enabled === undefined){
-                data.botcolor_enabled = true;
-                chrome.storage.sync.set({'botcolor_enabled': true});
+        chrome.storage.sync.get(Object.keys(config_defaults), (data) => {
+            for (let config in config_defaults){
+                if (data[config] === undefined){
+                    data[config] = config_defaults[config];
+                    chrome.storage.sync.set({config: data[config]});
+                }
             }
             resolve(data);
         });
@@ -79,14 +86,15 @@ function injectFile(rel, url, loc=document.getElementsByTagName('head')[0]){
     return injection;
 }
 
-function injectFileExtension(rel, url, callback, loc=document.getElementsByTagName('head')[0]){
-    chrome.runtime.sendMessage({request: "geturl", data: url}, function (response) {
-        let injection = document.createElement('link');
-        injection.rel = rel;
-        injection.href = response;
-        loc.appendChild(injection);
-        callback(injection);
-    });
+function injectFileExtension(rel, url, loc=document.getElementsByTagName('head')[0]){
+    return new Promise((resolve, reject) =>
+        chrome.runtime.sendMessage({request: "geturl", data: url}, function (response) {
+            let injection = document.createElement('link');
+            injection.rel = rel;
+            injection.href = response;
+            loc.appendChild(injection);
+            resolve(injection);
+    }));
 }
 
 function toggleAttribute(element, attribute){
@@ -112,16 +120,24 @@ function ext() {
     resetEmotes();
 
     let cssInjection;
-    injectFileExtension('stylesheet', 'lib/inject.css', (result) => cssInjection = result);
     let botColorInjection;
-    injectFileExtension('stylesheet', 'lib/botcolor.css', (result) => botColorInjection = result);
-    
-    getMixerUsername()
+    let hideAvatarInjection;
+
+    injectFileExtension('stylesheet', 'lib/inject.css')
+        .then((result) => new Promise((resolve, reject) => { cssInjection = result; resolve(); }))
+        .then(() => injectFileExtension('stylesheet', 'lib/botcolor.css'))
+        .then((result) => new Promise((resolve, reject) => { botColorInjection = result; resolve(); }))
+        .then(() => injectFileExtension('stylesheet', 'lib/hideavatars.css'))
+        .then((result) => new Promise((resolve, reject) => { hideAvatarInjection = result; resolve(); }))
+        .then(getMixerUsername)
         .then(addUserEmotes)
         .then(getBetterMixerConfig)
         .then(function (config) {
             if (!config.botcolor_enabled){
                 toggleAttribute(botColorInjection, 'href');
+            }
+            if (!config.hide_avatars){
+                toggleAttribute(hideAvatarInjection, 'href');
             }
 
             // Search for new chat messages
@@ -138,6 +154,7 @@ function ext() {
                 }
             });
 
+            // Observe when new dialogs are opened
             let dialogObserver = new MutationObserver(function (mutations) {
                 for (let mutation of mutations) {
                     if (mutation.addedNodes.length == 1) {
@@ -167,32 +184,44 @@ function ext() {
                                     let preferencesPanel = addedNode.getElementsByTagName("bui-dialog-content")[0];
                                     let sampleSection = preferencesPanel.children[0];
                                     let customSection = sampleSection.cloneNode();
+                                    customSection.style.marginTop = "24px";
+
                                     let customLabel = sampleSection.children[0].cloneNode();
                                     customLabel.innerHTML = "Better Mixer Preferences";
                                     customSection.appendChild(customLabel);
 
-                                    let botcolorToggle = sampleSection.getElementsByTagName('bui-toggle')[0].cloneNode(true);
-                                    botcolorToggle.children[0].children[2].innerHTML = "Change Bot Colors";
-                                    if (config.botcolor_enabled){
-                                        if (!botcolorToggle.classList.contains('bui-toggle-checked')){
-                                            botcolorToggle.classList.add('bui-toggle-checked');
+                                    let toggleList = [
+                                        ['botcolor_enabled',    "Change Bot Colors",    botColorInjection],
+                                        ['hide_avatars',        "Hide Avatars",         hideAvatarInjection]
+                                    ];
+                                    for (let toggleData of toggleList){
+                                        let toggleSwitch = sampleSection.getElementsByTagName('bui-toggle')[0].cloneNode(true);
+                                        toggleSwitch.children[0].children[2].innerHTML = toggleData[1];
+                                        if (config.botcolor_enabled){
+                                            if (!toggleSwitch.classList.contains('bui-toggle-checked')){
+                                                toggleSwitch.classList.add('bui-toggle-checked');
+                                            }
                                         }
-                                    }
-                                    else{
-                                        if (botcolorToggle.classList.contains('bui-toggle-checked')){
-                                            botcolorToggle.classList.remove('bui-toggle-checked');
+                                        else{
+                                            if (toggleSwitch.classList.contains('bui-toggle-checked')){
+                                                toggleSwitch.classList.remove('bui-toggle-checked');
+                                            }
                                         }
+
+                                        toggleSwitch.addEventListener('click', (e) => {
+                                            toggleSwitch.classList.toggle('bui-toggle-checked');
+                                            toggleAttribute(toggleData[2], 'href');
+                                            config[toggleData[0]] = !config[toggleData[0]];
+                                            let delta = {};
+                                            delta[toggleData[0]] = config[toggleData[0]];
+                                            chrome.storage.sync.set(delta);
+
+                                            e.preventDefault();
+                                        });
+
+                                        customSection.appendChild(toggleSwitch);
                                     }
 
-                                    botcolorToggle.addEventListener('click', (e) => {
-                                        botcolorToggle.classList.toggle('bui-toggle-checked');
-                                        toggleAttribute(botColorInjection, 'href');
-                                        e.preventDefault();
-                                        config.botcolor_enabled = !config.botcolor_enabled;
-                                        chrome.storage.sync.set({'botcolor_enabled': config.botcolor_enabled});
-                                    });
-
-                                    customSection.appendChild(botcolorToggle);
                                     preferencesPanel.appendChild(customSection);
                                     break;
                                 default:
@@ -204,11 +233,10 @@ function ext() {
                 }
             });
 
-            // Execute the observer
+            // Execute the observers
             messageObserver.observe(document.getElementsByClassName("message-container")[0], {
                 "childList": true
             });
-            
             dialogObserver.observe(document.getElementsByTagName("b-channel-chat")[0], {
                 "childList": true
             });
