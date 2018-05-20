@@ -208,15 +208,13 @@ function ext() {
                                             }
                                         }
 
-                                        toggleSwitch.addEventListener('click', (e) => {
+                                        toggleSwitch.getElementsByTagName("input")[0].addEventListener('click', (e) => {
                                             toggleSwitch.classList.toggle('bui-toggle-checked');
                                             toggleAttribute(toggleData[2], 'href');
                                             config[toggleData[0]] = !config[toggleData[0]];
                                             let delta = {};
                                             delta[toggleData[0]] = config[toggleData[0]];
                                             chrome.storage.sync.set(delta);
-
-                                            e.preventDefault();
                                         });
 
                                         customSection.appendChild(toggleSwitch);
