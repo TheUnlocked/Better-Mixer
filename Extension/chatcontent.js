@@ -197,7 +197,7 @@ function ext() {
                                     for (let toggleData of toggleList){
                                         let toggleSwitch = sampleSection.getElementsByTagName('bui-toggle')[0].cloneNode(true);
                                         toggleSwitch.children[0].children[2].innerHTML = toggleData[1];
-                                        if (config.botcolor_enabled){
+                                        if (config[toggleData[0]]){
                                             if (!toggleSwitch.classList.contains('bui-toggle-checked')){
                                                 toggleSwitch.classList.add('bui-toggle-checked');
                                             }
