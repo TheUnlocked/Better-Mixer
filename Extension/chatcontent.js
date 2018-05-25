@@ -141,10 +141,10 @@ function ext() {
     .then(getBetterMixerConfig)
     .then(function (config) {
         if (!config.botcolor_enabled){
-            toggleElement(botColorInjection, 'href');
+            botColorInjection.disabled = true;
         }
         if (!config.hide_avatars){
-            toggleElement(hideAvatarInjection, 'href');
+            hideAvatarInjection.disabled = true;
         }
 
         // Search for new chat messages
