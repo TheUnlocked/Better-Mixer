@@ -101,6 +101,13 @@ function toggleElement(element){
     element.disabled = !element.disabled;
 }
 
+function Ensure(func){
+    return (...args) => new Promise((resolve, reject) => {
+        func(...args);
+        resolve();
+    });
+}
+
 let cssInjection;
 let botColorInjection;
 let hideAvatarInjection;
@@ -108,12 +115,12 @@ let hideAvatarInjection;
 function onetimeInjection(){
     return new Promise((resolve, reject) => {
         injectFileExtension('stylesheet', 'lib/inject.css')
-        .then((result) => new Promise((resolve, reject) => { cssInjection = result; resolve(); }))
+        .then(Ensure((result) => cssInjection = result))
         .then(() => injectFileExtension('stylesheet', 'lib/botcolor.css'))
-        .then((result) => new Promise((resolve, reject) => { botColorInjection = result; resolve(); }))
+        .then(Ensure((result) => botColorInjection = result))
         .then(() => injectFileExtension('stylesheet', 'lib/hideavatars.css'))
-        .then((result) => new Promise((resolve, reject) => { hideAvatarInjection = result; resolve(); }))
-        .then(() => resolve());
+        .then(Ensure((result) => hideAvatarInjection = result))
+        .then(resolve);
     });
 }
 
