@@ -39,3 +39,14 @@
     margin: -6px 2px 0;
     top: 5px;
 }
+
+div.profile-bio > ul {
+    float: right;
+    width: 100%;
+    /* Using transitions for if one day this is actually supported. */
+    transition: width 2s;
+}
+
+div.profile-bio :hover {
+    width: auto;
+}
