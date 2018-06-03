@@ -5,8 +5,13 @@
 // If you wish to redistribute or modify this code or the extension for large-scale use, written permission must be obtained.
 // Any attempt to intentionally subvert these rules may result in a complete ban from redistributing and/or modifying this code or any part of the extension.
 
-// Initializer observer, to be used once.
-let extinit;
+
+$(function () {
+    onetimeInjection().then(() => {
+        initialize();
+        $(window).on('pushState', () => setTimeout(refreshEmotes, 100));
+    });
+});
 
 let customEmotes = {};
 
@@ -24,8 +29,15 @@ function getMixerUsername() {
     return new Promise(function (resolve, reject) {
         // Get username or user ID
         let usernameOrID = window.location.pathname.split('/').pop().toLowerCase(); // Sadly this won't work for co-streams.
+
+        if (usernameOrID.endsWith(')')){
+            reject('Not a user');
+            return;
+        }
+
         // If the retrieved identifier is the user ID, get their username.
         let userID = parseInt(usernameOrID);
+
         if (userID) {
             $.getJSON(`https://mixer.com/api/v1/channels/${userID}/details`, function (data) {
                 console.log(data);
@@ -114,31 +126,26 @@ let hideAvatarInjection;
 
 function onetimeInjection(){
     return new Promise((resolve, reject) => {
-        injectFileExtension('stylesheet', 'lib/inject.css')
+        injectFileExtension('stylesheet', 'lib/css/inject.css')
         .then(Ensure((result) => cssInjection = result))
-        .then(() => injectFileExtension('stylesheet', 'lib/botcolor.css'))
+        .then(() => injectFileExtension('stylesheet', 'lib/css/botcolor.css'))
         .then(Ensure((result) => botColorInjection = result))
-        .then(() => injectFileExtension('stylesheet', 'lib/hideavatars.css'))
+        .then(() => injectFileExtension('stylesheet', 'lib/css/hideavatars.css'))
         .then(Ensure((result) => hideAvatarInjection = result))
         .then(resolve);
     });
 }
 
-let messageObserver;
-let dialogObserver;
-
-function ext() {
-    if (messageObserver) {
-        messageObserver.disconnect();
-    }
-    if (dialogObserver) {
-        dialogObserver.disconnect();
-    }
+function refreshEmotes() {
     resetEmotes();
 
-    getMixerUsername()
-    .then(addUserEmotes)
-    .then(getBetterMixerConfig)
+    return getMixerUsername()
+        .then(addUserEmotes, () => new Promise((resolve, reject) => resolve()))
+        .then(getBetterMixerConfig);
+}
+
+function initialize() {
+    refreshEmotes()
     .then(function (config) {
         if (!config.botcolor_enabled){
             botColorInjection.disabled = true;
@@ -146,108 +153,78 @@ function ext() {
         if (!config.hide_avatars){
             hideAvatarInjection.disabled = true;
         }
-
+    
         // Search for new chat messages
-        messageObserver = new MutationObserver(function (mutations) {
-            for (let mutation of mutations) {
-                if (mutation.addedNodes.length == 1) {
-                    let addedElement = mutation.addedNodes[0];
-                    for (let addedMsg of addedElement.getElementsByTagName("b-channel-chat-message")) {
-                        for (let patch of messagePatches){
-                            patch(addedMsg);
-                        }
-                    }
-                }
-            }
+        $.initialize('b-channel-chat-message', (s, element) => {
+            for(let patch of messagePatches) patch(element);
         });
-
+    
         // Observe when new dialogs are opened
-        dialogObserver = new MutationObserver(function (mutations) {
-            for (let mutation of mutations) {
-                if (mutation.addedNodes.length == 1) {
-                    for (let addedNode of mutation.addedNodes){
-                        switch (addedNode.tagName){
-                            case "B-CHANNEL-CHAT-EMOTE-DIALOG":
-                                if (Object.keys(customEmotes).length !== 0){
-                                    let emotePanel = addedNode.getElementsByTagName("bui-dialog-content")[0];
-                                    let customTiles = emotePanel.children[0].cloneNode();
-                                    let tile = emotePanel.children[0].children[0];
-                                    emotePanel.insertBefore(customTiles, emotePanel.children[0]);
-                                    emotePanel.style.overflow = "hidden";
-                                    for (let emoteName of Object.keys(customEmotes)){
-                                        let emote = customEmotes[emoteName];
-                                        let emoteTile = tile.cloneNode();
-                                        emoteTile.innerHTML = emoteLiteral(emote[0], emoteName, emote[1]);
-                                        makeEmoteTooltip(emoteTile, emoteName);
-                                        emoteTile.addEventListener('click', () => document
-                                                                                .getElementById('better-mixer-injection-script')
-                                                                                .dispatchEvent(new CustomEvent('addToChat', {detail:emoteName + " "})));
-                                        customTiles.appendChild(emoteTile);
-                                    }
-                                    customTiles.appendChild(document.createElement('hr'));
-                                }
-                                break;
-                            case "B-CHANNEL-CHAT-PREFERENCES-DIALOG":
-                                let preferencesPanel = addedNode.getElementsByTagName("bui-dialog-content")[0];
-                                let sampleSection = preferencesPanel.children[0];
-                                let customSection = sampleSection.cloneNode();
-                                customSection.style.marginTop = "24px";
-
-                                let customLabel = sampleSection.children[0].cloneNode();
-                                customLabel.innerHTML = "Better Mixer Preferences";
-                                customSection.appendChild(customLabel);
-
-                                let toggleList = [
-                                    ['botcolor_enabled',    "Change Bot Colors",    botColorInjection],
-                                    ['hide_avatars',        "Hide Avatars",         hideAvatarInjection]
-                                ];
-                                for (let toggleData of toggleList){
-                                    let toggleSwitch = sampleSection.getElementsByTagName('bui-toggle')[0].cloneNode(true);
-                                    toggleSwitch.children[0].children[2].innerHTML = toggleData[1];
-                                    if (config[toggleData[0]]){
-                                        if (!toggleSwitch.classList.contains('bui-toggle-checked')){
-                                            toggleSwitch.classList.add('bui-toggle-checked');
-                                        }
-                                    }
-                                    else{
-                                        if (toggleSwitch.classList.contains('bui-toggle-checked')){
-                                            toggleSwitch.classList.remove('bui-toggle-checked');
-                                        }
-                                    }
-
-                                    toggleSwitch.getElementsByTagName("input")[0].addEventListener('click', (e) => {
-                                        toggleSwitch.classList.toggle('bui-toggle-checked');
-                                        let newValue = toggleSwitch.classList.contains('bui-toggle-checked');
-                                        toggleData[2].disabled = !newValue;
-                                        config[toggleData[0]] = newValue;
-                                        let delta = {};
-                                        delta[toggleData[0]] = newValue;
-                                        chrome.storage.sync.set(delta);
-                                    });
-
-                                    customSection.appendChild(toggleSwitch);
-                                }
-
-                                preferencesPanel.appendChild(customSection);
-                                break;
-                            default:
-                                break;
-
-                        }
-                    }
+        $.initialize('b-channel-chat-emote-dialog', (s, element) => {
+            if (Object.keys(customEmotes).length !== 0){
+                let emotePanel = element.getElementsByTagName("bui-dialog-content")[0];
+                let customTiles = emotePanel.children[0].cloneNode();
+                let tile = emotePanel.children[0].children[0];
+                emotePanel.insertBefore(customTiles, emotePanel.children[0]);
+                emotePanel.style.overflow = "hidden";
+                for (let emoteName of Object.keys(customEmotes)){
+                    let emote = customEmotes[emoteName];
+                    let emoteTile = tile.cloneNode();
+                    emoteTile.innerHTML = emoteLiteral(emote[0], emoteName, emote[1]);
+                    makeEmoteTooltip(emoteTile, emoteName);
+                    emoteTile.addEventListener('click', () => document
+                                                            .getElementById('better-mixer-injection-script')
+                                                            .dispatchEvent(new CustomEvent('addToChat', {detail:emoteName + " "})));
+                    customTiles.appendChild(emoteTile);
                 }
+                customTiles.appendChild(document.createElement('hr'));
             }
         });
-
-        // Execute the observers
-        messageObserver.observe(document.getElementsByClassName("message-container")[0], {
-            "childList": true
-        });
-        dialogObserver.observe(document.getElementsByTagName("b-channel-chat")[0], {
-            "childList": true
+        $.initialize('b-channel-chat-preferences-dialog', (s, element) => {
+            let preferencesPanel = element.getElementsByTagName("bui-dialog-content")[0];
+                let sampleSection = preferencesPanel.children[0];
+                let customSection = sampleSection.cloneNode();
+                customSection.style.marginTop = "24px";
+    
+                let customLabel = sampleSection.children[0].cloneNode();
+                customLabel.innerHTML = "Better Mixer Preferences";
+                customSection.appendChild(customLabel);
+    
+                let toggleList = [
+                    ['botcolor_enabled',    "Change Bot Colors",    botColorInjection],
+                    ['hide_avatars',        "Hide Avatars",         hideAvatarInjection]
+                ];
+                for (let toggleData of toggleList){
+                    let toggleSwitch = sampleSection.getElementsByTagName('bui-toggle')[0].cloneNode(true);
+                    toggleSwitch.children[0].children[2].innerHTML = toggleData[1];
+                    if (config[toggleData[0]]){
+                        if (!toggleSwitch.classList.contains('bui-toggle-checked')){
+                            toggleSwitch.classList.add('bui-toggle-checked');
+                        }
+                    }
+                    else{
+                        if (toggleSwitch.classList.contains('bui-toggle-checked')){
+                            toggleSwitch.classList.remove('bui-toggle-checked');
+                        }
+                    }
+    
+                    toggleSwitch.getElementsByTagName("input")[0].addEventListener('click', (e) => {
+                        toggleSwitch.classList.toggle('bui-toggle-checked');
+                        let newValue = toggleSwitch.classList.contains('bui-toggle-checked');
+                        toggleData[2].disabled = !newValue;
+                        config[toggleData[0]] = newValue;
+                        let delta = {};
+                        delta[toggleData[0]] = newValue;
+                        chrome.storage.sync.set(delta);
+                    });
+    
+                    customSection.appendChild(toggleSwitch);
+                }
+    
+                preferencesPanel.appendChild(customSection);
         });
     });
-    
+
     let injectionScript = document.createElement('script');
     injectionScript.id = 'better-mixer-injection-script';
     injectionScript.innerHTML = `
@@ -258,14 +235,28 @@ function ext() {
             preparedNew += ' ';
         codeMirrorDoc.setValue(\`\${preparedNew}\${text}\`);
     }
-    document.getElementById('better-mixer-injection-script').addEventListener('addToChat', (event) => addToChat(event.detail));`;
+    document.getElementById('better-mixer-injection-script').addEventListener('addToChat', (event) => addToChat(event.detail));
+    
+    (function(history){
+        var pushState = history.pushState;
+        history.pushState = function(state) {
+            if (typeof history.onpushstate == "function") {
+                history.onpushstate({state: state});
+            }
+            
+            window.dispatchEvent(new CustomEvent('pushState'));
+
+            return pushState.apply(history, arguments);
+        };
+    })(window.history);
+    `;
     document.head.appendChild(injectionScript);
 }
 
 let messagePatches = [patchMessageEmotes, patchMessageBotColor];
 
 function patchMessageEmotes(message){
-    for (let msgText of message.getElementsByClassName("textComponent")) {
+    for (let msgText of message.getElementsByClassName('textComponent')) {
         if (msgText) {
             // Break it up into text pieces, and check each piece for an emote
             let segmented = msgText.innerHTML.trim().split(" ");
@@ -323,25 +314,3 @@ function makeEmoteTooltip(emoteElement, emoteName){
         emoteElement.addEventListener('mouseout', mouseoutEvent);
     });
 }
-
-// Initiate script
-let observing = false;
-
-$(function () {
-    onetimeInjection()
-    .then(() => {
-        extinit = new MutationObserver(function (mutations) {
-            let exists = document.getElementsByClassName("message-container").length == 1;
-            if (!observing && exists) {
-                observing = true;
-                ext();
-            } else if (observing && !exists) {
-                observing = false;
-            }
-        });
-        extinit.observe(document, {
-            "childList": true,
-            "subtree": true
-        }); // We aren't going to destroy this because of soft page transitions
-    });
-});
