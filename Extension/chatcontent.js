@@ -99,12 +99,12 @@ function injectFile(rel, url, loc=document.getElementsByTagName('head')[0]){
     return injection;
 }
 
-function injectFileExtension(rel, url, loc=document.getElementsByTagName('head')[0]){
+function injectFileExtension(src, url, elementType='link', srcType = 'href', loc=document.getElementsByTagName('head')[0]){
     return new Promise((resolve, reject) =>
         chrome.runtime.sendMessage({request: "geturl", data: url}, function (response) {
-            let injection = document.createElement('link');
-            injection.rel = rel;
-            injection.href = response;
+            let injection = document.createElement(elementType);
+            injection.rel = src;
+            injection[srcType] = response;
             loc.appendChild(injection);
             resolve(injection);
     }));
@@ -136,6 +136,10 @@ function onetimeInjection(){
         .then(Ensure((result) => hideAvatarInjection = result))
         .then(() => injectFileExtension('stylesheet', 'lib/css/movebadges.css'))
         .then(Ensure((result) => moveBadgesInjection = result))
+
+        
+        .then(() => injectFileExtension('stylesheet', 'lib/js/inject.js', elementType = 'script', srcType = 'src'))
+        .then(Ensure((result) => result.id = 'better-mixer-injection-script'))
         .then(resolve);
     });
 }
@@ -181,7 +185,7 @@ function initialize() {
                     makeEmoteTooltip(emoteTile, emoteName);
                     emoteTile.addEventListener('click', () => document
                                                             .getElementById('better-mixer-injection-script')
-                                                            .dispatchEvent(new CustomEvent('addToChat', {detail:emoteName + " "})));
+                                                            .dispatchEvent(new CustomEvent('addToChat', {detail:emoteName})));
                     customTiles.appendChild(emoteTile);
                 }
                 customTiles.appendChild(document.createElement('hr'));
@@ -232,33 +236,6 @@ function initialize() {
                 preferencesPanel.appendChild(customSection);
         });
     });
-
-    let injectionScript = document.createElement('script');
-    injectionScript.id = 'better-mixer-injection-script';
-    injectionScript.innerHTML = `
-    function addToChat(text) {
-        let codeMirrorDoc = document.getElementsByClassName('CodeMirror')[0].CodeMirror.getDoc();
-        let preparedNew = codeMirrorDoc.getValue();
-        if (preparedNew != '' && !preparedNew.endsWith(' '))
-            preparedNew += ' ';
-        codeMirrorDoc.setValue(\`\${preparedNew}\${text}\`);
-    }
-    document.getElementById('better-mixer-injection-script').addEventListener('addToChat', (event) => addToChat(event.detail));
-    
-    (function(history){
-        var pushState = history.pushState;
-        history.pushState = function(state) {
-            if (typeof history.onpushstate == "function") {
-                history.onpushstate({state: state});
-            }
-            
-            window.dispatchEvent(new CustomEvent('pushState'));
-
-            return pushState.apply(history, arguments);
-        };
-    })(window.history);
-    `;
-    document.head.appendChild(injectionScript);
 }
 
 let messagePatches = [patchMessageEmotes, patchMessageBotColor, patchMessageBadges];
