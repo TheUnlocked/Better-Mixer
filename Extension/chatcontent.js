@@ -71,6 +71,7 @@ function getBetterMixerConfig() {
     let config_defaults = {
         'botcolor_enabled':     true,
         'hide_avatars':         false,
+        'move_badges':          false,
     };
 
     return new Promise(function (resolve, reject) {
@@ -123,6 +124,7 @@ function Ensure(func){
 let cssInjection;
 let botColorInjection;
 let hideAvatarInjection;
+let moveBadgesInjection;
 
 function onetimeInjection(){
     return new Promise((resolve, reject) => {
@@ -132,6 +134,8 @@ function onetimeInjection(){
         .then(Ensure((result) => botColorInjection = result))
         .then(() => injectFileExtension('stylesheet', 'lib/css/hideavatars.css'))
         .then(Ensure((result) => hideAvatarInjection = result))
+        .then(() => injectFileExtension('stylesheet', 'lib/css/movebadges.css'))
+        .then(Ensure((result) => moveBadgesInjection = result))
         .then(resolve);
     });
 }
@@ -152,6 +156,9 @@ function initialize() {
         }
         if (!config.hide_avatars){
             hideAvatarInjection.disabled = true;
+        }
+        if (!config.move_badges){
+            moveBadgesInjection.disabled = true;
         }
     
         // Search for new chat messages
@@ -191,8 +198,9 @@ function initialize() {
                 customSection.appendChild(customLabel);
     
                 let toggleList = [
-                    ['botcolor_enabled',    "Change Bot Colors",    botColorInjection],
-                    ['hide_avatars',        "Hide Avatars",         hideAvatarInjection]
+                    ['botcolor_enabled',    "Change Bot Colors",            botColorInjection],
+                    ['hide_avatars',        "Hide Avatars",                 hideAvatarInjection],
+                    ['move_badges',         "Show Badges Before Username",  moveBadgesInjection]
                 ];
                 for (let toggleData of toggleList){
                     let toggleSwitch = sampleSection.getElementsByTagName('bui-toggle')[0].cloneNode(true);
@@ -253,7 +261,7 @@ function initialize() {
     document.head.appendChild(injectionScript);
 }
 
-let messagePatches = [patchMessageEmotes, patchMessageBotColor];
+let messagePatches = [patchMessageEmotes, patchMessageBotColor, patchMessageBadges];
 
 function patchMessageEmotes(message){
     for (let msgText of message.getElementsByClassName('textComponent')) {
@@ -294,6 +302,19 @@ function patchMessageBotColor(message){
     let username = message.getElementsByClassName("username")[0].innerText;
     if (username.includes("Bot") || username.toLowerCase().endsWith("bot")){
         message.getElementsByTagName("b-channel-chat-author")[0].classList.add('bettermixer-bots');
+    }
+}
+function patchMessageBadges(message){
+    let authorElement = message.getElementsByTagName('b-channel-chat-author')[0];
+    let newBadges = [];
+
+    for (let badge of message.getElementsByClassName('badge')) {
+        let newBadge = badge.cloneNode();
+        newBadge.classList.add('bettermixer-badge-relocated');
+        newBadges.push(newBadge);
+    }
+    for (let newBadge of newBadges){
+        authorElement.prepend(newBadge);
     }
 }
 

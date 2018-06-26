@@ -50,3 +50,11 @@ div.profile-bio > ul {
 div.profile-bio :hover {
     width: auto;
 }
+
+b-channel-chat-author > .badge.bettermixer-badge-relocated {
+    display: none;
+}
+
+b-channel-chat-author > .badge {
+    top: 2px;
+}
