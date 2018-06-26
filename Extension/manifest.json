@@ -2,7 +2,7 @@
   "manifest_version": 2,
 
   "name": "Better Mixer",
-  "version": "1.5.1",
+  "version": "1.5.2",
 
   "icons": {"128": "Icons/icon.png"},
 
@@ -10,11 +10,6 @@
   "description": "Improvements to Mixer.com",
 
   "author": "Unlocked",
-
-  "options_ui": {
-    "page": "Options/options.html",
-    "chrome_style": true
-  },
 
   "permissions": [
     "tabs",
