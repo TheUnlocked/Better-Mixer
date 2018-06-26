@@ -129,9 +129,14 @@ function onetimeInjection(){
         .then(() => injectFileExtension('stylesheet', 'lib/css/movebadges.css'))
         .then(Ensure((result) => moveBadgesInjection = result))
 
-        
+        // .then(() => injectFileExtension('stylesheet', 'lib/js/jquery-3.3.1.min.js', elementType = 'script', srcType = 'src'))
+        // .then(Ensure((result) => undefined))
+        // .then(() => injectFileExtension('stylesheet', 'lib/js/jquery.initialize.min.js', elementType = 'script', srcType = 'src'))
+        // .then(Ensure((result) => undefined))
+
         .then(() => injectFileExtension('stylesheet', 'lib/js/inject.js', elementType = 'script', srcType = 'src'))
         .then(Ensure((result) => result.id = 'better-mixer-injection-script'))
+
         .then(resolve);
     });
 }

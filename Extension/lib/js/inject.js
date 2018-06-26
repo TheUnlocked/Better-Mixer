@@ -23,3 +23,19 @@ document.currentScript.addEventListener('addToChat', (event) => addToChat(event.
         return pushState.apply(history, arguments);
     };
 })(window.history);
+
+// function waitFor$(){
+//     if($){
+//         $.initialize('.CodeMirror', (s, element) => {
+//             element.CodeMirror.addKeyMap({
+//                 'Up': 'goLineUp',
+//                 'Down': 'goLineDown'
+//             }, true);
+//         });
+//     }
+//     else{
+//         setTimeout(waitFor$, 100);
+//     }
+// }
+
+// waitFor$();
