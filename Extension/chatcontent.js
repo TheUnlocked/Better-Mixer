@@ -1,11 +1,3 @@
-// COPYRIGHT © 2018 Unlocked
-// "The extension" refers to the "MoreMixer" or "More Mixer" browser extension
-// "This code" refers to the code in this document, or any other code in the extension.
-// You may modify and redistribute this code or the extension for private use, as long as credit is given.
-// If you wish to redistribute or modify this code or the extension for large-scale use, written permission must be obtained.
-// Any attempt to intentionally subvert these rules may result in a complete ban from redistributing and/or modifying this code or any part of the extension.
-
-
 $(function () {
     onetimeInjection().then(() => {
         initialize();
