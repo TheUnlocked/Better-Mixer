@@ -31,8 +31,7 @@ function getMixerUsername() {
         let userID = parseInt(usernameOrID);
 
         if (userID) {
-            $.getJSON(`https://mixer.com/api/v1/channels/${userID}/details`, function (data) {
-                console.log(data);
+            $.getJSON(`https://mixer.com/api/v1/channels/${userID}`, function (data) {
                 resolve(data.token.toLowerCase());
             });
             return;
@@ -44,7 +43,7 @@ function getMixerUsername() {
 function addUserEmotes(username) {
     return new Promise(function (resolve, reject) {
         $.getJSON("https://raw.githubusercontent.com/TheUnlocked/Better-Mixer/master/Info/ffzsync.json", function (userSync) {
-            console.log(username);
+            console.log(`Channel: ${username}`);
             $.getJSON(`https://api.frankerfacez.com/v1/room/${userSync[username]}`, function (data) {
                 let userEmotes = {};
                 for (let emoteSet in data.sets) {
