@@ -142,11 +142,13 @@ function onetimeInjection(){
 }
 
 function refreshEmotes() {
-    resetEmotes();
+    if (window.location.pathname.split('/').pop().toLowerCase() != 'bounceback'){
+        resetEmotes();
 
-    return getMixerUsername()
-        .then(addUserEmotes, () => new Promise((resolve, reject) => resolve()))
-        .then(getBetterMixerConfig);
+        return getMixerUsername()
+            .then(addUserEmotes, () => new Promise((resolve, reject) => resolve()))
+            .then(getBetterMixerConfig);
+    }
 }
 
 function initialize() {
@@ -283,7 +285,7 @@ function patchMessageBadges(message){
     let newBadges = [];
 
     for (let badge of message.getElementsByClassName('badge')) {
-        let newBadge = badge.cloneNode();
+        let newBadge = badge.cloneNode(deep=true);
         newBadge.classList.add('bettermixer-badge-relocated');
         newBadges.push(newBadge);
     }
