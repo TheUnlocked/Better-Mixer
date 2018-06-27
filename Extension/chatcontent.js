@@ -1,7 +1,7 @@
 $(function () {
     onetimeInjection().then(() => {
         initialize();
-        $(window).on('pushState', () => setTimeout(refreshEmotes, 100));
+        $(window).on('pushState', () => setTimeout(refresh, 100));
     });
 });
 
@@ -37,6 +37,28 @@ function getMixerUsername() {
             return;
         }
         resolve(usernameOrID);
+    });
+}
+
+function getMixerID() {
+    return new Promise(function (resolve, reject) {
+        // Get username or user ID
+        let usernameOrID = window.location.pathname.split('/').pop().toLowerCase(); // Sadly this won't work for co-streams.
+
+        if (usernameOrID.endsWith(')')){
+            reject('Not a user');
+            return;
+        }
+
+        let userID = parseInt(usernameOrID);
+
+        if (!userID) {
+            $.getJSON(`https://mixer.com/api/v1/channels/${usernameOrID}`, function (data) {
+                resolve(data.id);
+            });
+            return;
+        }
+        resolve(userID);
     });
 }
 
@@ -118,6 +140,10 @@ let hideAvatarInjection;
 let moveBadgesInjection;
 
 function onetimeInjection(){
+    let fontAwesome = injectFile('stylesheet', 'https://use.fontawesome.com/releases/v5.1.0/css/all.css');
+    fontAwesome.integrity = 'sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt';
+    fontAwesome.crossOrigin = 'anonymous';
+
     return new Promise((resolve, reject) => {
         injectFileExtension('stylesheet', 'lib/css/inject.css')
         .then(Ensure((result) => cssInjection = result))
@@ -140,19 +166,27 @@ function onetimeInjection(){
     });
 }
 
-function refreshEmotes() {
+let chatSocket = {};
+let messageId = 0;
+let messageHistory = [];
+
+function refresh() {
+    messageId = 0;
     if (window.location.pathname.split('/').pop().toLowerCase() != 'bounceback'){
         resetEmotes();
-
+        
         return getMixerUsername()
             .then(addUserEmotes, () => new Promise((resolve, reject) => resolve()))
+            .then(getMixerID)
+            .then(loadChat, () => new Promise((resolve, reject) => resolve(undefined)))
+            .then(Ensure((result) => { if (result) chatSocket = result; }))
             .then(getBetterMixerConfig);
     }
 }
 
 function initialize() {
-    refreshEmotes()
-    .then(function (config) {
+    refresh()
+    .then(config => {
         if (!config.botcolor_enabled){
             botColorInjection.disabled = true;
         }
@@ -236,7 +270,12 @@ function initialize() {
     });
 }
 
-let messagePatches = [patchMessageEmotes, patchMessageBotColor, patchMessageBadges];
+let messagePatches = [
+    patchMessageEmotes,
+    patchMessageBotColor,
+    patchMessageBadges,
+    patchMessageInlineControls
+];
 
 function patchMessageEmotes(message){
     for (let msgText of message.getElementsByClassName('textComponent')) {
@@ -290,6 +329,43 @@ function patchMessageBadges(message){
     }
     for (let newBadge of newBadges){
         authorElement.prepend(newBadge);
+    }
+}
+function patchMessageInlineControls(message){
+    function patch(id){
+        let msg = message.getElementsByTagName('b-channel-chat-author')[0];
+        
+        if (chatSocket.permissions.includes('remove_message')){
+            let deleteControl = document.createElement('inline-action');
+            deleteControl.classList.add('fas', 'fa-trash');
+            deleteControl.addEventListener('mousedown', (e) => chatSocket.deleteMessage(id));
+
+            msg.prepend(deleteControl);
+        }
+    }
+
+    function getMessage(){
+        message.messageId = messageId++;
+        if (message.messageId >= messageHistory.length){
+            messageHistory = [];
+            chatSocket.lastMessages()
+            .then((data) => { patch(data[0].id); });
+        }
+        else{
+            patch(messageHistory[message.messageId].id);
+        }
+    }
+
+    if (message.firstChild.classList.contains('message-pending') || message.firstChild.classList.contains('message-deleted'))
+        return;
+
+    if (messageHistory.length == 0 && messageId == 0){
+        chatSocket.lastMessages(100)
+        .then(Ensure((data) => messageHistory = data ))
+        .then(getMessage);
+    }
+    else{
+        getMessage();
     }
 }
 
