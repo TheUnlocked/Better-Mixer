@@ -85,6 +85,7 @@ function getBetterMixerConfig() {
         'botcolor_enabled':     true,
         'hide_avatars':         false,
         'move_badges':          false,
+        'show_inline_controls': false,
     };
 
     return new Promise(function (resolve, reject) {
@@ -134,10 +135,11 @@ function Ensure(func){
     });
 }
 
-let cssInjection;
-let botColorInjection;
-let hideAvatarInjection;
-let moveBadgesInjection;
+let cssInjection,
+    botColorInjection,
+    hideAvatarInjection,
+    moveBadgesInjection,
+    showInlineControlsInjection;
 
 function onetimeInjection(){
     let fontAwesome = injectFile('stylesheet', 'https://use.fontawesome.com/releases/v5.1.0/css/all.css');
@@ -153,6 +155,8 @@ function onetimeInjection(){
         .then(Ensure((result) => hideAvatarInjection = result))
         .then(() => injectFileExtension('stylesheet', 'lib/css/movebadges.css'))
         .then(Ensure((result) => moveBadgesInjection = result))
+        .then(() => injectFileExtension('stylesheet', 'lib/css/showinlines.css'))
+        .then(Ensure((result) => showInlineControlsInjection = result))
 
         // .then(() => injectFileExtension('stylesheet', 'lib/js/jquery-3.3.1.min.js', elementType = 'script', srcType = 'src'))
         // .then(Ensure((result) => undefined))
@@ -196,6 +200,9 @@ function initialize() {
         if (!config.move_badges){
             moveBadgesInjection.disabled = true;
         }
+        if (!config.show_inline_controls){
+            showInlineControlsInjection.disabled = true;
+        }
     
         // Search for new chat messages
         $.initialize('b-channel-chat-message', (s, element) => {
@@ -236,7 +243,8 @@ function initialize() {
                 let toggleList = [
                     ['botcolor_enabled',    "Change Bot Colors",            botColorInjection],
                     ['hide_avatars',        "Hide Avatars",                 hideAvatarInjection],
-                    ['move_badges',         "Show Badges Before Username",  moveBadgesInjection]
+                    ['move_badges',         "Show Badges Before Username",  moveBadgesInjection],
+                    ['show_inline_controls',"Show Inline Controls",         showInlineControlsInjection]
                 ];
                 for (let toggleData of toggleList){
                     let toggleSwitch = sampleSection.getElementsByTagName('bui-toggle')[0].cloneNode(true);
@@ -339,16 +347,19 @@ function patchMessageInlineControls(message){
         let inlineControls = [
             // [permission, icon, action]
             ['remove_message', ['far', 'fa-trash-alt'], e => chatSocket.deleteMessage(id)],
-            ['change_ban', ['fas', 'fa-ban'], e => undefined],
-            ['timeout', ['far', 'fa-clock'], e => undefined],
+            ['timeout', ['far', 'fa-clock'], e => document
+                                                    .getElementById('better-mixer-injection-script')
+                                                    .dispatchEvent(new CustomEvent('populateTimeout', {detail:message.getElementsByClassName('username')[0].innerHTML}))],
+            ['change_ban', ['fas', 'fa-ban'], e => document
+                                                    .getElementById('better-mixer-injection-script')
+                                                    .dispatchEvent(new CustomEvent('populateBan', {detail:message.getElementsByClassName('username')[0].innerHTML}))],
         ];
 
         for (let control of inlineControls){
             if (chatSocket.permissions.includes(control[0])){
                 let deleteControl = document.createElement('inline-action');
                 deleteControl.classList.add('better-mixer-inline-control', ...control[1]);
-                deleteControl.addEventListener('mousedown', control[2]);
-                deleteControl.addEventListener('mousedown', e => console.log(e));
+                deleteControl.addEventListener('mousedown', e => { e.stopPropagation(); control[2](e); });
 
                 addedControls.push(deleteControl);
             }

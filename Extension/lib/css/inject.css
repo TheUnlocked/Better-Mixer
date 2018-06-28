@@ -62,4 +62,5 @@ b-channel-chat-author > .badge {
 .better-mixer-inline-control {
     padding-left: 2px;
     padding-right: 2px;
+    display: none;
 }

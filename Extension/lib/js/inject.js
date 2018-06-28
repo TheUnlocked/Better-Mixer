@@ -9,7 +9,26 @@ function addToChat(text) {
     doc.replaceSelection(insertText, select='end');
 }
 
+function populateTimeout(username) {
+    let cm = document.getElementsByClassName('CodeMirror')[0].CodeMirror;
+    let doc = cm.getDoc();
+
+    let newStr = `/timeout @${username} 5m`;
+    doc.setValue(newStr);
+    cm.focus();
+    doc.setSelection({line: 0, ch: newStr.length - 2}, {line: 0, ch: newStr.length});
+}
+
+function populateBan(username) {
+    let doc = document.getElementsByClassName('CodeMirror')[0].CodeMirror.getDoc();
+
+    doc.setValue(`/ban @${username}`);
+    cm.focus();
+}
+
 document.currentScript.addEventListener('addToChat', (event) => addToChat(event.detail));
+document.currentScript.addEventListener('populateTimeout', (event) => populateTimeout(event.detail));
+document.currentScript.addEventListener('populateBan', (event) => populateBan(event.detail));
 
 (function(history){
     var pushState = history.pushState;
