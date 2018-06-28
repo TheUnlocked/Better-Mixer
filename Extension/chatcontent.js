@@ -334,14 +334,28 @@ function patchMessageBadges(message){
 function patchMessageInlineControls(message){
     function patch(id){
         let msg = message.getElementsByTagName('b-channel-chat-author')[0];
-        
-        if (chatSocket.permissions.includes('remove_message')){
-            let deleteControl = document.createElement('inline-action');
-            deleteControl.classList.add('fas', 'fa-trash');
-            deleteControl.addEventListener('mousedown', (e) => chatSocket.deleteMessage(id));
+        let addedControls = [];
 
-            msg.prepend(deleteControl);
+        let inlineControls = [
+            // [permission, icon, action]
+            ['remove_message', ['far', 'fa-trash-alt'], e => chatSocket.deleteMessage(id)],
+            ['change_ban', ['fas', 'fa-ban'], e => undefined],
+            ['timeout', ['far', 'fa-clock'], e => undefined],
+        ];
+
+        for (let control of inlineControls){
+            if (chatSocket.permissions.includes(control[0])){
+                let deleteControl = document.createElement('inline-action');
+                deleteControl.classList.add('better-mixer-inline-control', ...control[1]);
+                deleteControl.addEventListener('mousedown', control[2]);
+                deleteControl.addEventListener('mousedown', e => console.log(e));
+
+                addedControls.push(deleteControl);
+            }
         }
+
+        for (let control of addedControls)
+            msg.prepend(control);
     }
 
     function getMessage(){

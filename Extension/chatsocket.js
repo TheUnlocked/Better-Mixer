@@ -20,6 +20,9 @@ function loadChat(id){
             ws.onopen = e => {
                 let msgId = 0;
                 let chat = {};
+
+                chat.id = id;
+
                 let callbackBuffer = {};
 
                 ws.onmessage = (event) => {

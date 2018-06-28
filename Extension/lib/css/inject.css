@@ -58,3 +58,8 @@ b-channel-chat-author > .badge.bettermixer-badge-relocated {
 b-channel-chat-author > .badge {
     top: 2px;
 }
+
+.better-mixer-inline-control {
+    padding-left: 2px;
+    padding-right: 2px;
+}
