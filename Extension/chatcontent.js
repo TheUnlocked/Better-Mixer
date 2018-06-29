@@ -1,4 +1,4 @@
-$(function () {
+$(() => {
     onetimeInjection().then(() => {
         initialize();
         $(window).on('pushState', () => setTimeout(refresh, 100));
@@ -84,7 +84,7 @@ function getBetterMixerConfig() {
     let config_defaults = {
         'botcolor_enabled':     true,
         'hide_avatars':         false,
-        'move_badges':          false,
+        'move_badges':          true,
         'show_inline_controls': false,
     };
 
@@ -181,9 +181,9 @@ function refresh() {
         
         return getMixerUsername()
             .then(addUserEmotes, () => new Promise((resolve, reject) => resolve()))
-            .then(getMixerID)
-            .then(loadChat, () => new Promise((resolve, reject) => resolve(undefined)))
-            .then(Ensure((result) => { if (result) chatSocket = result; }))
+            // .then(getMixerID)
+            // .then(loadChat, () => new Promise((resolve, reject) => resolve(undefined)))
+            // .then(Ensure((result) => { if (result) chatSocket = result; }))
             .then(getBetterMixerConfig);
     }
 }
@@ -244,7 +244,7 @@ function initialize() {
                     ['botcolor_enabled',    "Change Bot Colors",            botColorInjection],
                     ['hide_avatars',        "Hide Avatars",                 hideAvatarInjection],
                     ['move_badges',         "Show Badges Before Username",  moveBadgesInjection],
-                    ['show_inline_controls',"Show Inline Controls",         showInlineControlsInjection]
+                    // ['show_inline_controls',"Show Inline Controls",         showInlineControlsInjection]
                 ];
                 for (let toggleData of toggleList){
                     let toggleSwitch = sampleSection.getElementsByTagName('bui-toggle')[0].cloneNode(true);
@@ -282,7 +282,7 @@ let messagePatches = [
     patchMessageEmotes,
     patchMessageBotColor,
     patchMessageBadges,
-    patchMessageInlineControls
+    // patchMessageInlineControls
 ];
 
 function patchMessageEmotes(message){
