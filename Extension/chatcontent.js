@@ -7,14 +7,17 @@ $(() => {
 
 let customEmotes = {};
 
-function textLiteral(text) {
-    return `<span class="textComponent">${text}</span>`;
-}
-
 function emoteLiteral(img, alt, size) {
-    return `<div class="graphic bettermixer-emotes" style="height: ${size}px; width: ${size}px;">
-                <img src="${img}" alt="${alt}" title="${alt}" />
-            </div>`;
+    let emote = document.createElement('div');
+    emote.classList.add('graphic', 'bettermixer-emotes');
+    emote.style.height = size + "px";
+    emote.style.width = size + "px";
+    let image = document.createElement('img');
+    image.src = img;
+    image.alt = alt;
+    image.title = alt;
+    emote.appendChild(image);
+    return emote;
 }
 
 function getMixerUsername() {
@@ -82,10 +85,11 @@ function addUserEmotes(username) {
 
 function getBetterMixerConfig() {
     let config_defaults = {
-        'botcolor_enabled':     true,
-        'hide_avatars':         false,
-        'move_badges':          true,
-        'show_inline_controls': false,
+        'botcolor_enabled':         true,
+        'alternate_line_colors':    false,
+        'hide_avatars':             false,
+        'move_badges':              true,
+        'show_inline_controls':     false,
     };
 
     return new Promise(function (resolve, reject) {
@@ -139,12 +143,13 @@ let cssInjection,
     botColorInjection,
     hideAvatarInjection,
     moveBadgesInjection,
-    showInlineControlsInjection;
+    showInlineControlsInjection,
+    alternateLineColorsInjection;
 
 function onetimeInjection(){
-    let fontAwesome = injectFile('stylesheet', 'https://use.fontawesome.com/releases/v5.1.0/css/all.css');
-    fontAwesome.integrity = 'sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt';
-    fontAwesome.crossOrigin = 'anonymous';
+    // let fontAwesome = injectFile('stylesheet', 'https://use.fontawesome.com/releases/v5.1.0/css/all.css');
+    // fontAwesome.integrity = 'sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt';
+    // fontAwesome.crossOrigin = 'anonymous';
 
     return new Promise((resolve, reject) => {
         injectFileExtension('stylesheet', 'lib/css/inject.css')
@@ -155,8 +160,10 @@ function onetimeInjection(){
         .then(Ensure((result) => hideAvatarInjection = result))
         .then(() => injectFileExtension('stylesheet', 'lib/css/movebadges.css'))
         .then(Ensure((result) => moveBadgesInjection = result))
-        .then(() => injectFileExtension('stylesheet', 'lib/css/showinlines.css'))
-        .then(Ensure((result) => showInlineControlsInjection = result))
+        // .then(() => injectFileExtension('stylesheet', 'lib/css/showinlines.css'))
+        // .then(Ensure((result) => moveBadgesInjection = result))
+        .then(() => injectFileExtension('stylesheet', 'lib/css/alternatelinecolors.css'))
+        .then(Ensure((result) => alternateLineColorsInjection = result))
 
         // .then(() => injectFileExtension('stylesheet', 'lib/js/jquery-3.3.1.min.js', elementType = 'script', srcType = 'src'))
         // .then(Ensure((result) => undefined))
@@ -200,8 +207,11 @@ function initialize() {
         if (!config.move_badges){
             moveBadgesInjection.disabled = true;
         }
-        if (!config.show_inline_controls){
-            showInlineControlsInjection.disabled = true;
+        // if (!config.show_inline_controls){
+        //     showInlineControlsInjection.disabled = true;
+        // }
+        if (!config.alternate_line_colors){
+            alternateLineColorsInjection.disabled = true;
         }
     
         // Search for new chat messages
@@ -241,9 +251,10 @@ function initialize() {
                 customSection.appendChild(customLabel);
     
                 let toggleList = [
-                    ['botcolor_enabled',    "Change Bot Colors",            botColorInjection],
-                    ['hide_avatars',        "Hide Avatars",                 hideAvatarInjection],
-                    ['move_badges',         "Show Badges Before Username",  moveBadgesInjection],
+                    ['botcolor_enabled',        "Change Bot Colors",            botColorInjection],
+                    ['alternate_line_colors',   "Alternate Chat Line Colors",   alternateLineColorsInjection],
+                    ['hide_avatars',            "Hide Avatars",                 hideAvatarInjection],
+                    ['move_badges',             "Show Badges Before Username",  moveBadgesInjection],
                     // ['show_inline_controls',"Show Inline Controls",         showInlineControlsInjection]
                 ];
                 for (let toggleData of toggleList){
@@ -281,6 +292,7 @@ function initialize() {
 let messagePatches = [
     patchMessageEmotes,
     patchMessageBotColor,
+    patchMessageAlternateColors,
     patchMessageBadges,
     // patchMessageInlineControls
 ];
@@ -298,21 +310,29 @@ function patchMessageEmotes(message){
                 if (emote) {
                     // End the text element if you find an emote
                     if (textBuffer) {
-                        segmentedNew.push(textLiteral(textBuffer));
+                        let newText = msgText.cloneNode();
+                        newText.innerHTML = textBuffer;
+                        segmentedNew.push(newText);
                         textBuffer = "";
                     }
                     // Push the emote
                     segmentedNew.push(emoteLiteral(emote[0], segment, emote[1]));
                 } else {
-                    textBuffer += ` ${segment}`;
+                    textBuffer += `${segment} `;
                 }
             }
             // Finish the text buffer, if one exists
             if (textBuffer) {
-                segmentedNew.push(textLiteral(textBuffer));
+                let newText = msgText.cloneNode();
+                newText.innerHTML = textBuffer;
+                segmentedNew.push(newText);
             }
             // Replace the text element with the new text/emote elements
-            $(msgText).replaceWith(segmentedNew.join(" "));
+            for (let segment of segmentedNew){
+                msgText.parentElement.insertBefore(segment, msgText);
+                msgText.parentElement.insertBefore(document.createTextNode(' '), msgText);
+            }
+            msgText.parentElement.removeChild(msgText);
             
             for (let emote of message.querySelectorAll('.graphic.bettermixer-emotes > img')){
                 makeEmoteTooltip(emote, emote.alt);
@@ -324,6 +344,19 @@ function patchMessageBotColor(message){
     let username = message.getElementsByClassName("username")[0].innerText;
     if (username.includes("Bot") || username.toLowerCase().endsWith("bot")){
         message.getElementsByTagName("b-channel-chat-author")[0].classList.add('bettermixer-bots');
+    }
+}
+let alt = true;
+function patchMessageAlternateColors(message){
+    let parent = message.parentElement;
+
+    if (!parent.previousSibling.classList || parent.previousSibling.classList.contains("timestamp"))
+        parent.betterMixerAltLineColor = !parent.previousSibling.previousSibling.betterMixerAltLineColor;
+    else
+        parent.betterMixerAltLineColor = !parent.previousSibling.betterMixerAltLineColor;
+
+    if (parent.betterMixerAltLineColor){
+        parent.classList.add("bettermixer-alternate-chat-line-color");
     }
 }
 function patchMessageBadges(message){

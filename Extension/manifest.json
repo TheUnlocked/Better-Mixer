@@ -2,7 +2,7 @@
   "manifest_version": 2,
 
   "name": "Better Mixer",
-  "version": "1.5.2",
+  "version": "1.5.3",
 
   "icons": {"128": "Icons/icon.png"},
 
@@ -20,7 +20,7 @@
   "content_scripts": [
     {
       "matches": ["https://mixer.com/*"],
-      "js": ["lib/js/jquery-3.3.1.min.js", "lib/js/jquery.initialize.min.js", "chatsocket.js", "chatcontent.js"]
+      "js": ["lib/js/jquery-3.3.1.min.js", "lib/js/jquery.initialize.min.js", "chatcontent.js"]
     }
   ],
 

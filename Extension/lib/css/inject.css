@@ -64,3 +64,7 @@ b-channel-chat-author > .badge {
     padding-right: 2px;
     display: none;
 }
+
+/* .stage.online {
+    max-height: calc(100vh - 60px - 8px) !important;
+} */
