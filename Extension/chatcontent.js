@@ -230,7 +230,7 @@ function initialize() {
                 for (let emoteName of Object.keys(customEmotes)){
                     let emote = customEmotes[emoteName];
                     let emoteTile = tile.cloneNode();
-                    emoteTile.innerHTML = emoteLiteral(emote[0], emoteName, emote[1]);
+                    emoteTile.appendChild(emoteLiteral(emote[0], emoteName, emote[1]));
                     makeEmoteTooltip(emoteTile, emoteName);
                     emoteTile.addEventListener('click', () => document
                                                             .getElementById('better-mixer-injection-script')
