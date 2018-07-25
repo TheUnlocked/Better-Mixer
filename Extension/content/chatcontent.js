@@ -350,10 +350,12 @@ let alt = true;
 function patchMessageAlternateColors(message){
     let parent = message.parentElement;
 
-    if (!parent.previousSibling.classList || parent.previousSibling.classList.contains("timestamp"))
+    if (!parent.previousSibling.classList || parent.previousSibling.classList.contains("timestamp")){
         parent.betterMixerAltLineColor = !parent.previousSibling.previousSibling.betterMixerAltLineColor;
-    else
+    } 
+    else{
         parent.betterMixerAltLineColor = !parent.previousSibling.betterMixerAltLineColor;
+    }
 
     if (parent.betterMixerAltLineColor){
         parent.classList.add("bettermixer-alternate-chat-line-color");
