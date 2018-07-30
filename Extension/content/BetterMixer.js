@@ -1,11 +1,15 @@
-import FFZAddon from "./Addons/FFZ/FFZAddon";
-import GameWispAddon from "./Addons/GameWisp/GameWispAddon";
-import ConfigurationManager from "./Configs/ConfigurationManager";
+import FFZAddon from "./Addons/FFZ/FFZAddon.js";
+import GameWispAddon from "./Addons/GameWisp/GameWispAddon.js";
+import ConfigurationManager from "./Configs/ConfigurationManager.js";
+import StylesheetToggleConfig from "./Configs/StylesheetToggleConfig.js";
+
+let SRC = document.getElementById('BetterMixer-module').src;
+let BASE_URL = SRC.split('/').slice(0, -2).join('/') + '/';
 
 export default class BetterMixer {
     constructor(){
 
-        this.log("Better Mixer loaded.");
+        this.log("Base loaded.");
 
         this.ffz = new FFZAddon(this);
         this.gameWisp = new GameWispAddon(this);
@@ -13,62 +17,45 @@ export default class BetterMixer {
 
         $(window).on('pushState', () => setTimeout(this.reload(), 100));
 
-        this.injectFile("lib/css/inject.css", BetterMixer.InjectionTypeEnum.STYLESHEET);
-        this.injectFile("lib/js/inject.js", BetterMixer.InjectionTypeEnum.SCRIPT);
+        this.injectStylesheet("lib/css/inject.css");
 
-        this.injectFile("lib/css/botcolor.css", BetterMixer.InjectionTypeEnum.STYLESHEET,
-            element => this.configuration.registerConfig(new StylesheetToggleConfig(element, 'botcolor_enabled', 'Change Bot Colors', true, true)));
-        this.injectFile("lib/css/movebadges.css", BetterMixer.InjectionTypeEnum.STYLESHEET,
-            element => this.configuration.registerConfig(new StylesheetToggleConfig(element, 'move_badges', 'Show Badges Before Username', false, true)));
-        this.injectFile("lib/css/alternatelinecolors.css", BetterMixer.InjectionTypeEnum.STYLESHEET, 
-            element => this.configuration.registerConfig(new StylesheetToggleConfig(element, 'alternate_line_colors', 'Alternate Chat Line Colors', false, true)));
-        this.injectFile("lib/css/hideavatars.css", BetterMixer.InjectionTypeEnum.STYLESHEET,
-            element => this.configuration.registerConfig(new StylesheetToggleConfig(element, 'hide_avatars', 'Hide Avatars', false, true)));
-        
+        this.configuration.registerConfig(new StylesheetToggleConfig(
+            this.injectStylesheet("lib/css/botcolor.css"),
+            'botcolor_enabled', 'Change Bot Colors', true, true));
 
+        this.configuration.registerConfig(new StylesheetToggleConfig(
+            this.injectStylesheet("lib/css/movebadges.css"),
+            'move_badges', 'Show Badges Before Username', false, true));
+
+        this.configuration.registerConfig(new StylesheetToggleConfig(
+            this.injectStylesheet("lib/css/alternatelinecolors.css"),
+            'alternate_line_colors', 'Alternate Chat Line Colors', false, true));
+
+        this.configuration.registerConfig(new StylesheetToggleConfig(
+            this.injectStylesheet("lib/css/hideavatars.css"),
+            'hide_avatars', 'Hide Avatars', false, true));
     }
 
     reload(){
-
+        
     }
 
-    injectFile(file, type, callback){
+    injectStylesheet(file){
         let injection;
-        switch (type) {
-            
-            case BetterMixer.InjectionTypeEnum.STYLESHEET:
-                chrome.runtime.sendMessage({request: "geturl", data: file}, function (response) {
-                    let injection = document.createElement('link');
-                    injection.rel = 'stylesheet';
-                    injection.href = response;
-                    document.head.appendChild(injection);
-                });
-                break;
-
-            case BetterMixer.InjectionTypeEnum.SCRIPT:
-                chrome.runtime.sendMessage({request: "geturl", data: file}, function (response) {
-                    let injection = document.createElement('script');
-                    injection.src = response;
-                    document.head.appendChild(injection);
-                });
-                break;
-
-            default:
-                break;
-        }
-        if (callback){
-            callback(injection);
-        }
+        injection = document.createElement('link');
+        injection.rel = 'stylesheet';
+        injection.href = BASE_URL + file;
+        document.head.appendChild(injection);
+        return injection;
     }
 
     log(msg){
         console.log(`[Better Mixer] ${msg}`);
     }
-}
 
-BetterMixer.InjectionTypeEnum = Object.freeze({
-    STYLESHEET: 0,
-    SCRIPT: 1
-});
+    postToContent(message){
+        window.postMessage([SRC, message], '*');
+    }
+}
 
 BetterMixer.instance = new BetterMixer();

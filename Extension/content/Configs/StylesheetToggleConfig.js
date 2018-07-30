@@ -1,8 +1,9 @@
-import Config from "./Config";
+import Config from "./Config.js";
 
 export default class StylesheetToggleConfig extends Config {
     constructor(element, configName, displayText, descriptionText = "", defaultState = false, enabledState = true){
-        
+        super();
+
         this._element = element;
         this._configName = configName;
         this._displayText = displayText;
@@ -10,6 +11,8 @@ export default class StylesheetToggleConfig extends Config {
         this._defaultState = defaultState;
         this._enabledState = enabledState;
         this._state = defaultState;
+
+        update();
 
     }
 

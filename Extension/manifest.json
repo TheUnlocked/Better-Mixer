@@ -20,17 +20,13 @@
   "content_scripts": [
     {
       "matches": ["https://mixer.com/*"],
-      "js": ["lib/js/jquery-3.3.1.min.js", "lib/js/jquery.initialize.min.js", "content/chatcontent.js"]
+      "js": ["lib/js/jquery-3.3.1.min.js", "lib/js/jquery.initialize.min.js", "content.js", "chatcontent.js"]
     }
   ],
 
   "web_accessible_resources": [
-    "lib/**/*.*"
-  ],
-
-  "background": {
-    "scripts": [
-      "background.js"
-    ]
-  }
+    "lib/**/*.*",
+    "content/**/*.js",
+    "content/*.js"
+  ]
 }

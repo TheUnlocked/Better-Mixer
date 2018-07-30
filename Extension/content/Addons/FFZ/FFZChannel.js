@@ -1,4 +1,4 @@
-import Emote from "../../Emote";
+import Emote from "../../Emote.js";
 
 export default class FFZChannel{
     constructor(parent, username) {

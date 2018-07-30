@@ -1,4 +1,4 @@
-import FFZChannel from "./FFZChannel";
+import FFZChannel from "./FFZChannel.js";
 
 export default class FFZAddon {
     constructor(plugin) {

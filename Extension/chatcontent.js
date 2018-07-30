@@ -118,14 +118,13 @@ function injectFile(rel, url, loc=document.getElementsByTagName('head')[0]){
 }
 
 function injectFileExtension(src, url, elementType='link', srcType = 'href', loc=document.getElementsByTagName('head')[0]){
-    return new Promise((resolve, reject) =>
-        chrome.runtime.sendMessage({request: "geturl", data: url}, function (response) {
-            let injection = document.createElement(elementType);
-            injection.rel = src;
-            injection[srcType] = response;
-            loc.appendChild(injection);
-            resolve(injection);
-    }));
+    return new Promise((resolve, reject) => {
+        let injection = document.createElement(elementType);
+        injection.rel = src;
+        injection[srcType] = chrome.runtime.getURL(url);
+        loc.appendChild(injection);
+        resolve(injection);
+    });
 }
 
 function toggleElement(element){
