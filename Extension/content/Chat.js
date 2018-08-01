@@ -1,6 +1,7 @@
 import Channel from "./Channel.js";
 import ChatSocket from "./ChatSocket.js";
 import ChatMessage from "./ChatMessage.js";
+import BetterMixer from "./BetterMixer.js";
 
 export default class Chat {
     /**
@@ -20,9 +21,12 @@ export default class Chat {
                 return;
             }
             this._msgObserver = $.initialize('b-channel-chat-message', (_, element) => {
-                new ChatMessage(this, element);
+                let msg = new ChatMessage(this, element);
+                this.plugin.dispatchEvent(BetterMixer.Events.ON_MESSAGE, null, msg);
             }, { target: this.element });
-        })();
+        });
+
+        registerChatObserver();
     }
 
     unload(){

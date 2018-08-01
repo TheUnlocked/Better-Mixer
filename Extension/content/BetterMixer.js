@@ -1,3 +1,6 @@
+import "../lib/js/jquery-3.3.1.min.js";
+import "../lib/js/jquery.initialize.min.js";
+
 import FFZAddon from "./Addons/FFZ/FFZAddon.js";
 import GameWispAddon from "./Addons/GameWisp/GameWispAddon.js";
 import ConfigurationManager from "./Configs/ConfigurationManager.js";
@@ -12,12 +15,12 @@ export default class BetterMixer {
 
         this.log("Base loaded.");
 
+        this.configuration = new ConfigurationManager(this);
         this.ffz = new FFZAddon(this);
         this.gameWisp = new GameWispAddon(this);
-        this.configuration = new ConfigurationManager(this);
         this.activeChannels = [];
 
-        this._events = {};
+        this._events = [];
         for (let _ in BetterMixer.Events){
             this._events.push([]);
         }
@@ -160,7 +163,7 @@ export default class BetterMixer {
             sender: sender,
             data: data
         };
-        
+
         let collected = [];
         if (eventType >= Object.keys(BetterMixer.Events).length){
             this.log(`Event ${eventType} does not exist.`, BetterMixer.LogType.ERROR);
@@ -190,7 +193,7 @@ BetterMixer.Events = {
     ON_USER_LOAD: 3,
     ON_MESSAGE: 4,
 
-    GATHER_EMOTES: 101
+    GATHER_EMOTES: 5
 };
 
 BetterMixer.instance = new BetterMixer();

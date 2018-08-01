@@ -1,5 +1,5 @@
-import BetterMixer from "./BetterMixer.js";
 import Chat from "./Chat.js";
+import User from "./User.js";
 
 export default class ChatMessage {
     /**
@@ -8,13 +8,12 @@ export default class ChatMessage {
      */
     constructor(chat, element){
 
+        this._element = element;
+        this._authorElement = element.getElementsByTagName('b-channel-chat-author')[0];
+
         this.chat = chat;
         this.plugin = chat.plugin;
-        this.element = element;
-        this.author = author;
-        this.text = text;
-
-        plugin.dispatchEvent(BetterMixer.Events.ON_MESSAGE, null, this);
+        this.author = new User({ username: this._authorElement.getElementsByClassName('username')[0].innerText });
 
     }
 }

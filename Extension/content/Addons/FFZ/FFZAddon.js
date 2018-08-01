@@ -26,11 +26,11 @@ export default class FFZAddon {
      * @param {Channel} channel 
      */
     getSync(channel){
-        let twitchName = this._syncList[channel.owner.username];
+        let twitchName = this._syncList[channel.owner.username.toLowerCase()];
         if (twitchName){
             return new FFZChannel(this, channel, twitchName);
         }
-        this.plugin.log(`${channel} is not FFZ synced.`, BetterMixer.LogType.WARNING);
+        this.plugin.log(`${channel.owner.username} is not FFZ synced.`, BetterMixer.LogType.WARNING);
         return undefined;
     }
 }
