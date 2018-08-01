@@ -1,27 +1,38 @@
+import BetterMixer from "./BetterMixer.js";
+import Chat from "./Chat.js";
+
 export default class Channel {
-    constructor(plugin, channelName) {
+    /**
+     * @param {BetterMixer} plugin 
+     * @param {string} channelName 
+     */
+    constructor(plugin, channelName){
 
         this.plugin = plugin;
         
-        let retry = 0;
+        $.ajax({
+            url: `https://mixer.com/api/v1/channels/${channelName}`,
+            dataType: 'json',
+            async: false,
+            success: data => {
+                this.id = data.id;
+                this.owner = new User(data.user);
+                this.name = data.name;
+                this.audience = data.audience;
+                this.description = data.description;
+                this.partnered = data.partnered;
+                this.ffzChannel = plugin.ffz.getSync(this);
+                this.gameWispChannel = plugin.gameWisp.getSync(this);
+                this.chat = new Chat(this);
+                this.plugin.log(`Loaded channel '${channelName}'`, BetterMixer.LogType.INFO);
+            },
+            error: xhr => this.plugin.log(`${xhr.statusText}: Failed to get channel ${channelName}`, BetterMixer.LogType.ERROR)
+        });
+    }
 
-        while (retry != -1) {
-            $.ajax({
-                url: `https://mixer.com/api/v1/channels/${channelName}`,
-                dataType: 'json',
-                async: false,
-                success: data => {
-                    this.id = data.id;
-                    this.owner = new User(data.user);
-                    this.name = data.name;
-                    this.audience = data.audience;
-                    this.description = data.description;
-                    this.partnered = data.partnered;
-                    this.ffzChannel = plugin.ffz.getSync(this);
-                    this.gameWispChannel = plugin.gameWisp.getSync(this);
-                },
-                error: xhr => this.plugin.log(`${xhr.statusText}: Failed to get channel ${channelName}`)
-            });
-        }
+    unload(){
+        this.chat.unload();
+        this.ffzChannel.unload();
+        this.gameWispChannel.unload();
     }
 }

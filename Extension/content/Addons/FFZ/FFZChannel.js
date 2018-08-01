@@ -1,7 +1,15 @@
 import Emote from "../../Emote.js";
+import BetterMixer from "../../BetterMixer.js";
+import FFZAddon from "./FFZAddon.js";
+import Channel from "../../Channel.js";
 
 export default class FFZChannel{
-    constructor(parent, username) {
+    /**
+     * @param {FFZAddon} parent 
+     * @param {Channel} channel
+     * @param {string} username 
+     */
+    constructor(parent, channel, username) {
 
         this.ffz = parent;
         this.plugin = parent.plugin;
@@ -19,9 +27,21 @@ export default class FFZChannel{
                         emotes.append(new Emote(emote.name, emote.urls['1'], emote.width, emote.height));
                     }
                 }
+                
+                this.plugin.addEventListener(BetterMixer.Events.GATHER_EMOTES, event => {
+                    if (event.data.channel === this.channel){
+                        return this.emotes;
+                    }
+                });
+
+                this.plugin.log(`Synced ${this.channel.owner.username} with FFZ emotes from ${this.twitch}.`, BetterMixer.LogType.INFO)
             },
-            error: xhr => this.plugin.log(`${xhr.statusText}: Failed to load emotes from FFZ.`)
+            error: xhr => this.plugin.log(`${xhr.statusText}: Failed to load emotes from FFZ.`, BetterMixer.LogType.WARNING)
         });
+
+    }
+
+    unload(){
 
     }
 }

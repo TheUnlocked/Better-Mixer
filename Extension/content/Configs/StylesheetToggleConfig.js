@@ -11,9 +11,6 @@ export default class StylesheetToggleConfig extends Config {
         this._defaultState = defaultState;
         this._enabledState = enabledState;
         this._state = defaultState;
-
-        update();
-
     }
 
     // The name used internally

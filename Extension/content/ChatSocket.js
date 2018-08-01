@@ -1,8 +1,10 @@
 export default class ChatSocket {
-    constructor(chat) {
+    constructor(chat){
 
         this.chat = chat;
         this.plugin = chat.plugin;
+        this.socket = null;
+        this.permissions = [];
         this._msgid = 0;
         this._callbackBuffer = {};
 
@@ -15,17 +17,9 @@ export default class ChatSocket {
     
                 this.socket.onopen = e => {
                     this.permissions = data.permissions;
-
-                    chat.get = (method, ...args) => new Promise((resolve, reject) => {
-                        callbackBuffer[msgId] = [resolve, reject];
-                        chat.send(method, ...args);
-                    });
-    
-                    chat.lastMessages = (count=1) => chat.get("history", count);
-                    chat.deleteMessage = (id) => chat.send("deleteMessage", id);
     
                     $.getJSON('https://mixer.com/api/v1/users/current', (userData) => {
-                        chat.send("auth", id, userData.id, data.authkey);
+                        this.send("auth", id, userData.id, data.authkey);
                         this.plugin.log("Connected to chat!");
     
                         resolve(chat);
@@ -50,12 +44,41 @@ export default class ChatSocket {
         });
     }
 
-    send (method, ...args) {
+    unload(){
+        this.socket.close();
+    }
+
+    /**
+     * Sends a method to the websocket
+     * @param {Function} method 
+     * @param {any} args 
+     */
+    send(method, ...args){
         this.socket.send(JSON.stringify({
             "type": "method",
             "method": method,
             "arguments": args,
             "id": this._msgid++
         }));
-    };
+    }
+
+    /**
+     * Same as ChatSocket.send except it returns a promise which recieves the reply.
+     * @param {Function} method 
+     * @param {any} args 
+     */
+    get(method, ...args){
+        return new Promise((resolve, reject) => {
+            callbackBuffer[msgId] = [resolve, reject];
+            chat.send(method, ...args);
+        });
+    }
+    
+    getHistory(numMessages){
+        return this.get("history", numMessages);
+    }
+
+    deleteMessage(messageId){
+        return this.send("deleteMessage", messageId);
+    }
 }

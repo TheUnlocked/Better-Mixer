@@ -23,9 +23,7 @@ export default class ConfigurationManager {
 
                     this._recvconfigs = data.data;
 
-                    while (this._registerBuffer.length > 0){
-                        this.registerConfig(this._registerBuffer.pop());
-                    }
+                    this._registerBuffer.forEach(config => this.registerConfig(config));
                     
                     this.plugin.log('Config loaded.');
                 }
@@ -35,7 +33,7 @@ export default class ConfigurationManager {
     }
 
     /**
-     * @desc Warning: This method may register the config asynchronously.
+     * Warning: This method may register the config asynchronously.
      * @param {Config} config 
      */
     registerConfig(config){
@@ -53,6 +51,7 @@ export default class ConfigurationManager {
         else{
             config.state = this._recvconfigs[config.configName];
         }
+        config.update();
     }
 
     saveConfig(){
