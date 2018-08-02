@@ -1,4 +1,4 @@
-.bettermixer-emote-tooltip {
+.bettermixer-tooltip {
 	visibility: visible;
     animation-name: bettermixer-tooltip-anim;
     animation-duration: 0.15s;
@@ -15,7 +15,7 @@
     z-index: 99;
 }
 
-.bettermixer-emote-tooltip::after {
+.bettermixer-tooltip::after {
     content: "";
     position: absolute;
     top: 100%;

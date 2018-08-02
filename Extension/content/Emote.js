@@ -27,7 +27,7 @@ export default class Emote{
 
             tooltip.innerHTML = this.name;
             let rect = emote.getBoundingClientRect();
-            tooltip.classList.add('bettermixer-emote-tooltip');
+            tooltip.classList.add('bettermixer-tooltip');
             tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.clientWidth / 2) + "px";
             tooltip.style.top = rect.top - 24 + "px";
             tooltip.style.pointerEvents = "none";

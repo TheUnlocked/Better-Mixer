@@ -15,13 +15,15 @@ export default class Chat {
         this.users = { [channel.owner.username]: channel.owner };
 
         let registerChatObserver = (() => {
-            this.element = document.getElementsByTagName('b-channel-chat')[0];
+            this.element = document.querySelector('b-channel-chat:not(.bettermixer-chat-window)');
             //this.socket = new ChatSocket(this);
 
             if (!this.element){
                 setTimeout(registerChatObserver, 100);
                 return;
             }
+            this.element.classList.add('bettermixer-chat-window');
+            
             this._msgObserver = $.initialize('b-channel-chat-message', (_, element) => {
                 let authorName = element.getElementsByClassName('username')[0].innerText;
                 let msg = new ChatMessage(this, element, this.users[authorName]);

@@ -79,7 +79,7 @@ export default class BetterMixer {
             }
         };
 
-        let creatorBadge = new Badge("Better Mixer Creator", "https://i.imgur.com/wLnZGEy.png", "Creator of the Better Mixer Chrome extension.");
+        let creatorBadge = new Badge("Better Mixer Creator", "https://i.imgur.com/HfmDsUC.png", "Creator of the Better Mixer Chrome extension.");
 
         this.addEventListener(BetterMixer.Events.GATHER_BADGES, event => event.data.user.username == "Unlocked" ? creatorBadge : undefined);
 
@@ -88,10 +88,6 @@ export default class BetterMixer {
 
     reload(){
         let page = window.location.pathname.substring(1).toLowerCase();
-        if (page.startsWith('me/bounceback')){
-            setTimeout(() => this.reload(), 100);
-            return;
-        }
         if (/^[a-z0-9_]+$/i.test(page)){
             this._page = page;
         }
