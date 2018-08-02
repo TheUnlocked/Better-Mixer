@@ -30,6 +30,10 @@ export default class ConfigurationManager {
             }
         };
         window.addEventListener('message', initializeListener);
+
+        this._configDialogObserver = $.initialize('b-channel-chat-preferences-dialog', (_, element) => {
+            this.plugin.dispatchEvent(BetterMixer.Events.ON_MESSAGE, null, this);
+        }, { target: this.element });
     }
 
     /**

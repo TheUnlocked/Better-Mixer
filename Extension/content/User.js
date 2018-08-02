@@ -29,16 +29,11 @@ export default class User {
                             break;
                         case "Staff":
                             this.staff = true;
-                            
+
                             break;
                     }
                 }
             }
-            let emoteGatherEventData = {
-                channel: message.chat.channel,
-                author: message.author,
-                message: message
-            };
         };
 
         this._loadUser(data);

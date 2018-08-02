@@ -7,6 +7,8 @@ import ConfigurationManager from "./Configs/ConfigurationManager.js";
 import StylesheetToggleConfig from "./Configs/StylesheetToggleConfig.js";
 import Channel from "./Channel.js";
 import Patcher from "./Patcher.js";
+import User from "./User.js";
+import Badge from "./Badge.js";
 
 let SRC = document.getElementById('BetterMixer-module').src;
 let BASE_URL = SRC.split('/').slice(0, -2).join('/') + '/';
@@ -25,6 +27,15 @@ export default class BetterMixer {
         for (let _ in BetterMixer.Events){
             this._events.push([]);
         }
+
+        $.ajax({
+            url: `https://mixer.com/api/v1/users/current`,
+            dataType: 'json',
+            async: false,
+            success: data => {
+                this.user = new User(data);
+            }
+        });
 
         // Reload on page change
         (function(history){
@@ -68,21 +79,31 @@ export default class BetterMixer {
             }
         };
 
+        let creatorBadge = new Badge("Better Mixer Creator", "https://i.imgur.com/wLnZGEy.png", "Creator of the Better Mixer Chrome extension.");
+
+        this.addEventListener(BetterMixer.Events.GATHER_BADGES, event => event.data.user.username == "Unlocked" ? creatorBadge : undefined);
+
         this.patcher = new Patcher(this);
     }
 
     reload(){
-        let page = window.location.pathname.split('/').pop().toLowerCase();
-        this.log(`Switched to page '${page}'`);
-        if (page != "" && !page.endsWith(')')){
-            for (let channel of this.activeChannels){
-                channel.unload();
-            }
-            this.activeChannels = [];
-            let mainChannel = new Channel(this, page);
-            if (mainChannel.id){
-                this.activeChannels.push();
-            }
+        let page = window.location.pathname.substring(1).toLowerCase();
+        if (page.startsWith('me/bounceback')){
+            setTimeout(() => this.reload(), 100);
+            return;
+        }
+        if (/^[a-z0-9_]+$/i.test(page)){
+            this._page = page;
+        }
+        this.log(`Switched to page '${this._page}'`);
+
+        for (let channel of this.activeChannels){
+            channel.unload();
+        }
+        this.activeChannels = [];
+        let mainChannel = new Channel(this, this._page);
+        if (mainChannel.id){
+            this.activeChannels.push(mainChannel);
         }
     }
 
@@ -173,7 +194,12 @@ export default class BetterMixer {
             return;
         }
 
-        this._events[eventType].forEach(handler => collected.push(handler(event)));
+        this._events[eventType].forEach(handler => {
+            let result = handler(event);
+            if (result){
+                collected.push(result);
+            }
+        });
         return collected;
     }
 }
@@ -196,10 +222,12 @@ BetterMixer.Events = {
     ON_CHAT_LOAD: 2,
     ON_USER_LOAD: 3,
     ON_MESSAGE: 4,
-    ON_DIALOG_OPEN: 5,
+    ON_EMOTES_DIALOG_OPEN: 5,
+    ON_SETTINGS_DIALOG_OPEN: 6,
 
-    GATHER_EMOTES: 6,
-    GATHER_BADGES: 7,
+    GATHER_EMOTES: 7,
+    GATHER_BADGES: 8,
 };
 
 BetterMixer.instance = new BetterMixer();
+window.BetterMixer = BetterMixer;

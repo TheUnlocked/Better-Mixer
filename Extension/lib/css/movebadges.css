@@ -3,5 +3,6 @@ b-channel-chat-author > .badge:not(.bettermixer-badge-relocated) {
 }
 
 b-channel-chat-author > .badge.bettermixer-badge-relocated {
-    display: inline-block;
+    display: inline-block !important;
+    margin-right: 5px;
 }

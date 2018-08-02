@@ -33,7 +33,7 @@ export default class Channel {
 
     unload(){
         this.chat.unload();
-        this.ffzChannel.unload();
-        this.gameWispChannel.unload();
+        this.ffzChannel && this.ffzChannel.unload();
+        this.gameWispChannel && this.gameWispChannel.unload();
     }
 }

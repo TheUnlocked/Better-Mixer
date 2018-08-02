@@ -28,11 +28,12 @@ export default class FFZChannel{
                     }
                 }
                 
-                this.plugin.addEventListener(BetterMixer.Events.GATHER_EMOTES, event => {
+                this._gatherEmotes = event => {
                     if (event.data.channel === this.channel){
                         return this.emotes;
                     }
-                });
+                };
+                this.plugin.addEventListener(BetterMixer.Events.GATHER_EMOTES, this._gatherEmotes);
 
                 this.plugin.log(`Synced ${this.channel.owner.username} with FFZ emotes from ${this.twitch}.`, BetterMixer.LogType.INFO)
             },
@@ -42,6 +43,6 @@ export default class FFZChannel{
     }
 
     unload(){
-
+        this.plugin.removeEventListener(BetterMixer.Events.GATHER_EMOTES, this._gatherEmotes);
     }
 }
