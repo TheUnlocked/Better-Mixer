@@ -1,5 +1,6 @@
 import Chat from "./Chat.js";
 import User from "./User.js";
+import BetterMixer from "./BetterMixer.js";
 
 export default class ChatMessage {
     /**

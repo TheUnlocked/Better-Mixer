@@ -198,7 +198,8 @@ BetterMixer.Events = {
     ON_MESSAGE: 4,
     ON_DIALOG_OPEN: 5,
 
-    GATHER_EMOTES: 6
+    GATHER_EMOTES: 6,
+    GATHER_BADGES: 7,
 };
 
 BetterMixer.instance = new BetterMixer();

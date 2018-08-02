@@ -6,5 +6,4 @@ export default class Badge{
         this.description = description;
         this.width = width;
     }
-
 }

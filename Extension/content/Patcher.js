@@ -13,6 +13,21 @@ export default class Patcher{
         this.plugin.addEventListener(BetterMixer.Events.ON_MESSAGE, event => {
             let message = event.sender;
 
+            // Alternating lines (will be done with pure CSS once :nth-child(An+B of S) comes out into chrome stable)
+            {
+                let parent = message.element.parentElement;
+                if (!parent.previousSibling.classList || parent.previousSibling.classList.contains("timestamp")){
+                    parent.betterMixerAltLineColor = !parent.previousSibling.previousSibling.betterMixerAltLineColor;
+                } 
+                else{
+                    parent.betterMixerAltLineColor = !parent.previousSibling.betterMixerAltLineColor;
+                }
+            
+                if (parent.betterMixerAltLineColor){
+                    parent.classList.add("bettermixer-alternate-chat-line-color");
+                }
+            }
+
             // Handle message emotes
             {
                 let emoteGatherEventData = {
@@ -65,8 +80,11 @@ export default class Patcher{
                 }
             }
 
-            if (message.author.username.includes("Bot") || message.author.username.toLowerCase().endsWith("bot")){
-                message.element.getElementsByTagName("b-channel-chat-author")[0].classList.add('bettermixer-role-bot');
+            // Handle bot color changes
+            {
+                if (message.author.username.includes("Bot") || message.author.username.toLowerCase().endsWith("bot")){
+                    message.element.getElementsByTagName("b-channel-chat-author")[0].classList.add('bettermixer-role-bot');
+                }
             }
         });
     }
