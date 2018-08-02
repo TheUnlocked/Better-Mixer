@@ -22,7 +22,7 @@ export default class Patcher{
                 };
                 let emoteList = plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, message)
                     .reduce((acc, val) => acc.concat(val), []); // Upgrade to .flat(1) when that becomes mainstream tech
-                let emotes = emoteList.reduce((result, value, index, arr) => { result[value.name] = value; return result; });
+                let emotes = emoteList.reduce((result, value, index, arr) => { result[value.name] = value; return result; }, {});
 
                 for (let textElement of message.element.getElementsByClassName('textComponent')) {
                     // Break it up into text pieces, and check each piece for an emote
@@ -63,6 +63,10 @@ export default class Patcher{
                     }
                     textElement.parentElement.removeChild(textElement);
                 }
+            }
+
+            if (message.author.username.includes("Bot") || message.author.username.toLowerCase().endsWith("bot")){
+                message.element.getElementsByTagName("b-channel-chat-author")[0].classList.add('bettermixer-role-bot');
             }
         });
     }

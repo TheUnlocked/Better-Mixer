@@ -22,7 +22,7 @@ export default class Chat {
                 return;
             }
             this._msgObserver = $.initialize('b-channel-chat-message', (_, element) => {
-                let authorName = this.element.getElementsByClassName('username')[0].innerText;
+                let authorName = element.getElementsByClassName('username')[0].innerText;
                 let msg = new ChatMessage(this, element, this.users[authorName]);
                 if (!this.users[authorName]){
                     this.users[authorName] = msg.author;
