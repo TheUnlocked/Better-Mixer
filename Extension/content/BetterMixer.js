@@ -6,6 +6,7 @@ import GameWispAddon from "./Addons/GameWisp/GameWispAddon.js";
 import ConfigurationManager from "./Configs/ConfigurationManager.js";
 import StylesheetToggleConfig from "./Configs/StylesheetToggleConfig.js";
 import Channel from "./Channel.js";
+import Patcher from "./Patcher.js";
 
 let SRC = document.getElementById('BetterMixer-module').src;
 let BASE_URL = SRC.split('/').slice(0, -2).join('/') + '/';
@@ -66,6 +67,8 @@ export default class BetterMixer {
                 channel.unload();
             }
         };
+
+        this.patcher = new Patcher(this);
     }
 
     reload(){
@@ -171,6 +174,7 @@ export default class BetterMixer {
         }
 
         this._events[eventType].forEach(handler => collected.push(handler(event)));
+        return collected;
     }
 }
 
@@ -192,8 +196,9 @@ BetterMixer.Events = {
     ON_CHAT_LOAD: 2,
     ON_USER_LOAD: 3,
     ON_MESSAGE: 4,
+    ON_DIALOG_OPEN: 5,
 
-    GATHER_EMOTES: 5
+    GATHER_EMOTES: 6
 };
 
 BetterMixer.instance = new BetterMixer();

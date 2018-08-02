@@ -5,15 +5,18 @@ export default class ChatMessage {
     /**
      * @param {Chat} chat 
      * @param {Element} element 
+     * @param {User} author
      */
-    constructor(chat, element){
-
-        this._element = element;
-        this._authorElement = element.getElementsByTagName('b-channel-chat-author')[0];
+    constructor(chat, element, author = undefined){
 
         this.chat = chat;
         this.plugin = chat.plugin;
-        this.author = new User({ username: this._authorElement.getElementsByClassName('username')[0].innerText });
-
+        this.element = element;
+        if (author){
+            this.author = author;
+        }
+        else{
+            this.author = new User({ username: this.element.getElementsByClassName('username')[0].innerText });
+        }
     }
 }

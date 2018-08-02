@@ -11,6 +11,7 @@ export default class Chat {
 
         this.channel = channel;
         this.plugin = channel.plugin;
+        this.users = { [channel.owner.username]: channel.owner };
 
         let registerChatObserver = (() => {
             this.element = document.getElementsByTagName('b-channel-chat-messages')[0];
@@ -21,7 +22,11 @@ export default class Chat {
                 return;
             }
             this._msgObserver = $.initialize('b-channel-chat-message', (_, element) => {
-                let msg = new ChatMessage(this, element);
+                let authorName = this.element.getElementsByClassName('username')[0].innerText;
+                let msg = new ChatMessage(this, element, this.users[authorName]);
+                if (!this.users[authorName]){
+                    this.users[authorName] = msg.author;
+                }
                 this.plugin.dispatchEvent(BetterMixer.Events.ON_MESSAGE, null, msg);
             }, { target: this.element });
         });
