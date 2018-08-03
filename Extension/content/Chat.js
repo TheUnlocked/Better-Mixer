@@ -19,7 +19,7 @@ export default class Chat {
             //this.socket = new ChatSocket(this);
 
             if (!this.element){
-                setTimeout(registerChatObserver, 100);
+                setTimeout(() => registerChatObserver(), 100);
                 return;
             }
             this.element.classList.add('bettermixer-chat-window');

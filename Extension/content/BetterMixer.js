@@ -47,10 +47,11 @@ export default class BetterMixer {
         
                 let ret = pushState.apply(history, arguments);
 
-                setTimeout(BetterMixer.instance.reload(), 100);
+                setTimeout(() => BetterMixer.instance.reload(), 0);
 
                 return ret;
             };
+            window.onpopstate = e => BetterMixer.instance.reload();
         })(window.history);
 
         this.injectStylesheet("lib/css/inject.css");
@@ -88,12 +89,27 @@ export default class BetterMixer {
 
     reload(){
         let page = window.location.pathname.substring(1).toLowerCase();
+
+        if (page == 'me/bounceback'){
+            this._page = "";
+            setTimeout(() => this.reload(), 100);
+            return;
+        }
+
         if (page.startsWith('embed/chat/')){
             page = page.substring(11);
             this.log(`Chat is either in a popout or embedded window.`);
         }
+
+        if (page.match(/^[a-z0-9_]+/i) == this._page){
+            return;
+        }
+
         if (/^[a-z0-9_]+$/i.test(page)){
             this._page = page;
+        }
+        else{
+            return;
         }
         this.log(`Switched to page '${this._page}'`);
 
