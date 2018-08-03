@@ -32,7 +32,7 @@ export default class ConfigurationManager {
         window.addEventListener('message', initializeListener);
 
         this._configDialogObserver = $.initialize('b-channel-chat-preferences-dialog', (_, element) => {
-            this.plugin.dispatchEvent(BetterMixer.Events.ON_MESSAGE, null, this);
+            this.plugin.dispatchEvent(BetterMixer.Events.ON_SETTINGS_DIALOG_OPEN, { dialog: element }, this);
         }, { target: this.element });
     }
 
@@ -59,12 +59,23 @@ export default class ConfigurationManager {
     }
 
     saveConfig(){
-        plugin.postToContent({message: 'setConfigs', data: Object.keys(this._configs).reduce((obj, key) => obj[key] = this._configs[key].state)});
+        this.plugin.postToContent({message: 'setConfigs', data: Object.keys(this._configs).reduce((result, value) => {
+            result[value] = this._configs[value].state;
+            return result;
+        }, {})});
     }
 
     updateConfig(){
         for (let configName in this._configs){
             this._configs[configName].update();
         }
+    }
+
+    getConfig(configName){
+        return this._configs[configName];
+    }
+
+    getAllConfigs(){
+        return Object.keys(this._configs).reduce((result, value) => { result.push(this._configs[value]); return result; }, []);
     }
 }

@@ -1,4 +1,5 @@
 import BetterMixer from "./BetterMixer.js";
+import Config from "./Configs/Config.js";
 
 export default class Patcher{
     /**
@@ -96,10 +97,9 @@ export default class Patcher{
                 let badges = plugin.dispatchGather(BetterMixer.Events.GATHER_BADGES, badgeGatherEventData, message)
                     .reduce((acc, val) => acc.concat(val), []); // Upgrade to .flat(1) when that becomes mainstream tech
 
-
                 let authorElement = message.element.getElementsByTagName('b-channel-chat-author')[0];
                 for (let badge of badges){
-                    if (badge.vanillaSelector){
+                    if (!badge.example){
                         authorElement.appendChild(badge.element);
                     }
                     let preceedingBadge = badge.element;
@@ -144,6 +144,45 @@ export default class Patcher{
                     emotePanel.appendChild(document.createElement('hr'));
                 }
             }
+        });
+
+        // Handle config menu
+        this.plugin.addEventListener(BetterMixer.Events.ON_SETTINGS_DIALOG_OPEN, event => {
+            let panel = event.data.dialog.getElementsByTagName("bui-dialog-content")[0];
+            let exampleSection = panel.children[0];
+            let betterMixerSection = exampleSection.cloneNode();
+            betterMixerSection.style.marginTop = "24px";
+
+            let label = exampleSection.children[0].cloneNode();
+            label.innerHTML = "Better Mixer Preferences";
+            betterMixerSection.appendChild(label);
+
+            for (let config of plugin.configuration.getAllConfigs()){
+                let configElement;
+                switch(config.configType){
+                    case Config.ConfigTypeEnum.BOOLEAN:
+                        configElement = exampleSection.getElementsByTagName('bui-toggle')[0].cloneNode(true);
+                        configElement.children[0].children[2].innerHTML = config.displayText;
+
+                        if (config.state != configElement.classList.contains('bui-toggle-checked')){
+                            configElement.classList.toggle('bui-toggle-checked');
+                        }
+
+                        configElement.getElementsByTagName("input")[0].addEventListener('click', e => {
+                            configElement.classList.toggle('bui-toggle-checked');
+                            config.state = configElement.classList.contains('bui-toggle-checked');
+                        });
+                        break;
+                }
+                betterMixerSection.appendChild(configElement);
+            }
+            panel.appendChild(betterMixerSection);
+
+            event.data.dialog.querySelector('button[i18n*="Buttons:save"]').addEventListener('click', e => {
+                this.plugin.configuration.saveConfig();
+                this.plugin.configuration.updateConfig();
+                this.plugin.log("Updated configurations.");
+            });
         });
     }
 }

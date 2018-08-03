@@ -34,6 +34,10 @@ export default class Chat {
             }, { target: this.element });
 
             this._gatherBadges = event => {
+                if (event.data.channel.chat !== this){
+                    return;
+                }
+
                 let badges = [];
                 for (let badgeElement of event.data.message.element.getElementsByClassName('badge')){
                     if (badgeElement.alt == 'Subscriber'){
