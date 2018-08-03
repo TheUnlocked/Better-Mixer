@@ -88,6 +88,10 @@ export default class BetterMixer {
 
     reload(){
         let page = window.location.pathname.substring(1).toLowerCase();
+        if (page.startsWith('embed/chat/')){
+            page = page.substring(11);
+            this.log(`Chat is either in a popout or embedded window.`);
+        }
         if (/^[a-z0-9_]+$/i.test(page)){
             this._page = page;
         }
