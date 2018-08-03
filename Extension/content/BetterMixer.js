@@ -101,16 +101,12 @@ export default class BetterMixer {
             this.log(`Chat is either in a popout or embedded window.`);
         }
 
-        if (page.match(/^[a-z0-9_]+/i) == this._page){
+        if (page.match(/^[a-z0-9_]+/i)[0] == this._page){
             return;
         }
 
-        if (/^[a-z0-9_]+$/i.test(page)){
-            this._page = page;
-        }
-        else{
-            return;
-        }
+        this._page = page.match(/^[a-z0-9_]+/i)[0];
+
         this.log(`Switched to page '${this._page}'`);
 
         for (let channel of this.activeChannels){
