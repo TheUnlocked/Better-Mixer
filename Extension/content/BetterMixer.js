@@ -122,9 +122,16 @@ export default class BetterMixer {
             channel.unload();
         }
         this.activeChannels = [];
+
         let mainChannel = new Channel(this, this._page);
         if (mainChannel.id){
             this.activeChannels.push(mainChannel);
+        }
+
+        let chatTabBar = document.querySelector('b-channel-chat-tabs>bui-tab-bar');
+
+        if (chatTabBar){
+
         }
     }
 
