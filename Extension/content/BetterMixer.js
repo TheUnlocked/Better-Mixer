@@ -9,6 +9,7 @@ import Channel from "./Channel.js";
 import Patcher from "./Patcher.js";
 import User from "./User.js";
 import Badge from "./Badge.js";
+import BTTVAddon from "./Addons/BTTV/BTTVAddon.js";
 
 let SRC = document.getElementById('BetterMixer-module').src;
 let BASE_URL = SRC.split('/').slice(0, -2).join('/') + '/';
@@ -20,6 +21,7 @@ export default class BetterMixer {
 
         this.configuration = new ConfigurationManager(this);
         this.ffz = new FFZAddon(this);
+        this.bttv = new BTTVAddon(this);
         this.gameWisp = new GameWispAddon(this);
         this.activeChannels = [];
 

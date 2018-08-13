@@ -1,8 +1,8 @@
-import FFZChannel from "./FFZChannel.js";
+import BTTVChannel from "./BTTVChannel.js";
 import BetterMixer from "../../BetterMixer.js";
 import Channel from "../../Channel.js";
 
-export default class FFZAddon {
+export default class BTTVAddon {
     /**
      * 
      * @param {BetterMixer} plugin 
@@ -18,7 +18,7 @@ export default class FFZAddon {
             success: data => {
                 this._syncList = data;
             },
-            error: xhr => this.plugin.log(`${xhr.statusText}: Failed to access FFZ sync list.`, BetterMixer.LogType.ERROR)
+            error: xhr => this.plugin.log(`${xhr.statusText}: Failed to access BTTV sync list.`, BetterMixer.LogType.ERROR)
         });
     }
 
@@ -28,8 +28,8 @@ export default class FFZAddon {
     getSync(channel){
         let twitchName = this._syncList[channel.owner.username.toLowerCase()];
         if (twitchName){
-            return new FFZChannel(this, channel, twitchName);
+            return new BTTVChannel(this, channel, twitchName);
         }
-        this.plugin.log(`${channel.owner.username} is not FFZ synced.`, BetterMixer.LogType.WARNING);
+        this.plugin.log(`${channel.owner.username} is not BTTV synced.`, BetterMixer.LogType.WARNING);
     }
 }

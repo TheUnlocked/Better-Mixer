@@ -23,6 +23,7 @@ export default class Channel {
                 this.description = data.description;
                 this.partnered = data.partnered;
                 this.ffzChannel = plugin.ffz.getSync(this);
+                this.bttvChannel = plugin.bttv.getSync(this);
                 this.gameWispChannel = plugin.gameWisp.getSync(this);
                 this.chat = new Chat(this);
                 this.plugin.log(`Loaded channel '${channelName}'`, BetterMixer.LogType.INFO);
