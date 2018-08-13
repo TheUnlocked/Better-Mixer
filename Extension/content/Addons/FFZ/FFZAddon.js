@@ -12,7 +12,7 @@ export default class FFZAddon {
         this.plugin = plugin;
 
         $.ajax({
-            url: `https://raw.githubusercontent.com/TheUnlocked/Better-Mixer/master/Info/ffzsync.json`,
+            url: `https://raw.githubusercontent.com/TheUnlocked/Better-Mixer/master/Info/twitchsync.json`,
             dataType: 'json',
             async: false,
             success: data => {

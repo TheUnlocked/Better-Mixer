@@ -17,14 +17,14 @@ export default class BTTVChannel{
         this.twitch = username;
         this.emotes = [];
 
-$.ajax({
+        $.ajax({
             url: `https://api.betterttv.net/2/channels/${username}`,
             dataType: 'json',
             async: false,
             success: data => {
-                    for (let emote of data.emotes) {
-                        this.emotes.push(new Emote(emote.code, emote.id['1']));
-                    }
+                for (let emote of data.emotes) {
+                    this.emotes.push(new Emote(emote.code, `https:${data.urlTemplate.replace('{{id}}', emote.id).replace('{{image}}', '3x')}`, 28, 28));
+                }
                 
                 this._gatherEmotes = event => {
                     if (event.data.channel === this.channel){

@@ -122,11 +122,12 @@ export default class Patcher{
             let examplePanel = event.data.dialog.getElementsByTagName("bui-dialog-content")[0];
             let exampleTile = examplePanel.children[0].children[0];
 
+            let emotePanel = examplePanel.children[0].cloneNode();
+            examplePanel.insertBefore(emotePanel, examplePanel.children[0]);
+            examplePanel.style.overflow = "hidden";
             for (let emoteSet of emoteSets){
                 if (Object.keys(emoteSet).length !== 0){
-                    let emotePanel = examplePanel.children[0].cloneNode();
-                    examplePanel.insertBefore(emotePanel, examplePanel.children[0]);
-                    examplePanel.style.overflow = "hidden";
+                    
                     for (let emote of emoteSet){
                         let emoteTile = exampleTile.cloneNode();
                         emoteTile.appendChild(emote.element);
@@ -141,9 +142,9 @@ export default class Patcher{
                         });
                         emotePanel.appendChild(emoteTile);
                     }
-                    emotePanel.appendChild(document.createElement('hr'));
                 }
             }
+            emotePanel.appendChild(document.createElement('hr'));
         });
 
         // Handle config menu
