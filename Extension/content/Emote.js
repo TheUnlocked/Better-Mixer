@@ -12,11 +12,11 @@ export default class Emote{
         // Create emote
         let emote = document.createElement('div');
         emote.classList.add('graphic', 'bettermixer-emotes');
-        emote.style.height = this.height + "px";
-        emote.style.width = this.width + "px";
         let image = document.createElement('img');
         image.src = this.image;
         image.alt = this.name;
+        image.style.height = this.height + "px";
+        image.style.width = this.width + "px";
         //image.title = this.name;
         emote.appendChild(image);
 
