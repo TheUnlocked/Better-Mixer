@@ -26,6 +26,9 @@ export default class FFZAddon {
      * @param {Channel} channel 
      */
     getSync(channel){
+        if (!this._syncList){
+            return;
+        }
         let twitchName = this._syncList[channel.owner.username.toLowerCase()];
         if (twitchName){
             return new FFZChannel(this, channel, twitchName);

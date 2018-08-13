@@ -26,6 +26,9 @@ export default class BTTVAddon {
      * @param {Channel} channel 
      */
     getSync(channel){
+        if (!this._syncList){
+            return;
+        }
         let twitchName = this._syncList[channel.owner.username.toLowerCase()];
         if (twitchName){
             return new BTTVChannel(this, channel, twitchName);
