@@ -179,7 +179,7 @@ export default class Patcher{
             }
             panel.appendChild(betterMixerSection);
 
-            event.data.dialog.querySelector('button[i18n*="Buttons:save"]').addEventListener('click', e => {
+            event.data.dialog.querySelector('button[variant="primary"]').addEventListener('click', e => {
                 this.plugin.configuration.saveConfig();
                 this.plugin.configuration.updateConfig();
                 this.plugin.log("Updated configurations.");
