@@ -1,5 +1,5 @@
 export default class Emote{
-    constructor(name, image, height, width){
+    constructor(name, image, width, height){
 
         this.name = name;
         this.image = image;
