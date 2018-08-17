@@ -66,6 +66,10 @@ b-channel-chat-author > .badge {
     display: none;
 }
 
+b-channel-chat-emote-dialog > bui-static-dialog > div > bui-dialog-content {
+    overflow-y: auto !important;
+}
+
 /* .stage.online {
     max-height: calc(100vh - 60px - 8px) !important;
 } */
