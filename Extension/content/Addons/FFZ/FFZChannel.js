@@ -28,8 +28,8 @@ export default class FFZChannel{
                         if (!emoteUrl)
                             emoteUrl = emote.urls['2'];
                         if (!emoteUrl)
-                            emoteUrl = emote.urls['1']
-                        this.emotes.push(new Emote(emote.name, emote.urls['4'], emote.width, emote.height));
+                            emoteUrl = emote.urls['1'];
+                        this.emotes.push(new Emote(emote.name, emoteUrl, emote.width, emote.height));
                     }
                 }
                 
