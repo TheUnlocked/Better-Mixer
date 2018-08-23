@@ -2,6 +2,7 @@ import Emote from "../../Emote.js";
 import BetterMixer from "../../BetterMixer.js";
 import BTTVAddon from "./BTTVAddon.js";
 import Channel from "../../Channel.js";
+import EmoteSet from "../../EmoteSet.js";
 
 export default class BTTVChannel{
     /**
@@ -15,7 +16,7 @@ export default class BTTVChannel{
         this.plugin = parent.plugin;
         this.channel = channel;
         this.twitch = username;
-        this.emotes = [];
+        this.emotes = new EmoteSet("BTTV Channel Emotes");
 
         $.ajax({
             url: `https://api.betterttv.net/2/channels/${username}`,
@@ -23,7 +24,7 @@ export default class BTTVChannel{
             async: false,
             success: data => {
                 for (let emote of data.emotes) {
-                    this.emotes.push(new Emote(emote.code, `https:${data.urlTemplate.replace('{{id}}', emote.id).replace('{{image}}', '3x')}`, 28, 28));
+                    this.emotes.addEmote(new Emote(emote.code, `https:${data.urlTemplate.replace('{{id}}', emote.id).replace('{{image}}', '3x')}`, 28, 28));
                 }
                 
                 this._gatherEmotes = event => {
@@ -33,7 +34,7 @@ export default class BTTVChannel{
                 };
                 this.plugin.addEventListener(BetterMixer.Events.GATHER_EMOTES, this._gatherEmotes);
 
-                this.plugin.log(`Synced ${this.channel.owner.username} with BTTV emotes from ${this.twitch}.`, BetterMixer.LogType.INFO)
+                this.plugin.log(`Synced ${this.channel.owner.username} with BTTV emotes from ${this.twitch}.`, BetterMixer.LogType.INFO);
             },
             error: xhr => this.plugin.log(`${xhr.statusText}: Failed to load emotes from FFZ.`, BetterMixer.LogType.WARNING)
         });

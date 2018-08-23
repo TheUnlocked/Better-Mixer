@@ -2,6 +2,7 @@ import Emote from "../../Emote.js";
 import BetterMixer from "../../BetterMixer.js";
 import FFZAddon from "./FFZAddon.js";
 import Channel from "../../Channel.js";
+import EmoteSet from "../../EmoteSet.js";
 
 export default class FFZChannel{
     /**
@@ -15,7 +16,7 @@ export default class FFZChannel{
         this.plugin = parent.plugin;
         this.channel = channel;
         this.twitch = username;
-        this.emotes = [];
+        this.emotes = new EmoteSet("FFZ Channel Emotes");
 
         $.ajax({
             url: `https://api.frankerfacez.com/v1/room/${username}`,
@@ -29,7 +30,7 @@ export default class FFZChannel{
                             emoteUrl = emote.urls['2'];
                         if (!emoteUrl)
                             emoteUrl = emote.urls['1'];
-                        this.emotes.push(new Emote(emote.name, emoteUrl, emote.width, emote.height));
+                        this.emotes.addEmote(new Emote(emote.name, emoteUrl, emote.width, emote.height));
                     }
                 }
                 
@@ -40,7 +41,7 @@ export default class FFZChannel{
                 };
                 this.plugin.addEventListener(BetterMixer.Events.GATHER_EMOTES, this._gatherEmotes);
 
-                this.plugin.log(`Synced ${this.channel.owner.username} with FFZ emotes from ${this.twitch}.`, BetterMixer.LogType.INFO)
+                this.plugin.log(`Synced ${this.channel.owner.username} with FFZ emotes from ${this.twitch}.`, BetterMixer.LogType.INFO);
             },
             error: xhr => this.plugin.log(`${xhr.statusText}: Failed to load emotes from FFZ.`, BetterMixer.LogType.WARNING)
         });

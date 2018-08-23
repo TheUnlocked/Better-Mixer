@@ -1,5 +1,6 @@
 import BetterMixer from "./BetterMixer.js";
 import Config from "./Configs/Config.js";
+import EmoteSet from "./EmoteSet.js";
 
 export default class Patcher{
     /**
@@ -117,18 +118,41 @@ export default class Patcher{
                 user: event.sender.plugin.user,
                 message: null
             };
-            let emoteSets = plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, event.sender);
+            let gatheredEmotes = plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, event.sender);
 
-            let examplePanel = event.data.dialog.getElementsByTagName("bui-dialog-content")[0];
-            let exampleTile = examplePanel.children[0].children[0];
+            let dialog = event.data.dialog.getElementsByTagName("bui-dialog-content")[0];
+            dialog.style.overflow = "hidden";
+            
+            let exampleEmoteSet = dialog.children[0];
+            let exampleTile = exampleEmoteSet.children[0];
 
-            let emotePanel = examplePanel.children[0].cloneNode();
-            examplePanel.insertBefore(emotePanel, examplePanel.children[0]);
-            examplePanel.style.overflow = "hidden";
+            let emoteSets = [];
+            let uncategorizedEmotes = new EmoteSet("Uncategorized");
+
+            for (let emotes of gatheredEmotes){
+                if (emotes.constructor === EmoteSet){
+                    emoteSets.push(emotes);
+                }
+                else{
+                    uncategorizedEmotes.addEmotes(emotes);
+                }
+            }
+
+            emoteSets.push(uncategorizedEmotes);
+
             for (let emoteSet of emoteSets){
-                if (Object.keys(emoteSet).length !== 0){
-                    
-                    for (let emote of emoteSet){
+                if (Object.keys(emoteSet.emotes).length !== 0){
+                    let emoteTileSet = exampleEmoteSet.cloneNode();
+                    emoteTileSet.classList.add('bettermixer-emote-tiles');
+
+                    let title = document.createElement('div');
+                    title.innerHTML = emoteSet.name;
+                    title.classList.add('display-1', 'bettermixer-dialog-subtitle');
+                    emoteTileSet.appendChild(title);
+
+                    dialog.appendChild(emoteTileSet);
+
+                    for (let emote of emoteSet.emotes){
                         let emoteTile = exampleTile.cloneNode();
                         emoteTile.appendChild(emote.element);
                         emoteTile.addEventListener('click', () => {
@@ -140,11 +164,17 @@ export default class Patcher{
                                             (doc.getLine(cursor.line)[cursor.ch] == ' ' ? '' : ' ');
                             doc.replaceSelection(insertText);
                         });
-                        emotePanel.appendChild(emoteTile);
+                        emoteTileSet.appendChild(emoteTile);
                     }
                 }
             }
-            emotePanel.appendChild(document.createElement('hr'));
+
+            let mixerEmoteSetTitle = document.createElement('div');
+            mixerEmoteSetTitle.innerHTML = "Mixer Emotes";
+            mixerEmoteSetTitle.classList.add('display-1', 'bettermixer-dialog-subtitle');
+            exampleEmoteSet.insertBefore(mixerEmoteSetTitle, exampleEmoteSet.children[0]);
+
+            dialog.appendChild(exampleEmoteSet);
         });
 
         // Handle config menu
