@@ -24,6 +24,11 @@ export default class FFZChannel{
             success: data => {
                 for (let emoteSet in data.sets) {
                     for (let emote of data.sets[emoteSet].emoticons) {
+                        let emoteUrl = emote.urls['4'];
+                        if (!emoteUrl)
+                            emoteUrl = emote.urls['2'];
+                        if (!emoteUrl)
+                            emoteUrl = emote.urls['1']
                         this.emotes.push(new Emote(emote.name, emote.urls['4'], emote.width, emote.height));
                     }
                 }
