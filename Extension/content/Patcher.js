@@ -37,7 +37,7 @@ export default class Patcher{
                     message: message
                 };
                 let emoteList = plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, message)
-                    .reduce((acc, val) => acc.concat(val), []); // Upgrade to .flat(1) when that becomes mainstream tech
+                    .reduce((acc, val) => val.constructor === EmoteSet ? acc.concat(val.emotes) : acc.concat(val), []); // Upgrade to .flat(1) when that becomes mainstream tech
                 let emotes = emoteList.reduce((result, value, index, arr) => { result[value.name] = value; return result; }, {});
 
                 for (let textElement of message.element.getElementsByClassName('textComponent')) {
