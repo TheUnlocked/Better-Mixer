@@ -1,6 +1,7 @@
 import BetterMixer from "./BetterMixer.js";
 import Config from "./Configs/Config.js";
 import EmoteSet from "./EmoteSet.js";
+import BrowseFiltersConfig from "./Configs/BrowseFiltersConfig.js";
 
 export default class Patcher{
     /**
@@ -37,7 +38,7 @@ export default class Patcher{
                     message: message
                 };
                 let emoteList = plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, message)
-                    .reduce((acc, val) => val.constructor === EmoteSet ? acc.concat(val.emotes) : acc.concat(val), []); // Upgrade to .flat(1) when that becomes mainstream tech
+                    .reduce((acc, val) => val.constructor === EmoteSet ? acc.concat(val.emotes) : acc.concat(val), []);
                 let emotes = emoteList.reduce((result, value, index, arr) => { result[value.name] = value; return result; }, {});
 
                 for (let textElement of message.element.getElementsByClassName('textComponent')) {
@@ -215,5 +216,28 @@ export default class Patcher{
                 this.plugin.log("Updated configurations.");
             });
         });
+
+        // Handle Browse > Filters > Save Filters
+        if (document.location.href.startsWith("https://mixer.com/browse/all")){
+            plugin.configuration.registerConfig(new BrowseFiltersConfig());
+
+            let checkFiltersLoaded = () => {
+                let filtersWindow = document.querySelector('b-browse-filters');
+                if (filtersWindow){
+                    let resetFiltersButton = filtersWindow.querySelector('button.reset-filters');
+                    let saveFiltersButton = resetFiltersButton.cloneNode(true);
+                    saveFiltersButton.classList.remove('reset-filters');
+                    saveFiltersButton.classList.add('bettermixer-save-filters');
+                    saveFiltersButton.firstChild.firstChild.firstChild.innerText = "Save Filters";
+                    filtersWindow.insertBefore(saveFiltersButton, resetFiltersButton);
+
+                    saveFiltersButton.addEventListener('click', e => {
+
+                    });
+                }
+                else setTimeout(checkFiltersLoaded, 100);
+            };
+            checkFiltersLoaded();
+        }
     }
 }

@@ -80,6 +80,12 @@ b-channel-chat-emote-dialog > bui-static-dialog > div > bui-dialog-content {
     text-align: left;
 }
 
+.bettermixer-save-filters {
+    position: absolute;
+    right: 162px;
+    top: 8px;
+}
+
 /* .stage.online {
     max-height: calc(100vh - 60px - 8px) !important;
 } */

@@ -32,12 +32,12 @@ export default class Config{
     update(){
     }
 
-    // The type of config, currently unused as configs can only be booleans
     get configType(){
-        return Config.ConfigTypeEnum.BOOLEAN;
+        return Config.ConfigTypeEnum.NONE;
     }
 }
 
 Config.ConfigTypeEnum = Object.freeze({
-    BOOLEAN: 0
+    NONE: 0,
+    BOOLEAN: 1
 });

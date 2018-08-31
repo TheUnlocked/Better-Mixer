@@ -98,6 +98,11 @@ export default class BetterMixer {
             return;
         }
 
+        if (page == 'browse/all'){
+            this.log(`This is not a user page.`);
+            return;
+        }
+
         if (page.startsWith('embed/chat/')){
             page = page.substring(11);
             this.log(`Chat is either in a popout or embedded window.`);
