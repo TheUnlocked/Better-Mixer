@@ -38,23 +38,36 @@ export default class ConfigurationManager {
 
     /**
      * Warning: This method may register the config asynchronously.
-     * @param {Config} config 
+     * @param {Config} config
+     * @param {Function?} callback
      */
-    registerConfig(config){
+    registerConfig(config, callback = undefined){
         this._configs[config.configName] = config;
 
+        if (!config.___cb){
+            config.___cb = [];
+        }
+
         if (!this._recvconfigs){
+            if (callback)
+                config.___cb.push(callback);
             this._registerBuffer.push(config);
             return;
         }
         
         if (this._recvconfigs[config.configName] === undefined){
-            plugin.postToContent({message: 'setConfigs', data: {[config.configName]: config.defaultState}});
+            this.plugin.postToContent({message: 'setConfigs', data: {[config.configName]: config.defaultState}});
             config.state = config.defaultState;
         }
         else{
             config.state = this._recvconfigs[config.configName];
         }
+        
+        for (let cb of config.___cb){
+            cb(config);
+        }
+        delete config.___cb;
+
         config.update();
     }
 
@@ -73,6 +86,15 @@ export default class ConfigurationManager {
 
     getConfig(configName){
         return this._configs[configName];
+    }
+
+    getConfigAsync(configName, callback){
+        if (this._recvconfigs){
+            callback(this._configs[configName]);
+        }
+        else{
+            this._configs[configName].___cb.push(callback);
+        }
     }
 
     getAllConfigs(){

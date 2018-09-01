@@ -1,7 +1,6 @@
 import BetterMixer from "./BetterMixer.js";
 import Config from "./Configs/Config.js";
 import EmoteSet from "./EmoteSet.js";
-import BrowseFiltersConfig from "./Configs/BrowseFiltersConfig.js";
 
 export default class Patcher{
     /**
@@ -218,26 +217,66 @@ export default class Patcher{
         });
 
         // Handle Browse > Filters > Save Filters
-        if (document.location.href.startsWith("https://mixer.com/browse/all")){
-            plugin.configuration.registerConfig(new BrowseFiltersConfig());
+        this.plugin.addEventListener(BetterMixer.Events.ON_PAGE_LOAD, () => {
+            let filterConfig = this.plugin.configuration.getConfigAsync('browse_filters', (filterConfig) => {
+                if (document.location.href.startsWith("https://mixer.com/browse/all")){
+                    if (document.location.href == "https://mixer.com/browse/all" && !document.querySelector('b-browse-filters.visible') && filterConfig.state != ""){
+                        document.location.href = "https://mixer.com/browse/all?" + filterConfig.state;
+                    }
 
-            let checkFiltersLoaded = () => {
-                let filtersWindow = document.querySelector('b-browse-filters');
-                if (filtersWindow){
-                    let resetFiltersButton = filtersWindow.querySelector('button.reset-filters');
-                    let saveFiltersButton = resetFiltersButton.cloneNode(true);
-                    saveFiltersButton.classList.remove('reset-filters');
-                    saveFiltersButton.classList.add('bettermixer-save-filters');
-                    saveFiltersButton.firstChild.firstChild.firstChild.innerText = "Save Filters";
-                    filtersWindow.insertBefore(saveFiltersButton, resetFiltersButton);
+                    let checkFiltersLoaded = () => {
+                        let filtersWindow = document.querySelector('b-browse-filters');
+                        if (filtersWindow && !filtersWindow.querySelector('button.bettermixer-save-filters')){
+                            let resetFiltersButton = filtersWindow.querySelector('button.reset-filters');
+                            let saveFiltersButton = resetFiltersButton.cloneNode(true);
+                            saveFiltersButton.classList.remove('reset-filters');
+                            saveFiltersButton.classList.add('bettermixer-save-filters');
+                            saveFiltersButton.firstChild.firstChild.firstChild.innerText = "Save Filters";
+                            filtersWindow.insertBefore(saveFiltersButton, resetFiltersButton);
 
-                    saveFiltersButton.addEventListener('click', e => {
+                            //Patcher.addTooltip(saveFiltersButton, 'The "Games" and "Share Controller" filters are currently not supported.');
 
-                    });
+                            saveFiltersButton.addEventListener('click', e => {
+                                if (window.location.href.includes('?'))
+                                    filterConfig.state = window.location.href.split('?')[1];
+                                else
+                                    filterConfig.state = "";
+                                this.plugin.configuration.saveConfig();
+                            });
+                        }
+                        else setTimeout(checkFiltersLoaded, 100);
+                    };
+                    checkFiltersLoaded();
                 }
-                else setTimeout(checkFiltersLoaded, 100);
-            };
-            checkFiltersLoaded();
-        }
+            });
+        });
+    }
+
+    /**
+     * 
+     * @param {Element} element 
+     * @param {String} text 
+     */
+    static addTooltip(element, text){
+        element.addEventListener('mouseover', () => {
+            let tooltip = document.createElement('div');
+            document.body.appendChild(tooltip); // This needs to happen first to make sure tooltip.clientWidth works correctly.
+
+            tooltip.innerHTML = text;
+            let rect = element.getBoundingClientRect();
+            tooltip.classList.add('bettermixer-tooltip');
+            tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.clientWidth / 2) + "px";
+            tooltip.style.top = document.documentElement.scrollTop + rect.top - 24 + "px";
+            tooltip.style.pointerEvents = "none";
+
+            let scrollEvent = () => tooltip.style.top = document.documentElement.scrollTop + rect.top - 24 + "px";
+            window.addEventListener('scroll', scrollEvent);
+
+            element.addEventListener('mouseout', function mouseoutEvent() {
+                document.body.removeChild(tooltip);
+                element.removeEventListener('mouseout', mouseoutEvent);
+                window.removeEventListener('scroll', scrollEvent);
+            });
+        });
     }
 }
