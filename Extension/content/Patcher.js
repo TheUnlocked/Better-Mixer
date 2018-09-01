@@ -155,6 +155,7 @@ export default class Patcher{
                     for (let emote of emoteSet.emotes){
                         let emoteTile = exampleTile.cloneNode();
                         emoteTile.appendChild(emote.element);
+                        emoteTile.style.width = emote.width + 12 + "px";
                         emoteTile.addEventListener('click', () => {
                             let doc = document.getElementsByClassName('CodeMirror')[0].CodeMirror.getDoc();
                             let cursor = doc.getCursor();
