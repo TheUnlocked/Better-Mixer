@@ -10,6 +10,7 @@ import Patcher from "./Patcher.js";
 import User from "./User.js";
 import Badge from "./Badge.js";
 import BTTVAddon from "./Addons/BTTV/BTTVAddon.js";
+import BrowseFiltersConfig from "./Configs/BrowseFiltersConfig.js";
 
 let SRC = document.getElementById('BetterMixer-module').src;
 let BASE_URL = SRC.split('/').slice(0, -2).join('/') + '/';
@@ -74,6 +75,8 @@ export default class BetterMixer {
             this.injectStylesheet("lib/css/hideavatars.css"),
             'hide_avatars', 'Hide Avatars', false, true));
 
+        this.configuration.registerConfig(new BrowseFiltersConfig());
+
         setTimeout(() => this.reload(), 0);
 
         window.onbeforeunload = () => {
@@ -92,9 +95,16 @@ export default class BetterMixer {
     reload(){
         let page = window.location.pathname.substring(1).toLowerCase();
 
+        this.dispatchEvent(BetterMixer.Events.ON_PAGE_LOAD, page, this);
+
         if (page == 'me/bounceback'){
             this._page = "";
             setTimeout(() => this.reload(), 100);
+            return;
+        }
+
+        if (page == 'browse/all'){
+            this.log(`This is not a user page.`);
             return;
         }
 
@@ -254,9 +264,10 @@ BetterMixer.Events = {
     ON_MESSAGE: 4,
     ON_EMOTES_DIALOG_OPEN: 5,
     ON_SETTINGS_DIALOG_OPEN: 6,
+    ON_PAGE_LOAD: 7,
 
-    GATHER_EMOTES: 7,
-    GATHER_BADGES: 8,
+    GATHER_EMOTES: 8,
+    GATHER_BADGES: 9,
 };
 
 BetterMixer.instance = new BetterMixer();
