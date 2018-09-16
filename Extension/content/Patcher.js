@@ -205,8 +205,12 @@ export default class Patcher{
                             config.state = configElement.classList.contains('bui-toggle-checked');
                         });
                         break;
+                    case Config.ConfigTypeEnum.NONE:
+                        break;
                 }
-                betterMixerSection.appendChild(configElement);
+                if (configElement){
+                    betterMixerSection.appendChild(configElement);
+                }
             }
             panel.appendChild(betterMixerSection);
 
