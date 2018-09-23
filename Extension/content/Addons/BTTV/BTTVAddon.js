@@ -33,6 +33,6 @@ export default class BTTVAddon {
         if (twitchName){
             return new BTTVChannel(this, channel, twitchName);
         }
-        this.plugin.log(`${channel.owner.username} is not BTTV synced.`, BetterMixer.LogType.WARNING);
+        this.plugin.log(`${channel.owner.username} is not BTTV synced.`, BetterMixer.LogType.INFO);
     }
 }

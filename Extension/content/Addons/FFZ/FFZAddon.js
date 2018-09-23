@@ -33,6 +33,6 @@ export default class FFZAddon {
         if (twitchName){
             return new FFZChannel(this, channel, twitchName);
         }
-        this.plugin.log(`${channel.owner.username} is not FFZ synced.`, BetterMixer.LogType.WARNING);
+        this.plugin.log(`${channel.owner.username} is not FFZ synced.`, BetterMixer.LogType.INFO);
     }
 }
