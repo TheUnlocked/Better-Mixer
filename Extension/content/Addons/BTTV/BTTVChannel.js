@@ -36,7 +36,7 @@ export default class BTTVChannel{
 
                 this.plugin.log(`Synced ${this.channel.owner.username} with BTTV emotes from ${this.twitch}.`, BetterMixer.LogType.INFO);
             },
-            error: xhr => this.plugin.log(`${xhr.statusText}: Failed to load emotes from FFZ.`, BetterMixer.LogType.WARNING)
+            error: xhr => this.plugin.log(`${xhr.statusText}: Failed to load emotes from BTTV.`, BetterMixer.LogType.WARNING)
         });
 
     }
