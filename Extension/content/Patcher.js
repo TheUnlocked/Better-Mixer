@@ -17,7 +17,7 @@ export default class Patcher{
             // Alternating lines (will be done with pure CSS once :nth-child(An+B of S) comes out into chrome stable)
             {
                 let parent = message.element.parentElement;
-                if (!parent.previousSibling.classList || parent.previousSibling.classList.contains("timestamp")){
+                if (!parent.previousSibling.classList || parent.previousSibling.getElementsByClassName('timestamp').length > 0){
                     parent.betterMixerAltLineColor = !parent.previousSibling.previousSibling.betterMixerAltLineColor;
                 } 
                 else{
