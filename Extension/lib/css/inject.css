@@ -58,6 +58,8 @@ div.profile-bio :hover {
 b-channel-chat-author > .badge {
     top: 2px;
     position: relative;
+    margin-left: 2px;
+    margin-right: 2px;
 }
 
 .better-mixer-inline-control {

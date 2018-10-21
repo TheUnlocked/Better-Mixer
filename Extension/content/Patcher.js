@@ -106,7 +106,7 @@ export default class Patcher{
                     let preceedingBadge = badge.element;
                     preceedingBadge.classList.add('bettermixer-badge-relocated');
                     preceedingBadge.style.display = 'none';
-                    authorElement.insertBefore(preceedingBadge, authorElement.getElementsByClassName('username')[0]);
+                    authorElement.insertBefore(preceedingBadge, authorElement.getElementsByClassName('wrapper')[0]);
                 }
             }
         });
