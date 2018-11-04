@@ -55,12 +55,12 @@ div.profile-bio :hover {
     display: none;
 } */
 
-b-channel-chat-author > .badge {
+b-channel-chat-author .badge {
     top: 2px;
     position: relative;
 }
 
-b-channel-chat-author > .badge:not(.bettermixer-badge-relocated) {
+b-channel-chat-author .badge:not(.bettermixer-badge-relocated) {
     margin-left: 2px;
 }
 
