@@ -34,7 +34,7 @@ export default class Chat {
         }
         this.element.classList.add('bettermixer-chat-window');
         
-        this._msgObserver = $.initialize('b-channel-chat-message', (_, element) => {
+        this._msgObserver = $.initialize('b-channel-chat-message, b-chat-attribution-message', (_, element) => {
             let authorName = element.getElementsByClassName('username')[0].innerText;
             let msg = new ChatMessage(this, element, this.users[authorName]);
             if (!this.users[authorName]){

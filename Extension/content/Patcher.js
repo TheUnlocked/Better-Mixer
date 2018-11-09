@@ -224,9 +224,10 @@ export default class Patcher{
         // Handle Browse > Filters > Save Filters
         this.plugin.addEventListener(BetterMixer.Events.ON_PAGE_LOAD, () => {
             let filterConfig = this.plugin.configuration.getConfigAsync('browse_filters', (filterConfig) => {
-                if (document.location.href.startsWith("https://mixer.com/browse/all")){
-                    if (document.location.href == "https://mixer.com/browse/all" && !document.querySelector('b-browse-filters.visible') && filterConfig.state != ""){
-                        document.location.href = "https://mixer.com/browse/all?" + filterConfig.state;
+                if (document.location.pathname.startsWith("/browse")){
+                    let browseBaseUrl = "https://mixer.com" + document.location.pathname;
+                    if (document.location.href == browseBaseUrl && !document.querySelector('b-browse-filters.visible') && filterConfig.state != ""){
+                        document.location.href = browseBaseUrl + "?" + filterConfig.state;
                     }
 
                     let checkFiltersLoaded = () => {
