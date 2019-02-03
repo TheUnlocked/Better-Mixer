@@ -17,7 +17,7 @@ export default class ChatMessage {
             this.author = author;
         }
         else{
-            this.author = new User({ username: this.element.getElementsByClassName('username')[0].innerText });
+            this.author = new User({ username: this.element.getElementsByClassName('Username__1i7gh')[0].innerText });
         }
     }
 }

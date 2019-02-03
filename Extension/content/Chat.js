@@ -24,7 +24,7 @@ export default class Chat {
             this.element = element;
         }
         else{
-            this.element = document.querySelector('b-channel-chat:not(.bettermixer-chat-window)');
+            this.element = document.querySelector('div.chatContainer__24UL3:not(.bettermixer-chat-window)');
         }
         //this.socket = new ChatSocket(this);
 
@@ -34,8 +34,8 @@ export default class Chat {
         }
         this.element.classList.add('bettermixer-chat-window');
         
-        this._msgObserver = $.initialize('b-channel-chat-message, b-chat-attribution-message', (_, element) => {
-            let authorName = element.getElementsByClassName('username')[0].innerText;
+        this._msgObserver = $.initialize('div.message__3cqAS', (_, element) => {
+            let authorName = element.getElementsByClassName('Username__1i7gh')[0].innerText;
             let msg = new ChatMessage(this, element, this.users[authorName]);
             if (!this.users[authorName]){
                 this.users[authorName] = msg.author;
@@ -49,7 +49,7 @@ export default class Chat {
             }
 
             let badges = [];
-            for (let badgeElement of event.data.message.element.getElementsByClassName('badge')){
+            for (let badgeElement of event.data.message.element.getElementsByClassName('badge__36dP3')){
                 if (badgeElement.alt == 'Subscriber'){
                     if (!this.subBadge){
                         this.subBadge = new Badge('Subscriber', badgeElement.src, 'Subscriber', badgeElement);
@@ -67,8 +67,10 @@ export default class Chat {
         };
         this.plugin.addEventListener(BetterMixer.Events.GATHER_BADGES, this._gatherBadges);
 
-        this._emoteDialogObserver = $.initialize('b-channel-chat-emote-dialog', (_, element) => {
-            this.plugin.dispatchEvent(BetterMixer.Events.ON_EMOTES_DIALOG_OPEN, { dialog: element }, this);
+        this._emoteDialogObserver = $.initialize('.wrapper__SsQT6 h1', (_, element) => {
+            if (element.innerText == "Emoticons"){
+                this.plugin.dispatchEvent(BetterMixer.Events.ON_EMOTES_DIALOG_OPEN, { dialog: element.parentElement }, this);
+            }
         }, { target: this.element });
     }
 

@@ -1,8 +1,8 @@
-b-channel-chat-author .badge:not(.bettermixer-badge-relocated) {
+.message__3cqAS .badge__36dP3:not(.bettermixer-badge-relocated) {
     display: none !important;
 }
 
-b-channel-chat-author .badge.bettermixer-badge-relocated {
+.message__3cqAS .badge__36dP3.bettermixer-badge-relocated {
     display: inline-block !important;
     margin-right: 4px;
 }

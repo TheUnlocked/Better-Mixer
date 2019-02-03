@@ -68,10 +68,6 @@ export default class BetterMixer {
             'move_badges', 'Show Badges Before Username', false, true));
 
         this.configuration.registerConfig(new StylesheetToggleConfig(
-            this.injectStylesheet("lib/css/alternatelinecolors.css"),
-            'alternate_line_colors', 'Alternate Chat Line Colors', false, true));
-
-        this.configuration.registerConfig(new StylesheetToggleConfig(
             this.injectStylesheet("lib/css/hideavatars.css"),
             'hide_avatars', 'Hide Avatars', false, true));
 

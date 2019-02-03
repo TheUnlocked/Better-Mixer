@@ -14,21 +14,6 @@ export default class Patcher{
         this.plugin.addEventListener(BetterMixer.Events.ON_MESSAGE, event => {
             let message = event.sender;
 
-            // Alternating lines (will be done with pure CSS once :nth-child(An+B of S) comes out into chrome stable)
-            {
-                let parent = message.element.parentElement;
-                if (!parent.previousSibling.classList || parent.previousSibling.getElementsByClassName('timestamp').length > 0){
-                    parent.betterMixerAltLineColor = !parent.previousSibling.previousSibling.betterMixerAltLineColor;
-                } 
-                else{
-                    parent.betterMixerAltLineColor = !parent.previousSibling.betterMixerAltLineColor;
-                }
-            
-                if (parent.betterMixerAltLineColor){
-                    parent.classList.add("bettermixer-alternate-chat-line-color");
-                }
-            }
-
             // Handle message emotes
             {
                 let emoteGatherEventData = {
@@ -40,7 +25,7 @@ export default class Patcher{
                     .reduce((acc, val) => val.constructor === EmoteSet ? acc.concat(val.emotes) : acc.concat(val), []);
                 let emotes = emoteList.reduce((result, value, index, arr) => { result[value.name] = value; return result; }, {});
 
-                for (let textElement of message.element.getElementsByClassName('textComponent')) {
+                for (let textElement of message.element.getElementsByClassName('textComponent__Efj4_')) {
                     // Break it up into text pieces, and check each piece for an emote
                     let words = textElement.innerHTML.trim().split(" ");
                     let messageBuilder = [];
@@ -84,7 +69,7 @@ export default class Patcher{
             // Handle bot color changes
             {
                 if (message.author.username.includes("Bot") || message.author.username.toLowerCase().endsWith("bot")){
-                    message.element.getElementsByTagName("b-channel-chat-author")[0].classList.add('bettermixer-role-bot');
+                    message.element.querySelector('.Username__1i7gh').classList.add('bettermixer-role-bot');
                 }
             }
 
@@ -98,7 +83,7 @@ export default class Patcher{
                 let badges = plugin.dispatchGather(BetterMixer.Events.GATHER_BADGES, badgeGatherEventData, message)
                     .reduce((acc, val) => acc.concat(val), []); // Upgrade to .flat(1) when that becomes mainstream tech
 
-                let authorElement = message.element.getElementsByTagName('b-channel-chat-author')[0];
+                let authorElement = message.element.querySelector('.Username__1i7gh');
                 for (let badge of badges){
                     if (!badge.example){
                         authorElement.appendChild(badge.element);
@@ -106,7 +91,7 @@ export default class Patcher{
                     let preceedingBadge = badge.element;
                     preceedingBadge.classList.add('bettermixer-badge-relocated');
                     preceedingBadge.style.display = 'none';
-                    authorElement.insertBefore(preceedingBadge, authorElement.getElementsByClassName('wrapper')[0]);
+                    authorElement.insertBefore(preceedingBadge, authorElement.firstChild);
                 }
             }
         });
@@ -237,7 +222,7 @@ export default class Patcher{
                             let saveFiltersButton = resetFiltersButton.cloneNode(true);
                             saveFiltersButton.classList.remove('reset-filters');
                             saveFiltersButton.classList.add('bettermixer-save-filters');
-                            saveFiltersButton.firstChild.firstChild.firstChild.innerText = "Save Filters";
+                            saveFiltersButton.querySelector('div > span > span').innerText = "Save Filters";
                             filtersWindow.insertBefore(saveFiltersButton, resetFiltersButton);
 
                             //Patcher.addTooltip(saveFiltersButton, 'The "Games" and "Share Controller" filters are currently not supported.');

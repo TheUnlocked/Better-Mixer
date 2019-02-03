@@ -40,48 +40,50 @@
     top: 5px;
 }
 
-div.profile-bio > ul {
+/* div.profile-bio > ul {
     float: right;
     width: 100%;
-    /* Using transitions for if one day this is actually supported. */
+                            // Using transitions for if one day this is actually supported.
     transition: width 2s;
 }
 
 div.profile-bio :hover {
     width: auto;
-}
+} */
 
 /* b-channel-chat-author > .badge.bettermixer-badge-relocated {
     display: none;
 } */
 
-b-channel-chat-author .badge {
-    top: 2px;
+.message__3cqAS .badge__36dP3 {
+    bottom: 2px;
     position: relative;
 }
 
-b-channel-chat-author .badge:not(.bettermixer-badge-relocated) {
-    margin-left: 2px;
+.message__3cqAS .badge__36dP3:not(.bettermixer-badge-relocated) {
+    margin-left: 5px;
 }
 
-.better-mixer-inline-control {
+/* .better-mixer-inline-control {
     padding-left: 2px;
     padding-right: 2px;
     display: none;
+} */
+
+.textComponent__Efj4_ {
+    margin-left: unset !important;
 }
 
+/* NEEDS FIXING */
 b-channel-chat-emote-dialog > bui-static-dialog > div > bui-dialog-content {
     overflow-y: auto !important;
 }
 
+/* NEEDS FIXING */
 .tiles.bettermixer-emote-tiles {
     border-bottom: 2px solid #252939;
     margin-bottom: 12px;
     padding-bottom: 2px;
-}
-
-.display-1.bettermixer-dialog-subtitle {
-    text-align: left;
 }
 
 .bettermixer-save-filters {
