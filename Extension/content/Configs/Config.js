@@ -39,5 +39,7 @@ export default class Config{
 
 Config.ConfigTypeEnum = Object.freeze({
     NONE: 0,
-    BOOLEAN: 1
+    BOOLEAN: 1,
+    STRING: 2,
+    COLOR: 3
 });

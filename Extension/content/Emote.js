@@ -5,9 +5,14 @@ export default class Emote{
 
         this.name = name;
         this.image = image;
-        this.height = height;
-        this.width = width;
-
+        if (height < 32){
+            this.height = height;
+            this.width = width;
+        }
+        else{
+            this.height = 32;
+            this.width = width / height * 32;
+        }
     }
 
     get element(){
@@ -16,12 +21,16 @@ export default class Emote{
         emote.classList.add('graphic', 'bettermixer-emotes');
         let image = document.createElement('img');
         image.src = this.image;
-        image.alt = this.name;
+        image.alt = this.name + " ";
         image.style.height = this.height + "px";
         image.style.width = this.width + "px";
 
+        // let emoteWidth = document.createElement('div');
+        // emoteWidth.style.width = this.width + "px";
+
         //image.title = this.name;
         emote.appendChild(image);
+        // emote.appendChild(emoteWidth);
         
         Patcher.addTooltip(emote, this.name);
 

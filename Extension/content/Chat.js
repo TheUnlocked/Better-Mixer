@@ -35,7 +35,11 @@ export default class Chat {
         this.element.classList.add('bettermixer-chat-window');
         
         this._msgObserver = $.initialize('div.message__3cqAS', (_, element) => {
-            let authorName = element.getElementsByClassName('Username__1i7gh')[0].innerText;
+            let usernameElement = element.getElementsByClassName('Username__1i7gh')[0];
+            if (!usernameElement){
+                return;
+            }
+            let authorName = usernameElement.innerText;
             let msg = new ChatMessage(this, element, this.users[authorName]);
             if (!this.users[authorName]){
                 this.users[authorName] = msg.author;
@@ -68,7 +72,7 @@ export default class Chat {
         this.plugin.addEventListener(BetterMixer.Events.GATHER_BADGES, this._gatherBadges);
 
         this._emoteDialogObserver = $.initialize('.wrapper__SsQT6 h1', (_, element) => {
-            if (element.innerText == "Emoticons"){
+            if (element.innerText == "EMOTICONS"){
                 this.plugin.dispatchEvent(BetterMixer.Events.ON_EMOTES_DIALOG_OPEN, { dialog: element.parentElement }, this);
             }
         }, { target: this.element });

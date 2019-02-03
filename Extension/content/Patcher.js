@@ -25,7 +25,8 @@ export default class Patcher{
                     .reduce((acc, val) => val.constructor === EmoteSet ? acc.concat(val.emotes) : acc.concat(val), []);
                 let emotes = emoteList.reduce((result, value, index, arr) => { result[value.name] = value; return result; }, {});
 
-                for (let textElement of message.element.getElementsByClassName('textComponent__Efj4_')) {
+                let textPieces = [...message.element.getElementsByClassName('textComponent__Efj4_')];
+                for (let textElement of textPieces) {
                     // Break it up into text pieces, and check each piece for an emote
                     let words = textElement.innerHTML.trim().split(" ");
                     let messageBuilder = [];
@@ -45,7 +46,7 @@ export default class Patcher{
                             // Push the emote
                             messageBuilder.push(emote.element);
                         } else {
-                            if (!textBuilder){
+                            if (!textBuilder && messageBuilder.length != 0){
                                 textBuilder = ' ';
                             }
                             textBuilder += `${word} `;
@@ -69,7 +70,7 @@ export default class Patcher{
             // Handle bot color changes
             {
                 if (message.author.username.includes("Bot") || message.author.username.toLowerCase().endsWith("bot")){
-                    message.element.querySelector('.Username__1i7gh').classList.add('bettermixer-role-bot');
+                    message.element.querySelector('.Username__1i7gh').style.color = BetterMixer.instance.configuration.getConfig("botcolor");
                 }
             }
 
@@ -105,11 +106,10 @@ export default class Patcher{
             };
             let gatheredEmotes = plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, event.sender);
 
-            let dialog = event.data.dialog.getElementsByTagName("bui-dialog-content")[0];
-            dialog.style.overflow = "hidden";
+            let emoteContainer = event.data.dialog.querySelector('div.container__3unoh');
+            emoteContainer.style.overflow = "hidden";
             
-            let exampleEmoteSet = dialog.children[0];
-            let exampleTile = exampleEmoteSet.children[0];
+            let exampleButton = emoteContainer.children[0];
 
             let emoteSets = [];
             let uncategorizedEmotes = new EmoteSet("Uncategorized");
@@ -126,41 +126,25 @@ export default class Patcher{
             emoteSets.push(uncategorizedEmotes);
 
             for (let emoteSet of emoteSets){
-                if (Object.keys(emoteSet.emotes).length !== 0){
-                    let emoteTileSet = exampleEmoteSet.cloneNode();
-                    emoteTileSet.classList.add('bettermixer-emote-tiles');
+                for (let emote of emoteSet.emotes){
+                    let emoteButton = exampleButton.cloneNode();
+                    emoteButton.appendChild(emote.element);
+                    emoteButton.style.width = emote.width + 12 + "px";
+                    emoteButton.addEventListener('click', () => {
+                        // let doc = document.getElementsByClassName('CodeMirror')[0].CodeMirror.getDoc();
+                        // let cursor = doc.getCursor();
 
-                    let title = document.createElement('div');
-                    title.innerHTML = emoteSet.name;
-                    title.classList.add('display-1', 'bettermixer-dialog-subtitle');
-                    emoteTileSet.appendChild(title);
+                        // let insertText = (doc.getLine(cursor.line)[cursor.ch - 1] == ' ' ? '' : ' ') +
+                        //                 emote.name +
+                        //                 (doc.getLine(cursor.line)[cursor.ch] == ' ' ? '' : ' ');
+                        // doc.replaceSelection(insertText);
 
-                    dialog.appendChild(emoteTileSet);
-
-                    for (let emote of emoteSet.emotes){
-                        let emoteTile = exampleTile.cloneNode();
-                        emoteTile.appendChild(emote.element);
-                        emoteTile.style.width = emote.width + 12 + "px";
-                        emoteTile.addEventListener('click', () => {
-                            let doc = document.getElementsByClassName('CodeMirror')[0].CodeMirror.getDoc();
-                            let cursor = doc.getCursor();
-
-                            let insertText = (doc.getLine(cursor.line)[cursor.ch - 1] == ' ' ? '' : ' ') +
-                                            emote.name +
-                                            (doc.getLine(cursor.line)[cursor.ch] == ' ' ? '' : ' ');
-                            doc.replaceSelection(insertText);
-                        });
-                        emoteTileSet.appendChild(emoteTile);
-                    }
+                        let inputBox = event.sender.element.querySelector('textarea');
+                        inputBox.value += `${inputBox.value.length == 0 || inputBox.value.endsWith(' ') ? '' : ' '}${emote.name} `;
+                    });
+                    emoteContainer.insertBefore(emoteButton, exampleButton);
                 }
             }
-
-            let mixerEmoteSetTitle = document.createElement('div');
-            mixerEmoteSetTitle.innerHTML = "Mixer Emotes";
-            mixerEmoteSetTitle.classList.add('display-1', 'bettermixer-dialog-subtitle');
-            exampleEmoteSet.insertBefore(mixerEmoteSetTitle, exampleEmoteSet.children[0]);
-
-            dialog.appendChild(exampleEmoteSet);
         });
 
         // Handle config menu

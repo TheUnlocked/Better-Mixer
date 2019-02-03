@@ -11,6 +11,7 @@ import User from "./User.js";
 import Badge from "./Badge.js";
 import BTTVAddon from "./Addons/BTTV/BTTVAddon.js";
 import BrowseFiltersConfig from "./Configs/BrowseFiltersConfig.js";
+import ColorConfig from "./Configs/ColorConfig.js";
 
 let SRC = document.getElementById('BetterMixer-module').src;
 let BASE_URL = SRC.split('/').slice(0, -2).join('/') + '/';
@@ -59,9 +60,8 @@ export default class BetterMixer {
 
         this.injectStylesheet("lib/css/inject.css");
 
-        this.configuration.registerConfig(new StylesheetToggleConfig(
-            this.injectStylesheet("lib/css/botcolor.css"),
-            'botcolor_enabled', 'Change Bot Colors', true, true));
+        this.configuration.registerConfig(new ColorConfig(
+            'botcolor', 'Bot Color', '', '#ba5c00'));
 
         this.configuration.registerConfig(new StylesheetToggleConfig(
             this.injectStylesheet("lib/css/movebadges.css"),

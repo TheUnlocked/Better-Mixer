@@ -40,6 +40,11 @@
     top: 5px;
 }
 
+/* .bettermixer-emotes img {
+    position: absolute;
+    bottom: -5px;
+} */
+
 /* div.profile-bio > ul {
     float: right;
     width: 100%;
@@ -69,10 +74,6 @@ div.profile-bio :hover {
     padding-right: 2px;
     display: none;
 } */
-
-.textComponent__Efj4_ {
-    margin-left: unset !important;
-}
 
 /* NEEDS FIXING */
 b-channel-chat-emote-dialog > bui-static-dialog > div > bui-dialog-content {
