@@ -65,11 +65,11 @@ export default class BetterMixer {
 
         this.configuration.registerConfig(new StylesheetToggleConfig(
             this.injectStylesheet("lib/css/movebadges.css"),
-            'move_badges', 'Show Badges Before Username', false, true));
+            'move_badges', 'Show Badges Before Username', '', true, true));
 
         this.configuration.registerConfig(new StylesheetToggleConfig(
             this.injectStylesheet("lib/css/hideavatars.css"),
-            'hide_avatars', 'Hide Avatars', false, true));
+            'hide_avatars', 'Hide Avatars', '', false, true));
 
         this.configuration.registerConfig(new BrowseFiltersConfig());
 

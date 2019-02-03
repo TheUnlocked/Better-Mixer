@@ -149,45 +149,82 @@ export default class Patcher{
 
         // Handle config menu
         this.plugin.addEventListener(BetterMixer.Events.ON_SETTINGS_DIALOG_OPEN, event => {
-            let panel = event.data.dialog.getElementsByTagName("bui-dialog-content")[0];
-            let exampleSection = panel.children[0];
-            let betterMixerSection = exampleSection.cloneNode();
-            betterMixerSection.style.marginTop = "24px";
+            let disconnected = false;
 
-            let label = exampleSection.children[0].cloneNode();
-            label.innerHTML = "Better Mixer Preferences";
-            betterMixerSection.appendChild(label);
+            let waitForLoadObserver = $.initialize('h2.title__o03-e', () => {
+                if (disconnected) return;
 
-            for (let config of plugin.configuration.getAllConfigs()){
-                let configElement;
-                switch(config.configType){
-                    case Config.ConfigTypeEnum.BOOLEAN:
-                        configElement = exampleSection.getElementsByTagName('bui-toggle')[0].cloneNode(true);
-                        configElement.children[0].children[2].innerHTML = config.displayText;
+                waitForLoadObserver.disconnect();
+                disconnected = true;
 
-                        if (config.state != configElement.classList.contains('bui-toggle-checked')){
-                            configElement.classList.toggle('bui-toggle-checked');
-                        }
+                let configSection = event.data.dialog.querySelector('section');
 
-                        configElement.getElementsByTagName("input")[0].addEventListener('click', e => {
-                            configElement.classList.toggle('bui-toggle-checked');
-                            config.state = configElement.classList.contains('bui-toggle-checked');
+                let label = document.createElement('h2');
+                label.classList.add('title__o03-e');
+                label.innerHTML = "Better Mixer Preferences";
+                configSection.insertBefore(label, configSection.lastChild);
+
+                let exampleToggle = configSection.querySelector('.control_cB-GA.toggle_jWBwj');
+
+                let configsData = [];
+
+                for (let config of plugin.configuration.getAllConfigs()){
+                    let configElement;
+                    switch(config.configType){
+                        case Config.ConfigTypeEnum.BOOLEAN:
+                            configElement = exampleToggle.cloneNode(true);
+                            configElement.children[2].innerHTML = config.displayText;
+
+                            if (config.state != configElement.classList.contains('checked_2YALu')){
+                                configElement.classList.toggle('checked_2YALu');
+                            }
+                            configElement.getElementsByTagName("input")[0].addEventListener('click', e => {
+                                configElement.classList.toggle('checked_2YALu');
+                                configElement.tempState = configElement.classList.contains('checked_2YALu');
+                            });
+                            break;
+                        case Config.ConfigTypeEnum.NONE:
+                            break;
+                    }
+                    if (configElement){
+                        configSection.insertBefore(configElement, configSection.lastChild);
+                        configsData.push({
+                            element: configElement,
+                            config: config
                         });
-                        break;
-                    case Config.ConfigTypeEnum.NONE:
-                        break;
+                    }
                 }
-                if (configElement){
-                    betterMixerSection.appendChild(configElement);
-                }
-            }
-            panel.appendChild(betterMixerSection);
 
-            event.data.dialog.querySelector('button[variant="primary"]').addEventListener('click', e => {
-                this.plugin.configuration.saveConfig();
-                this.plugin.configuration.updateConfig();
-                this.plugin.log("Updated configurations.");
-            });
+                // Reset to defaults
+                configSection.lastChild.addEventListener('click', e => {
+                    for (let configData of configsData){
+                        let element = configData.element;
+                        let config = configData.config;
+                        switch(config.configType){
+                            case Config.ConfigTypeEnum.BOOLEAN:
+                                if (config.defaultState != element.classList.contains('checked_2YALu')){
+                                    element.tempState = config.defaultState;
+                                    element.classList.toggle('checked_2YALu');
+                                }
+                                break;
+                            case Config.ConfigTypeEnum.NONE:
+                                break;
+                        }
+                    }
+                });
+
+                // Save
+                event.data.dialog.querySelector('button[data-variant="primary"]').addEventListener('click', e => {
+                    for (let configData of configsData){
+                        if (configData.element.tempState !== undefined){
+                            configData.config.state = configData.element.tempState;
+                        }
+                    }
+                    this.plugin.configuration.saveConfig();
+                    this.plugin.configuration.updateConfig();
+                    this.plugin.log("Updated configurations.");
+                });
+            }, { target: event.data.dialog });
         });
 
         // Handle Browse > Filters > Save Filters

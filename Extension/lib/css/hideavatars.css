@@ -1,7 +1,7 @@
-b-channel-chat-message .image{
+.message__3cqAS .ChatAvatar__18Zua{
     visibility: hidden !important;
 }
 
-b-channel-chat-message{
-    padding: 2px 6px 2px 12px !important;
+.message__3cqAS .messageContent__3EH9F{
+    margin-left: 2px;
 }
