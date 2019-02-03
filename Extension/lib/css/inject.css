@@ -75,17 +75,15 @@ div.profile-bio :hover {
     display: none;
 } */
 
-/* NEEDS FIXING */
-b-channel-chat-emote-dialog > bui-static-dialog > div > bui-dialog-content {
+/* b-channel-chat-emote-dialog > bui-static-dialog > div > bui-dialog-content {
     overflow-y: auto !important;
-}
+} */
 
-/* NEEDS FIXING */
-.tiles.bettermixer-emote-tiles {
+/* .tiles.bettermixer-emote-tiles {
     border-bottom: 2px solid #252939;
     margin-bottom: 12px;
     padding-bottom: 2px;
-}
+} */
 
 .bettermixer-save-filters {
     position: absolute;
@@ -96,3 +94,8 @@ b-channel-chat-emote-dialog > bui-static-dialog > div > bui-dialog-content {
 /* .stage.online {
     max-height: calc(100vh - 60px - 8px) !important;
 } */
+
+.container__3unoh {
+    overflow: auto !important;
+    padding-right: 12px;
+}
