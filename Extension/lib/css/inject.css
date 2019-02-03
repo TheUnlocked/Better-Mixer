@@ -5,14 +5,15 @@
     animation-timing-function: ease-out;
     width: auto;
     height: 24px;
-    background-color: #32384b;
+    background-color: #2e354b;
     color: #fff;
     font-size: 10.5pt;
     text-align: center;
-    border-radius: 6px;
+    border-radius: 4px;
     padding: 5px 10px 5px 10px;
     position: absolute;
     z-index: 99;
+    box-shadow: 2px 2px 3px rgba(0,0,0,0.2);
 }
 
 .bettermixer-tooltip::after {
