@@ -2,7 +2,7 @@ import "../lib/js/jquery-3.3.1.min.js";
 import "../lib/js/jquery.initialize.min.js";
 
 import FFZAddon from "./Addons/FFZ/FFZAddon.js";
-import GameWispAddon from "./Addons/GameWisp/GameWispAddon.js";
+//import GameWispAddon from "./Addons/GameWisp/GameWispAddon.js";
 import ConfigurationManager from "./Configs/ConfigurationManager.js";
 import StylesheetToggleConfig from "./Configs/StylesheetToggleConfig.js";
 import Channel from "./Channel.js";
@@ -24,7 +24,7 @@ export default class BetterMixer {
         this.configuration = new ConfigurationManager(this);
         this.ffz = new FFZAddon(this);
         this.bttv = new BTTVAddon(this);
-        this.gameWisp = new GameWispAddon(this);
+        //this.gameWisp = new GameWispAddon(this);
         this.activeChannels = [];
 
         this._events = [];
@@ -60,8 +60,12 @@ export default class BetterMixer {
 
         this.injectStylesheet("lib/css/inject.css");
 
-        this.configuration.registerConfig(new ColorConfig(
-            'botcolor', 'Bot Color', '', '#ba5c00'));
+        let botColorConfig = new ColorConfig(
+            'botcolor', 'Bot Color', '', '#d37110');
+        botColorConfig.update = function() {
+            $('.bettermixer-role-bot').css('color', this._state);
+        };
+        this.configuration.registerConfig(botColorConfig);
 
         this.configuration.registerConfig(new StylesheetToggleConfig(
             this.injectStylesheet("lib/css/movebadges.css"),

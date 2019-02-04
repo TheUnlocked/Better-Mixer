@@ -100,3 +100,20 @@ div.profile-bio :hover {
     overflow: auto !important;
     padding-right: 12px;
 }
+
+/* Color config visual correction */
+.input_10EhR:focus ~ span.label_1JyoC::before {
+    border-color: #0075d5;
+}
+.input_10EhR:focus ~ span.label_1JyoC::after {
+    border-color: #0075d5;
+}
+.bettermixer-color-config-invalid > .input_10EhR:focus ~ span.label_1JyoC::before {
+    border-color: #cc0202;
+}
+.bettermixer-color-config-invalid > .input_10EhR:focus ~ span.label_1JyoC::after {
+    border-color: #cc0202;
+}
+.bettermixer-color-config-invalid > .input_10EhR:focus {
+    border-color: #cc0202;
+}

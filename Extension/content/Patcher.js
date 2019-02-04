@@ -70,7 +70,10 @@ export default class Patcher{
             // Handle bot color changes
             {
                 if (message.author.username.includes("Bot") || message.author.username.toLowerCase().endsWith("bot")){
-                    message.element.querySelector('.Username__1i7gh').style.color = BetterMixer.instance.configuration.getConfig("botcolor");
+                    let usernameElement = message.element.querySelector('.Username__1i7gh');
+                    usernameElement.style.color = BetterMixer.instance.configuration.getConfig("botcolor").state;
+                    usernameElement.classList.add('bettermixer-role-bot');
+
                 }
             }
 
@@ -162,9 +165,10 @@ export default class Patcher{
                 let label = document.createElement('h2');
                 label.classList.add('title__o03-e');
                 label.innerHTML = "Better Mixer Preferences";
-                configSection.insertBefore(label, configSection.lastChild);
+                configSection.appendChild(label);
 
                 let exampleToggle = configSection.querySelector('.control_cB-GA.toggle_jWBwj');
+                let exampleColor = configSection.querySelector('.wrapper_msbKC .currentColor_1t7wS').parentElement.parentElement;
 
                 let configsData = [];
 
@@ -183,11 +187,34 @@ export default class Patcher{
                                 configElement.tempState = configElement.classList.contains('checked_2YALu');
                             });
                             break;
+                        case Config.ConfigTypeEnum.COLOR:
+                            configElement = exampleColor.cloneNode(true);
+                            configElement.children[0].innerHTML = config.displayText;
+                            configElement.appendChild(configElement.children[0]);
+
+                            let colorIndicator = configElement.getElementsByClassName('currentColor_1t7wS')[0];
+                            colorIndicator.style.backgroundColor = config.state;
+                            let valueInput = configElement.getElementsByTagName('input')[0];
+                            valueInput.value = config.state;
+                            
+                            valueInput.addEventListener('input', e => {
+                                const colorLengths = [3, 4, 6, 8];
+                                if (valueInput.value.match(/^#[a-fA-F0-9]*$/) && colorLengths.includes(valueInput.value.length - 1)){
+                                    configElement.classList.remove('bettermixer-color-config-invalid');
+                                    configElement.tempState = valueInput.value;
+                                    colorIndicator.style.backgroundColor = valueInput.value;
+                                }
+                                else{
+                                    configElement.classList.add('bettermixer-color-config-invalid');
+                                    configElement.tempState = undefined;
+                                }
+                            });
+                            break;
                         case Config.ConfigTypeEnum.NONE:
                             break;
                     }
                     if (configElement){
-                        configSection.insertBefore(configElement, configSection.lastChild);
+                        configSection.appendChild(configElement);
                         configsData.push({
                             element: configElement,
                             config: config
@@ -196,22 +223,22 @@ export default class Patcher{
                 }
 
                 // Reset to defaults
-                configSection.lastChild.addEventListener('click', e => {
-                    for (let configData of configsData){
-                        let element = configData.element;
-                        let config = configData.config;
-                        switch(config.configType){
-                            case Config.ConfigTypeEnum.BOOLEAN:
-                                if (config.defaultState != element.classList.contains('checked_2YALu')){
-                                    element.tempState = config.defaultState;
-                                    element.classList.toggle('checked_2YALu');
-                                }
-                                break;
-                            case Config.ConfigTypeEnum.NONE:
-                                break;
-                        }
-                    }
-                });
+                // configSection.lastChild.addEventListener('click', e => {
+                //     for (let configData of configsData){
+                //         let element = configData.element;
+                //         let config = configData.config;
+                //         switch(config.configType){
+                //             case Config.ConfigTypeEnum.BOOLEAN:
+                //                 if (config.defaultState != element.classList.contains('checked_2YALu')){
+                //                     element.tempState = config.defaultState;
+                //                     element.classList.toggle('checked_2YALu');
+                //                 }
+                //                 break;
+                //             case Config.ConfigTypeEnum.NONE:
+                //                 break;
+                //         }
+                //     }
+                // });
 
                 // Save
                 event.data.dialog.querySelector('button[data-variant="primary"]').addEventListener('click', e => {
