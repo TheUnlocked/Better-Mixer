@@ -24,7 +24,7 @@ export default class Channel {
                 this.partnered = data.partnered;
                 this.ffzChannel = plugin.ffz.getSync(this);
                 this.bttvChannel = plugin.bttv.getSync(this);
-                this.gameWispChannel = plugin.gameWisp.getSync(this);
+                // this.gameWispChannel = plugin.gameWisp.getSync(this);
                 this.chat = new Chat(this);
                 this.plugin.log(`Loaded channel '${channelName}'`, BetterMixer.LogType.INFO);
             },
@@ -35,6 +35,6 @@ export default class Channel {
     unload(){
         this.chat.unload();
         this.ffzChannel && this.ffzChannel.unload();
-        this.gameWispChannel && this.gameWispChannel.unload();
+        // this.gameWispChannel && this.gameWispChannel.unload();
     }
 }
