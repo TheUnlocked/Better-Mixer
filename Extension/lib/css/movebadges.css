@@ -1,8 +1,8 @@
-.message__3cqAS .badge__36dP3:not(.bettermixer-badge-relocated) {
+[class*="message"] [class*="badge"]:not(.bettermixer-badge-relocated) {
     display: none !important;
 }
 
-.message__3cqAS .badge__36dP3.bettermixer-badge-relocated {
+[class*="message"] [class*="badge"].bettermixer-badge-relocated {
     display: inline-block !important;
     margin-right: 4px;
 }

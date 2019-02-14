@@ -90,6 +90,10 @@ export default class BetterMixer {
         this.addEventListener(BetterMixer.Events.GATHER_BADGES, event => event.data.user.username == "Unlocked" ? creatorBadge : undefined);
 
         this.patcher = new Patcher(this);
+
+        this.addEventListener(BetterMixer.Events.ON_CHAT_LOAD, () => {
+            BetterMixer.ClassNames.BADGE = "badge__" + $('style').filter((_, element) => element.innerHTML.includes('.badge__'))[0].innerHTML.split('.badge__')[1].split('{')[0].trim();
+        });
     }
 
     reload(){
@@ -268,6 +272,10 @@ BetterMixer.Events = {
 
     GATHER_EMOTES: 8,
     GATHER_BADGES: 9,
+};
+
+BetterMixer.ClassNames = {
+    
 };
 
 BetterMixer.instance = new BetterMixer();

@@ -31,7 +31,7 @@ export default class ConfigurationManager {
         };
         window.addEventListener('message', initializeListener);
 
-        this._configDialogObserver = $.initialize('.wrapper__SsQT6 h1', (_, element) => {
+        this._configDialogObserver = $.initialize('[class*="wrapper"] h1', (_, element) => {
             if (element.innerText == "CHAT SETTINGS"){
                 this.plugin.dispatchEvent(BetterMixer.Events.ON_SETTINGS_DIALOG_OPEN, { dialog: element.parentElement }, this);
             }

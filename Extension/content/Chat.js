@@ -24,7 +24,7 @@ export default class Chat {
             this.element = element;
         }
         else{
-            this.element = document.querySelector('div.chatContainer__24UL3:not(.bettermixer-chat-window)');
+            this.element = document.querySelector('div[class*="chatContainer"]:not(.bettermixer-chat-window)');
         }
         //this.socket = new ChatSocket(this);
 
@@ -34,8 +34,10 @@ export default class Chat {
         }
         this.element.classList.add('bettermixer-chat-window');
         
-        this._msgObserver = $.initialize('div.message__3cqAS', (_, element) => {
-            let usernameElement = element.getElementsByClassName('Username__1i7gh')[0];
+        this.plugin.dispatchEvent(BetterMixer.Events.ON_CHAT_LOAD, this, this);
+        
+        this._msgObserver = $.initialize('div[class*="message__"]', (_, element) => {
+            let usernameElement = element.querySelectorAll('[class*="Username"]')[0];
             if (!usernameElement){
                 return;
             }
@@ -53,7 +55,7 @@ export default class Chat {
             }
 
             let badges = [];
-            for (let badgeElement of event.data.message.element.getElementsByClassName('badge__36dP3')){
+            for (let badgeElement of event.data.message.element.querySelectorAll('[class*="badge"]')){
                 if (badgeElement.alt == 'Subscriber'){
                     if (!this.subBadge){
                         this.subBadge = new Badge('Subscriber', badgeElement.src, 'Subscriber', badgeElement);
@@ -71,7 +73,7 @@ export default class Chat {
         };
         this.plugin.addEventListener(BetterMixer.Events.GATHER_BADGES, this._gatherBadges);
 
-        this._emoteDialogObserver = $.initialize('.wrapper__SsQT6 h1', (_, element) => {
+        this._emoteDialogObserver = $.initialize('[class*="wrapper"] h1', (_, element) => {
             if (element.innerText == "EMOTICONS"){
                 this.plugin.dispatchEvent(BetterMixer.Events.ON_EMOTES_DIALOG_OPEN, { dialog: element.parentElement }, this);
             }

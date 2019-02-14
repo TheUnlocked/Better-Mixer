@@ -8,7 +8,6 @@ export default class Patcher{
      * @param {BetterMixer} plugin 
      */
     constructor(plugin){
-
         this.plugin = plugin;
 
         this.plugin.addEventListener(BetterMixer.Events.ON_MESSAGE, event => {
@@ -25,7 +24,7 @@ export default class Patcher{
                     .reduce((acc, val) => val.constructor === EmoteSet ? acc.concat(val.emotes) : acc.concat(val), []);
                 let emotes = emoteList.reduce((result, value, index, arr) => { result[value.name] = value; return result; }, {});
 
-                let textPieces = [...message.element.getElementsByClassName('textComponent__Efj4_')];
+                let textPieces = [...message.element.querySelectorAll('[class*="textComponent"]')];
                 for (let textElement of textPieces) {
                     // Break it up into text pieces, and check each piece for an emote
                     let words = textElement.innerHTML.trim().split(" ");
@@ -70,7 +69,7 @@ export default class Patcher{
             // Handle bot color changes
             {
                 if (message.author.username.includes("Bot") || message.author.username.toLowerCase().endsWith("bot")){
-                    let usernameElement = message.element.querySelector('.Username__1i7gh');
+                    let usernameElement = message.element.querySelector('[class*="Username"]');
                     usernameElement.style.color = BetterMixer.instance.configuration.getConfig("botcolor").state;
                     usernameElement.classList.add('bettermixer-role-bot');
 
@@ -87,7 +86,7 @@ export default class Patcher{
                 let badges = plugin.dispatchGather(BetterMixer.Events.GATHER_BADGES, badgeGatherEventData, message)
                     .reduce((acc, val) => acc.concat(val), []); // Upgrade to .flat(1) when that becomes mainstream tech
 
-                let authorElement = message.element.querySelector('.Username__1i7gh');
+                let authorElement = message.element.querySelector('[class*="Username"]');
                 for (let badge of badges){
                     if (!badge.example){
                         authorElement.appendChild(badge.element);
@@ -109,7 +108,7 @@ export default class Patcher{
             };
             let gatheredEmotes = plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, event.sender);
 
-            let emoteContainer = event.data.dialog.querySelector('div.container__3unoh');
+            let emoteContainer = event.data.dialog.querySelector('div[class*="container"]');
             emoteContainer.style.overflow = "hidden";
             
             let exampleButton = emoteContainer.children[0];
@@ -128,25 +127,52 @@ export default class Patcher{
 
             emoteSets.push(uncategorizedEmotes);
 
-            for (let emoteSet of emoteSets){
-                for (let emote of emoteSet.emotes){
-                    let emoteButton = exampleButton.cloneNode();
-                    emoteButton.appendChild(emote.element);
-                    emoteButton.style.width = emote.width + 12 + "px";
-                    emoteButton.addEventListener('click', () => {
-                        // let doc = document.getElementsByClassName('CodeMirror')[0].CodeMirror.getDoc();
-                        // let cursor = doc.getCursor();
-
-                        // let insertText = (doc.getLine(cursor.line)[cursor.ch - 1] == ' ' ? '' : ' ') +
-                        //                 emote.name +
-                        //                 (doc.getLine(cursor.line)[cursor.ch] == ' ' ? '' : ' ');
-                        // doc.replaceSelection(insertText);
-
-                        let inputBox = event.sender.element.querySelector('textarea');
-                        inputBox.value += `${inputBox.value.length == 0 || inputBox.value.endsWith(' ') ? '' : ' '}${emote.name} `;
-                    });
-                    emoteContainer.insertBefore(emoteButton, exampleButton);
+            let firstEmoteSet = true;
+            function createEmoteSetHeader(title, before){
+                if (!before){
+                    before = exampleButton;
                 }
+                let mixerEmoteHeader = document.createElement('h1');
+                mixerEmoteHeader.classList.add('bettermixer-emote-set-header');
+                if (firstEmoteSet){
+                    mixerEmoteHeader.classList.add('bettermixer-emote-set-header-first');
+                    firstEmoteSet = false;
+                }
+                mixerEmoteHeader.innerHTML = title;
+                emoteContainer.insertBefore(mixerEmoteHeader, before);
+            }
+
+            for (let emoteSet of emoteSets){
+                if (emoteSet.emotes.length > 0){
+                    createEmoteSetHeader(emoteSet.name);
+                    for (let emote of emoteSet.emotes){
+                        let emoteButton = exampleButton.cloneNode();
+                        emoteButton.appendChild(emote.element);
+                        emoteButton.style.width = emote.width + 12 + "px";
+                        emoteButton.addEventListener('click', () => {
+                            // let doc = document.getElementsByClassName('CodeMirror')[0].CodeMirror.getDoc();
+                            // let cursor = doc.getCursor();
+
+                            // let insertText = (doc.getLine(cursor.line)[cursor.ch - 1] == ' ' ? '' : ' ') +
+                            //                 emote.name +
+                            //                 (doc.getLine(cursor.line)[cursor.ch] == ' ' ? '' : ' ');
+                            // doc.replaceSelection(insertText);
+
+                            let inputBox = event.sender.element.querySelector('textarea');
+                            inputBox.value += `${inputBox.value.length == 0 || inputBox.value.endsWith(' ') ? '' : ' '}${emote.name} `;
+                        });
+                        emoteContainer.insertBefore(emoteButton, exampleButton);
+                    }
+                }
+            }
+
+            let subscriberEmoteButtons = document.querySelectorAll('[style*="https://uploads.mixer.com/emoticons/"]');
+            if (subscriberEmoteButtons.length > 0){
+                createEmoteSetHeader("Subscriber Emotes");
+                createEmoteSetHeader("Mixer Emotes", subscriberEmoteButtons[subscriberEmoteButtons.length - 1].parentElement);
+            }
+            else{
+                createEmoteSetHeader("Mixer Emotes");
             }
         });
 
@@ -154,7 +180,7 @@ export default class Patcher{
         this.plugin.addEventListener(BetterMixer.Events.ON_SETTINGS_DIALOG_OPEN, event => {
             let disconnected = false;
 
-            let waitForLoadObserver = $.initialize('h2.title__o03-e', () => {
+            let waitForLoadObserver = $.initialize('h2[class*="title"]', () => {
                 if (disconnected) return;
 
                 waitForLoadObserver.disconnect();
@@ -162,13 +188,12 @@ export default class Patcher{
 
                 let configSection = event.data.dialog.querySelector('section');
 
-                let label = document.createElement('h2');
-                label.classList.add('title__o03-e');
+                let label = configSection.firstChild.cloneNode();
                 label.innerHTML = "Better Mixer Preferences";
                 configSection.appendChild(label);
 
-                let exampleToggle = configSection.querySelector('.control_cB-GA.toggle_jWBwj');
-                let exampleColor = configSection.querySelector('.wrapper_msbKC .currentColor_1t7wS').parentElement.parentElement;
+                let exampleToggle = configSection.querySelector('[class*="control"][class*="toggle"]');
+                let exampleColor = configSection.querySelector('[class*="wrapper"] [class*="currentColor"]').parentElement.parentElement;
 
                 let configsData = [];
 
@@ -192,7 +217,7 @@ export default class Patcher{
                             configElement.children[0].innerHTML = config.displayText;
                             configElement.appendChild(configElement.children[0]);
 
-                            let colorIndicator = configElement.getElementsByClassName('currentColor_1t7wS')[0];
+                            let colorIndicator = configElement.querySelector('[class*="currentColor"]');
                             colorIndicator.style.backgroundColor = config.state;
                             let valueInput = configElement.getElementsByTagName('input')[0];
                             valueInput.value = config.state;
@@ -289,6 +314,8 @@ export default class Patcher{
                 }
             });
         });
+
+        this.plugin.log("Patcher Loaded");
     }
 
     /**

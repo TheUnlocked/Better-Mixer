@@ -1,4 +1,5 @@
 import Patcher from "./Patcher.js";
+import BetterMixer from "./BetterMixer.js";
 
 export default class Badge{
     /**
@@ -22,7 +23,7 @@ export default class Badge{
             return this.example.cloneNode(true);
         }
         let badge = document.createElement('img');
-        badge.classList.add('badge__36dP3');
+        badge.classList.add(BetterMixer.ClassNames.BADGE);
         badge.src = this.image;
         badge.alt = this.name;
 

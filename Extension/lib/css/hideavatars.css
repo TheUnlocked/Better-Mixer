@@ -1,7 +1,7 @@
-.message__3cqAS .ChatAvatar__18Zua{
+[class*="message"] [class*="ChatAvatar"]{
     visibility: hidden !important;
 }
 
-.message__3cqAS .messageContent__3EH9F{
+[class*="message"] [class*="messageContent"]{
     margin-left: 2px;
 }

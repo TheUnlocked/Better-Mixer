@@ -61,12 +61,12 @@ div.profile-bio :hover {
     display: none;
 } */
 
-.message__3cqAS .badge__36dP3 {
+[class*="message"] [class*="badge"] {
     bottom: 2px;
     position: relative;
 }
 
-.message__3cqAS .badge__36dP3:not(.bettermixer-badge-relocated) {
+[class*="message"] [class*="badge"]:not(.bettermixer-badge-relocated) {
     margin-left: 5px;
 }
 
@@ -76,15 +76,19 @@ div.profile-bio :hover {
     display: none;
 } */
 
-/* b-channel-chat-emote-dialog > bui-static-dialog > div > bui-dialog-content {
-    overflow-y: auto !important;
-} */
 
-/* .tiles.bettermixer-emote-tiles {
-    border-bottom: 2px solid #252939;
-    margin-bottom: 12px;
-    padding-bottom: 2px;
-} */
+h1.bettermixer-emote-set-header {
+    color: #aaa;
+}
+
+h1.bettermixer-emote-set-header:not(.bettermixer-emote-set-header-first) {
+    margin-top: 5px;
+}
+
+[class*="ChatMessages"] [class*="container"] {
+    overflow: auto !important;
+    padding-right: 12px;
+}
 
 .bettermixer-save-filters {
     position: absolute;
@@ -92,28 +96,19 @@ div.profile-bio :hover {
     top: 8px;
 }
 
-/* .stage.online {
-    max-height: calc(100vh - 60px - 8px) !important;
-} */
-
-.container__3unoh {
-    overflow: auto !important;
-    padding-right: 12px;
-}
-
 /* Color config visual correction */
-.input_10EhR:focus ~ span.label_1JyoC::before {
+[class*="input"]:focus ~ span[class*="label"]::before {
     border-color: #0075d5;
 }
-.input_10EhR:focus ~ span.label_1JyoC::after {
+[class*="input"]:focus ~ span[class*="label"]::after {
     border-color: #0075d5;
 }
-.bettermixer-color-config-invalid > .input_10EhR:focus ~ span.label_1JyoC::before {
+.bettermixer-color-config-invalid > [class*="input"]:focus ~ span[class*="label"]::before {
     border-color: #cc0202;
 }
-.bettermixer-color-config-invalid > .input_10EhR:focus ~ span.label_1JyoC::after {
+.bettermixer-color-config-invalid > [class*="input"]:focus ~ span[class*="label"]::after {
     border-color: #cc0202;
 }
-.bettermixer-color-config-invalid > .input_10EhR:focus {
+.bettermixer-color-config-invalid > [class*="input"]:focus {
     border-color: #cc0202;
 }
