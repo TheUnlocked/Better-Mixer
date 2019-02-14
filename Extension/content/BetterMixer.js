@@ -222,7 +222,14 @@ export default class BetterMixer {
             return;
         }
 
-        this._events[eventType].forEach(handler => handler(event));
+        this._events[eventType].forEach(handler => {
+            try {
+                handler(event);
+            }
+            catch(error){
+                this.log(error.stack, BetterMixer.LogType.ERROR);
+            }
+        });
     }
 
     dispatchGather(eventType, data, sender){
@@ -239,9 +246,14 @@ export default class BetterMixer {
         }
 
         this._events[eventType].forEach(handler => {
-            let result = handler(event);
-            if (result){
-                collected.push(result);
+            try {
+                let result = handler(event);
+                if (result){
+                    collected.push(result);
+                }
+            }
+            catch(error){
+                console.error(error);
             }
         });
         return collected;
