@@ -38,15 +38,20 @@ export default class Patcher{
                             // End the text element if you find an emote
                             if (textBuilder) {
                                 let newText = textElement.cloneNode();
-                                newText.innerHTML = textBuilder;
+                                newText.innerHTML = textBuilder.trimStart();
                                 messageBuilder.push(newText);
                                 textBuilder = "";
+                            }
+                            else{
+                                let newText = document.createElement('span');
+                                newText.innerHTML = " ";
+                                messageBuilder.push(newText);
                             }
                             // Push the emote
                             messageBuilder.push(emote.element);
                         } else {
                             if (!textBuilder && messageBuilder.length != 0){
-                                textBuilder = ' ';
+                                textBuilder = "";
                             }
                             textBuilder += `${word} `;
                         }
@@ -57,6 +62,12 @@ export default class Patcher{
                         newText.innerHTML = textBuilder;
                         messageBuilder.push(newText);
                     }
+
+                    // Final padding
+                    let newText = document.createElement('span');
+                    newText.innerHTML = " ";
+                    messageBuilder.push(newText);
+
                     // Replace the text element with the new text/emote elements
                     for (let word of messageBuilder){
                         textElement.parentElement.insertBefore(word, textElement);

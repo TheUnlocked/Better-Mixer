@@ -1,3 +1,13 @@
+let DEBUG_MODE = !('update_url' in chrome.runtime.getManifest());
+
+if (DEBUG_MODE){
+    console.log("%c[Better Mixer] Running in debug mode.", "font-size: 16px; background: black; color: white; padding: 2px 4px 2px 2px;");
+    let hintFormatting = "background: #05a; color: white; padding: 2px 3px;";
+    console.log("%cBetterMixer.instance.postToContent({message: 'ping'})", hintFormatting);
+    console.log("%cBetterMixer.instance.postToContent({message: 'clearAllConfigs'})", hintFormatting);
+    console.log("%cBetterMixer.instance.postToContent({message: 'clearConfig', data: CONFIG_NAME_OR_ARRAY})", hintFormatting);
+}
+
 $(() => {
     let injection = document.createElement('script');
     injection.src = chrome.runtime.getURL('content/BetterMixer.js');
@@ -21,6 +31,13 @@ $(() => {
                     case 'setConfigs':
                         chrome.storage.sync.set(data.data);
                         break;
+                }
+
+                if (DEBUG_MODE){
+                    if (data.message == 'clearAllConfigs')
+                        chrome.storage.sync.clear();
+                    if (data.message == 'ping')
+                        console.log('pong');
                 }
             }
         }

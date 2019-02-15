@@ -32,34 +32,26 @@
     to {transform: scale(1); opacity: 100%;}
 }
 
-.bettermixer-emotes {
-    position: relative;
+.bettermixer-emote {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin: -6px 2px 0;
-    top: 5px;
 }
 
-/* .bettermixer-emotes img {
-    position: absolute;
-    bottom: -5px;
-} */
+.bettermixer-emote>img {
+    position: relative;
+    top: 5px;
+    margin: -6px 0 0;
+}
 
-/* div.profile-bio > ul {
-    float: right;
-    width: 100%;
-                            // Using transitions for if one day this is actually supported.
-    transition: width 2s;
+.bettermixer-emote-text {
+    display: none;
 }
 
 div.profile-bio :hover {
     width: auto;
-} */
+}
 
-/* b-channel-chat-author > .badge.bettermixer-badge-relocated {
-    display: none;
-} */
 
 [class*="message"] [class*="badge"] {
     bottom: 2px;

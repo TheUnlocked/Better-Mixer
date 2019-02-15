@@ -1,0 +1,7 @@
+.bettermixer-emote-animated>img {
+    display: none;
+}
+
+.bettermixer-emote-animated>.bettermixer-emote-text {
+    display: unset;
+}

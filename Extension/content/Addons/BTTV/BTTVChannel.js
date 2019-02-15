@@ -24,7 +24,8 @@ export default class BTTVChannel{
             async: false,
             success: data => {
                 for (let emote of data.emotes) {
-                    this.emotes.addEmote(new Emote(emote.code, `https:${data.urlTemplate.replace('{{id}}', emote.id).replace('{{image}}', '3x')}`, 28, 28));
+                    let animated = ['gif'].includes(emote.imageType);
+                    this.emotes.addEmote(new Emote(emote.code, `https:${data.urlTemplate.replace('{{id}}', emote.id).replace('{{image}}', '3x')}`, 28, 28, animated));
                 }
                 
                 this._gatherEmotes = event => {
