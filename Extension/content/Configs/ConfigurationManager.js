@@ -86,6 +86,11 @@ export default class ConfigurationManager {
         }
     }
 
+    /**
+     * 
+     * @param {string} configName 
+     * @returns {Config}
+     */
     getConfig(configName){
         return this._configs[configName];
     }

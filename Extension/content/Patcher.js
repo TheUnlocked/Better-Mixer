@@ -154,9 +154,14 @@ export default class Patcher{
             }
 
             for (let emoteSet of emoteSets){
-                if (emoteSet.emotes.length > 0){
+                let emoteSetEmotes = emoteSet.emotes;
+                if (!this.plugin.configuration.getConfig('show_emotes_animated').state){
+                    emoteSetEmotes = emoteSetEmotes.filter(emote => !emote.animated);
+                }
+
+                if (emoteSetEmotes.length > 0){
                     createEmoteSetHeader(emoteSet.name);
-                    for (let emote of emoteSet.emotes){
+                    for (let emote of emoteSetEmotes){
                         let emoteButton = exampleButton.cloneNode();
                         emoteButton.appendChild(emote.element);
                         emoteButton.style.width = emote.width + 12 + "px";

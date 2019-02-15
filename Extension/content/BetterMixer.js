@@ -69,7 +69,7 @@ export default class BetterMixer {
 
         this.configuration.registerConfig(new StylesheetToggleConfig(
             this.injectStylesheet("lib/css/hideanimatedemotes.css"),
-            'hide_emotes_animated', 'Show Animated Emotes', '', true, false));
+            'show_emotes_animated', 'Show Animated Emotes', '', true, false));
 
         this.configuration.registerConfig(new StylesheetToggleConfig(
             this.injectStylesheet("lib/css/movebadges.css"),

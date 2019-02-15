@@ -5,7 +5,6 @@ if (DEBUG_MODE){
     let hintFormatting = "background: #05a; color: white; padding: 2px 3px;";
     console.log("%cBetterMixer.instance.postToContent({message: 'ping'})", hintFormatting);
     console.log("%cBetterMixer.instance.postToContent({message: 'clearAllConfigs'})", hintFormatting);
-    console.log("%cBetterMixer.instance.postToContent({message: 'clearConfig', data: CONFIG_NAME_OR_ARRAY})", hintFormatting);
 }
 
 $(() => {
