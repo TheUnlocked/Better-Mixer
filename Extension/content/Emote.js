@@ -19,7 +19,7 @@ export default class Emote{
     get element(){
         // Create emote
         let emote = document.createElement('div');
-        emote.classList.add('graphic', 'bettermixer-emote');
+        emote.classList.add('bettermixer-emote');
         let image = document.createElement('img');
         image.src = this.image;
         image.alt = this.name + " ";

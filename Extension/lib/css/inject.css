@@ -104,3 +104,8 @@ h1.bettermixer-emote-set-header:not(.bettermixer-emote-set-header-first) {
 .bettermixer-color-config-invalid > [class*="input"]:focus {
     border-color: #cc0202;
 }
+
+/* Minor Graphical Fixes for Mixer */
+b-language-selector > bui-icon.icon-web[icon="InternetWithController"] {
+    padding-top: 0.11em;
+}
