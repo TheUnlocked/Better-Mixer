@@ -1,4 +1,5 @@
-[class*="message"] [class*="badge"]:not(.bettermixer-badge-relocated) {
+/* :not(span):not([class*="background"]) to avoid moving the fan progression badge */
+[class*="message"] [class*="badge"]:not(.bettermixer-badge-relocated):not(span):not([class*="background"]) {
     display: none !important;
 }
 

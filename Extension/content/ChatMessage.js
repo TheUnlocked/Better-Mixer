@@ -17,7 +17,7 @@ export default class ChatMessage {
             this.author = author;
         }
         else{
-            this.author = new User({ username: this.element.querySelector('[class*="Username"]').innerText });
+            this.author = new User({ username: this.element.querySelector('[class*="Username"]').innerText.split(' ')[0]});
         }
     }
 }
