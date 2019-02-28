@@ -111,7 +111,7 @@ export default class BetterMixer {
             return;
         }
 
-        if (page == 'browse/all'){
+        if (page == 'browse/all' || page.startsWith('dashboard') || page == "pro"){
             this.log(`This is not a user page.`);
             return;
         }

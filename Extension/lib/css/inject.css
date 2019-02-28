@@ -106,6 +106,6 @@ h1.bettermixer-emote-set-header:not(.bettermixer-emote-set-header-first) {
 }
 
 /* Minor Graphical Fixes for Mixer */
-b-language-selector > bui-icon.icon-web[icon="InternetWithController"] {
+b-language-selector bui-icon.icon-web[icon="InternetWithController"] {
     padding-top: 0.11em;
 }
