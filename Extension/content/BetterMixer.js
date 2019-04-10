@@ -79,6 +79,10 @@ export default class BetterMixer {
             this.injectStylesheet("lib/css/hideavatars.css"),
             'hide_avatars', 'Hide Avatars', '', false, true));
 
+        this.configuration.registerConfig(new StylesheetToggleConfig(
+            this.injectStylesheet("lib/css/hidechatresizer.css"),
+            'hide_chat_resizer', 'Disable Chat Resizer', '', false, true));
+
         this.configuration.registerConfig(new BrowseFiltersConfig());
 
         setTimeout(() => this.reload(), 0);
