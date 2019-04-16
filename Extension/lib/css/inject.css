@@ -77,9 +77,8 @@ h1.bettermixer-emote-set-header:not(.bettermixer-emote-set-header-first) {
     margin-top: 5px;
 }
 
-[class*="ChatMessages"] [class*="container"] {
-    overflow: auto !important;
-    padding-right: 12px;
+[class*="chatContainer"] [class*="container"] {
+    overflow-y: overlay !important;
 }
 
 .bettermixer-save-filters {
