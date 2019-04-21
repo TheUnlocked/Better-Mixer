@@ -220,12 +220,12 @@ export default class Patcher{
                             configElement = exampleToggle.cloneNode(true);
                             configElement.children[2].innerHTML = config.displayText;
 
-                            if (config.state != configElement.classList.contains('checked_2YALu')){
-                                configElement.classList.toggle('checked_2YALu');
+                            if (config.state != configElement.classList.contains('checked_37Lzx')){
+                                configElement.classList.toggle('checked_37Lzx');
                             }
                             configElement.getElementsByTagName("input")[0].addEventListener('click', e => {
-                                configElement.classList.toggle('checked_2YALu');
-                                configElement.tempState = configElement.classList.contains('checked_2YALu');
+                                configElement.classList.toggle('checked_37Lzx');
+                                configElement.tempState = configElement.classList.contains('checked_37Lzx');
                             });
                             break;
                         case Config.ConfigTypeEnum.COLOR:
