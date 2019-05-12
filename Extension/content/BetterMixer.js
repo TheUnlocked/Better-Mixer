@@ -164,6 +164,7 @@ export default class BetterMixer {
         injection = document.createElement('link');
         injection.rel = 'stylesheet';
         injection.href = BASE_URL + file;
+        injection.disabled = true;
         document.head.appendChild(injection);
         return injection;
     }
