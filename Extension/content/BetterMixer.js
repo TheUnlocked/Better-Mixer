@@ -58,7 +58,7 @@ export default class BetterMixer {
             window.onpopstate = e => BetterMixer.instance.reload();
         })(window.history);
 
-        this.injectStylesheet("lib/css/inject.css");
+        this.injectStylesheet("lib/css/inject.css").disabled = false;
 
         let botColorConfig = new ColorConfig(
             'botcolor', 'Bot Color', '', '#d37110');
