@@ -1,7 +1,9 @@
 import "../lib/js/jquery-3.3.1.min.js";
 import "../lib/js/jquery.initialize.min.js";
 
+import TwitchAddon from "./Addons/Twitch/TwitchAddon.js";
 import FFZAddon from "./Addons/FFZ/FFZAddon.js";
+import BTTVAddon from "./Addons/BTTV/BTTVAddon.js";
 //import GameWispAddon from "./Addons/GameWisp/GameWispAddon.js";
 import ConfigurationManager from "./Configs/ConfigurationManager.js";
 import StylesheetToggleConfig from "./Configs/StylesheetToggleConfig.js";
@@ -9,7 +11,6 @@ import Channel from "./Channel.js";
 import Patcher from "./Patcher.js";
 import User from "./User.js";
 import Badge from "./Badge.js";
-import BTTVAddon from "./Addons/BTTV/BTTVAddon.js";
 import BrowseFiltersConfig from "./Configs/BrowseFiltersConfig.js";
 import ColorConfig from "./Configs/ColorConfig.js";
 
@@ -22,6 +23,7 @@ export default class BetterMixer {
         this.log("Base loaded.");
 
         this.configuration = new ConfigurationManager(this);
+        this.twitch = new TwitchAddon(this);
         this.ffz = new FFZAddon(this);
         this.bttv = new BTTVAddon(this);
         //this.gameWisp = new GameWispAddon(this);
