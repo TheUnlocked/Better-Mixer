@@ -23,8 +23,10 @@ export default class Channel {
                 this.description = data.description;
                 this.partnered = data.partnered;
                 this.twitchChannel = plugin.twitch.getSync(this);
-                this.ffzChannel = plugin.ffz.getSync(this.twitchChannel);
-                this.bttvChannel = plugin.bttv.getSync(this.twitchChannel);
+                if (this.twitchChannel){
+                    this.ffzChannel = plugin.ffz.getSync(this.twitchChannel);
+                    this.bttvChannel = plugin.bttv.getSync(this.twitchChannel);
+                }
                 // this.gameWispChannel = plugin.gameWisp.getSync(this);
                 this.chat = new Chat(this);
                 this.plugin.log(`Loaded channel '${channelName}'`, BetterMixer.LogType.INFO);
