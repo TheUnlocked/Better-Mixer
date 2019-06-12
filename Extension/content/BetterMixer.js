@@ -194,8 +194,9 @@ export default class BetterMixer {
 
     registerEventType(eventName){
         if (!(eventName in BetterMixer.Events)){
-            BetterMixer.Events[eventName] = Object.keys(BetterMixer.Events).length;
+            BetterMixer.Events[eventName] = BetterMixer.Events.length;
             this._events.push([]);
+            return BetterMixer.Events[eventName];
         }
         else{
             this.log(`${eventName} is already an event!`, BetterMixer.LogType.WARNING);

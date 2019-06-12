@@ -329,6 +329,21 @@ export default class Patcher{
                     checkFiltersLoaded();
                 }
             });
+
+            let checkNotifsLoaded = () => {
+                let notificationButton = document.querySelector('b-notifications');
+                if (!notificationButton){
+                    setTimeout(checkNotifsLoaded, 100);
+                    return;
+                }
+                $.initialize('b-went-live-notification', (_, element) => {
+                    let date = element.querySelector('b-short-human-date');
+                    if (!isNaN(date.innerText[date.innerText.length-1])){
+                        element.innerHTML = element.innerHTML.replace("live", "live on").replace(" ago!", "!");
+                    }
+                }, { target: notificationButton });
+            }
+            checkNotifsLoaded();
         });
 
         this.plugin.log("Patcher Loaded");
