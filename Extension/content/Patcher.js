@@ -22,7 +22,7 @@ export default class Patcher{
                 };
                 let emoteList = plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, message)
                     .reduce((acc, val) => val.constructor === EmoteSet ? acc.concat(val.emotes) : acc.concat(val), []);
-                let emotes = emoteList.reduce((result, value, index, arr) => { result[value.name] = value; return result; }, {});
+                let emotes = emoteList.reduce((result, value) => { result[value.name] = value; return result; }, {});
 
                 let textPieces = [...message.element.querySelectorAll('[class*="textComponent"]')];
                 for (let textElement of textPieces) {
@@ -330,20 +330,13 @@ export default class Patcher{
                 }
             });
 
-            let checkNotifsLoaded = () => {
-                let notificationButton = document.querySelector('b-notifications');
-                if (!notificationButton){
-                    setTimeout(checkNotifsLoaded, 100);
-                    return;
-                }
-                $.initialize('b-went-live-notification', (_, element) => {
-                    let date = element.querySelector('b-short-human-date');
-                    if (!isNaN(date.innerText[date.innerText.length-1])){
-                        element.innerHTML = element.innerHTML.replace("live", "live on").replace(" ago!", "!");
-                    }
-                }, { target: notificationButton });
+        });
+
+        $.initialize('b-went-live-notification', (_, element) => {
+            let date = element.querySelector('b-short-human-date');
+            if (!isNaN(date.innerText[date.innerText.length-1])){
+                element.innerHTML = element.innerHTML.replace("live", "live on").replace(" ago!", "!");
             }
-            checkNotifsLoaded();
         });
 
         this.plugin.log("Patcher Loaded");

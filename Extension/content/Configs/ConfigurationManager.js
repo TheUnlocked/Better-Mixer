@@ -35,7 +35,7 @@ export default class ConfigurationManager {
             if (element.innerText == "CHAT SETTINGS"){
                 this.plugin.dispatchEvent(BetterMixer.Events.ON_SETTINGS_DIALOG_OPEN, { dialog: element.parentElement }, this);
             }
-        }, { target: this.element });
+        });
     }
 
     /**
