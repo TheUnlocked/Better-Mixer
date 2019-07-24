@@ -69,13 +69,15 @@ div.profile-bio :hover {
 } */
 
 
-h1.bettermixer-emote-set-header {
-    color: #aaa;
+h3.bettermixer-emote-set-header {
+    color: #8f94ae;
+    margin: 8px 0 0;
+    font-size: 0.9em;
 }
 
-h1.bettermixer-emote-set-header:not(.bettermixer-emote-set-header-first) {
+/* h1.bettermixer-emote-set-header:not(.bettermixer-emote-set-header-first) {
     margin-top: 5px;
-}
+} */
 
 [class*="chatContainer"] [class*="container"] {
     overflow-y: overlay !important;

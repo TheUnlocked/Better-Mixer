@@ -122,7 +122,7 @@ export default class Patcher{
             let emoteContainer = event.data.dialog.querySelector('div[class*="container"]');
             emoteContainer.style.overflow = "hidden";
             
-            let exampleButton = emoteContainer.children[0];
+            let exampleButton = emoteContainer.querySelector('button[class*="emoteButton"]');
 
             let emoteSets = [];
             let uncategorizedEmotes = new EmoteSet("Uncategorized");
@@ -141,16 +141,16 @@ export default class Patcher{
             let firstEmoteSet = true;
             function createEmoteSetHeader(title, before){
                 if (!before){
-                    before = exampleButton;
+                    before = emoteContainer[0];
                 }
-                let mixerEmoteHeader = document.createElement('h1');
+                let mixerEmoteHeader = document.createElement('h3');
                 mixerEmoteHeader.classList.add('bettermixer-emote-set-header');
                 if (firstEmoteSet){
                     mixerEmoteHeader.classList.add('bettermixer-emote-set-header-first');
                     firstEmoteSet = false;
                 }
                 mixerEmoteHeader.innerHTML = title;
-                emoteContainer.insertBefore(mixerEmoteHeader, before);
+                return mixerEmoteHeader;
             }
 
             for (let emoteSet of emoteSets){
@@ -160,8 +160,10 @@ export default class Patcher{
                 }
 
                 if (emoteSetEmotes.length > 0){
-                    createEmoteSetHeader(emoteSet.name);
-                    for (let emote of emoteSetEmotes){
+                    let emoteSetContainer = document.createElement('div');
+                    let emoteSetHeader = createEmoteSetHeader(emoteSet.name);
+                    emoteSetContainer.appendChild(emoteSetHeader);
+                    for (let emote of emoteSetEmotes.reverse()){
                         let emoteButton = exampleButton.cloneNode();
                         emoteButton.appendChild(emote.element);
                         emoteButton.style.width = emote.width + 12 + "px";
@@ -177,8 +179,10 @@ export default class Patcher{
                             let inputBox = event.sender.element.querySelector('textarea');
                             inputBox.value += `${inputBox.value.length == 0 || inputBox.value.endsWith(' ') ? '' : ' '}${emote.name} `;
                         });
-                        emoteContainer.insertBefore(emoteButton, exampleButton);
+                        emoteSetContainer.appendChild(emoteButton);
                     }
+                    emoteContainer.insertBefore(emoteSetContainer, emoteContainer.children[0]);
+                    emoteContainer.insertBefore(emoteSetHeader, emoteContainer.children[0]);
                 }
             }
 
