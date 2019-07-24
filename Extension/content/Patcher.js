@@ -185,15 +185,6 @@ export default class Patcher{
                     emoteContainer.insertBefore(emoteSetHeader, emoteContainer.children[0]);
                 }
             }
-
-            let subscriberEmoteButtons = emoteContainer.querySelectorAll('[style*="https://uploads.mixer.com/emoticons/"]');
-            if (subscriberEmoteButtons.length > 0){
-                createEmoteSetHeader("Subscriber Emotes");
-                createEmoteSetHeader("Mixer Emotes", subscriberEmoteButtons[subscriberEmoteButtons.length - 1].parentElement.nextSibling);
-            }
-            else{
-                createEmoteSetHeader("Mixer Emotes");
-            }
         });
 
         // Handle config menu
