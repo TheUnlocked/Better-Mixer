@@ -24,7 +24,7 @@ export default class Patcher{
                     .reduce((acc, val) => val.constructor === EmoteSet ? acc.concat(val.emotes) : acc.concat(val), []);
                 let emotes = emoteList.reduce((result, value) => { result[value.name] = value; return result; }, {});
 
-                let textPieces = [...message.element.querySelectorAll('[class*="textComponent"]')];
+                let textPieces = [...message.element.querySelectorAll('span:not([class*="_"])')];
                 for (let textElement of textPieces) {
                     // Break it up into text pieces, and check each piece for an emote
                     let words = textElement.innerHTML.trim().split(" ");
@@ -40,7 +40,7 @@ export default class Patcher{
                                 let newText = textElement.cloneNode();
                                 newText.innerHTML = textBuilder.trimStart();
                                 messageBuilder.push(newText);
-                                textBuilder = "";
+                                textBuilder = " ";
                             }
                             else{
                                 let newText = document.createElement('span');
@@ -51,7 +51,7 @@ export default class Patcher{
                             messageBuilder.push(emote.element);
                         } else {
                             if (!textBuilder && messageBuilder.length != 0){
-                                textBuilder = "";
+                                textBuilder = " ";
                             }
                             textBuilder += `${word} `;
                         }
