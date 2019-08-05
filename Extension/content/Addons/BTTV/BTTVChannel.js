@@ -23,27 +23,31 @@ export default class BTTVChannel{
                 setTimeout(load, 100);
                 return;
             }
-            $.ajax({
-                url: `https://api.betterttv.net/2/channels/${this.twitch.login}`,
-                dataType: 'json',
-                async: false,
-                success: data => {
-                    for (let emote of data.emotes) {
-                        let animated = ['gif'].includes(emote.imageType);
-                        this.emotes.addEmote(new Emote(emote.code, `https:${data.urlTemplate.replace('{{id}}', emote.id).replace('{{image}}', '3x')}`, 28, 28, animated));
-                    }
-                    
-                    this._gatherEmotes = event => {
-                        if (event.data.channel === this.channel){
-                            return this.emotes;
-                        }
-                    };
-                    this.plugin.addEventListener(BetterMixer.Events.GATHER_EMOTES, this._gatherEmotes);
 
-                    this.plugin.log(`Synced ${this.channel.owner.username} with BTTV emotes from ${this.twitch.login}.`, BetterMixer.LogType.INFO);
-                },
-                error: xhr => this.plugin.log(`${xhr.statusText}: Failed to load emotes from BTTV.`, BetterMixer.LogType.INFO)
-            });
+                  /* Backwards Compatibility */
+            if (!this.channel.channelSettings.bttv || this.channel.channelSettings.bttv.sync){
+                $.ajax({
+                    url: `https://api.betterttv.net/2/channels/${this.twitch.login}`,
+                    dataType: 'json',
+                    async: false,
+                    success: data => {
+                        for (let emote of data.emotes) {
+                            let animated = ['gif'].includes(emote.imageType);
+                            this.emotes.addEmote(new Emote(emote.code, `https:${data.urlTemplate.replace('{{id}}', emote.id).replace('{{image}}', '3x')}`, 28, 28, animated));
+                        }
+                        
+                        this._gatherEmotes = event => {
+                            if (event.data.channel === this.channel){
+                                return this.emotes;
+                            }
+                        };
+                        this.plugin.addEventListener(BetterMixer.Events.GATHER_EMOTES, this._gatherEmotes);
+
+                        this.plugin.log(`Synced ${this.channel.owner.username} with BTTV emotes from ${this.twitch.login}.`, BetterMixer.LogType.INFO);
+                    },
+                    error: xhr => this.plugin.log(`${xhr.statusText}: Failed to load emotes from BTTV.`, BetterMixer.LogType.INFO)
+                });
+            }
         };
         load();
     }

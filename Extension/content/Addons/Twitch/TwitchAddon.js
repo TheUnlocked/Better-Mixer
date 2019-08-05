@@ -2,7 +2,7 @@ import BetterMixer from "../../BetterMixer.js";
 import Channel from "../../Channel.js";
 import TwitchChannel from "./TwitchChannel.js";
 
-export default class FFZAddon {
+export default class TwitchAddon {
     /**
      * 
      * @param {BetterMixer} plugin 
@@ -26,13 +26,22 @@ export default class FFZAddon {
      * @param {Channel} channel 
      */
     getSync(channel){
+        if (channel.channelSettings.twitch){
+            if (channel.channelSettings.twitch.id){
+                return new TwitchChannel(this, channel, undefined, channel.channelSettings.twitch.id);
+            }
+            else if (channel.channelSettings.twitch.name){
+                return new TwitchChannel(this, channel, channel.channelSettings.twitch.name, undefined);
+            }
+        }
+
         if (!this._syncList){
             return;
         }
 
         let twitchName = this._syncList[channel.owner.username.toLowerCase()];
         if (twitchName){
-            return new TwitchChannel(this, channel, twitchName);
+            return new TwitchChannel(this, channel, twitchName, undefined);
         }
         this.plugin.log(`${channel.owner.username} is not Twitch synced.`, BetterMixer.LogType.INFO);
     }

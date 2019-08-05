@@ -176,7 +176,7 @@ export default class BetterMixer {
             case BetterMixer.LogType.INFO:
                 console.log(`[Better Mixer] ${msg}`);
                 break;
-            case BetterMixer.LogType.WARNING:
+            case BetterMixer.LogType.WARN:
                 console.warn(`[Better Mixer] ${msg}`);
                 break;
             case BetterMixer.LogType.ERROR:
@@ -199,7 +199,7 @@ export default class BetterMixer {
             return BetterMixer.Events[eventName];
         }
         else{
-            this.log(`${eventName} is already an event!`, BetterMixer.LogType.WARNING);
+            this.log(`${eventName} is already an event!`, BetterMixer.LogType.WARN);
         }
     }
 
@@ -215,7 +215,7 @@ export default class BetterMixer {
 
         let index = this._events[eventType].indexOf(callback);
         if (index == -1){
-            this.log("That event listener does not exist!", BetterMixer.LogType.WARNING);
+            this.log("That event listener does not exist!", BetterMixer.LogType.WARN);
             return;
         }
 
@@ -277,7 +277,8 @@ export default class BetterMixer {
  */
 BetterMixer.LogType = Object.freeze({
     INFO: 0,
-    WARNING: 1,
+    WARN: 1,
+    /* Deprecated - DO NOT USE */ WARNING: 1,
     ERROR: 2
 });
 
