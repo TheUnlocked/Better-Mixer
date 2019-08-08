@@ -106,6 +106,35 @@ h3.bettermixer-emote-set-header {
     border-color: #cc0202;
 }
 
+/* Dropdown visuals */
+.bettermixer-dropdown-box select {
+    width: 100%;
+    color: unset;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+.bettermixer-dropdown-box select::after {
+    content: "";
+    position: absolute;
+    border: 5px solid transparent;
+    border-top-color: #424754;
+    top: 50%;
+    margin-top: -2.5px;
+    right: 18.5px;
+}
+.bettermixer-dropdown-box select > option {
+    background-color: #212c3d;
+    padding: 16px 18px;
+    font-size: 17px;
+}
+.bettermixer-dropdown-box select > option[bettermixer-selected] {
+    background-color: rgb(53, 66, 85);
+}
+/* .bettermixer-dropdown-box select > option:hover {
+    box-shadow: inset 20px 20px rgb(48.6, 59.52, 75.48);
+} */
+
 /* Minor Graphical Fixes for Mixer */
 b-language-selector bui-icon.icon-web[icon="InternetWithController"] {
     padding-top: 0.11em;

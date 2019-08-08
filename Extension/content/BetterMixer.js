@@ -13,6 +13,7 @@ import User from "./User.js";
 import Badge from "./Badge.js";
 import BrowseFiltersConfig from "./Configs/BrowseFiltersConfig.js";
 import ColorConfig from "./Configs/ColorConfig.js";
+import BotDetectionConfig from "./Configs/BotDetectionConfig.js";
 
 let SRC = document.getElementById('BetterMixer-module').src;
 let BASE_URL = SRC.split('/').slice(0, -2).join('/') + '/';
@@ -86,6 +87,8 @@ export default class BetterMixer {
             'hide_chat_resizer', 'Disable Chat Resizer', '', false, true));
 
         this.configuration.registerConfig(new BrowseFiltersConfig());
+
+        this.configuration.registerConfig(new BotDetectionConfig());
 
         setTimeout(() => this.reload(), 0);
 

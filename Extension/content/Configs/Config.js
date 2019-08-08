@@ -41,5 +41,6 @@ Config.ConfigTypeEnum = Object.freeze({
     NONE: 0,
     BOOLEAN: 1,
     STRING: 2,
-    COLOR: 3
+    COLOR: 3,
+    DROPDOWN: 4
 });

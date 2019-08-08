@@ -1,12 +1,13 @@
 import Config from "./Config.js";
 
-export default class ColorConfig extends Config {
-    constructor(configName, displayText, descriptionText = "", defaultState = ""){
+export default class DropdownConfig extends Config {
+    constructor(configName, displayText, descriptionText = "", options = {}, defaultState = ""){
         super();
 
         this._configName = configName;
         this._displayText = displayText;
         this._descriptionText = descriptionText;
+        this._options = options;
         this._defaultState = defaultState;
         this._state = defaultState;
     }
@@ -41,6 +42,14 @@ export default class ColorConfig extends Config {
         return this._defaultState;
     }
 
+    get options(){
+        return Object.keys(this._options);
+    }
+
+    getDisplayFromOption(option){
+        return this._options[option] || "";
+    }
+
     // Updates the configuration effect
     update(){
         
@@ -48,6 +57,6 @@ export default class ColorConfig extends Config {
 
     // The type of config, currently unused as configs can only be booleans
     get configType(){
-        return Config.ConfigTypeEnum.COLOR;
+        return Config.ConfigTypeEnum.DROPDOWN;
     }
 }
