@@ -166,7 +166,8 @@ export default class Patcher{
                     for (let emote of emoteSetEmotes.reverse()){
                         let emoteButton = exampleButton.cloneNode();
                         emoteButton.appendChild(emote.element);
-                        emoteButton.style.width = emote.width + 12 + "px";
+                        emoteButton.style.paddingLeft = '4px';
+                        emoteButton.style.paddingRight = '4px';
                         emoteButton.addEventListener('click', () => {
                             // let doc = document.getElementsByClassName('CodeMirror')[0].CodeMirror.getDoc();
                             // let cursor = doc.getCursor();

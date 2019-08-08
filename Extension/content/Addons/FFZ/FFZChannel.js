@@ -11,7 +11,6 @@ export default class FFZChannel{
      * @param {string} username 
      */
     constructor(parent, channel) {
-
         this.ffz = parent;
         this.plugin = parent.plugin;
         this.channel = channel.channel;

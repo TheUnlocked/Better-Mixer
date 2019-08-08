@@ -22,17 +22,17 @@ export default class BetterMixer {
 
         this.log("Base loaded.");
 
-        this.configuration = new ConfigurationManager(this);
-        this.twitch = new TwitchAddon(this);
-        this.ffz = new FFZAddon(this);
-        this.bttv = new BTTVAddon(this);
-        //this.gameWisp = new GameWispAddon(this);
-        this.activeChannels = [];
-
         this._events = [];
         for (let _ in BetterMixer.Events){
             this._events.push([]);
         }
+
+        this.configuration = new ConfigurationManager(this);
+        this.twitch = new TwitchAddon(this);
+        this.bttv = new BTTVAddon(this);
+        this.ffz = new FFZAddon(this);
+        //this.gameWisp = new GameWispAddon(this);
+        this.activeChannels = [];
 
         $.ajax({
             url: `https://mixer.com/api/v1/users/current`,

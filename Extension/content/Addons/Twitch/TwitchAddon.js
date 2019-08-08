@@ -8,7 +8,6 @@ export default class TwitchAddon {
      * @param {BetterMixer} plugin 
      */
     constructor(plugin) {
-
         this.plugin = plugin;
 
         $.ajax({

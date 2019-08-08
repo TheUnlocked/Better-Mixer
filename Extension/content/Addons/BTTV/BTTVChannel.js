@@ -11,7 +11,6 @@ export default class BTTVChannel{
      * @param {string} username 
      */
     constructor(parent, channel) {
-
         this.bttv = parent;
         this.plugin = parent.plugin;
         this.channel = channel.channel;
