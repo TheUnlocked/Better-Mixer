@@ -11,7 +11,7 @@ export default class FFZAddon {
      */
     constructor(plugin) {
         this.plugin = plugin;
-        this.globalEmotes = new EmoteSet("FFZ Global Emotes");
+        this.globalEmotes = new EmoteSet("FFZ Global Emotes", -50);
 
         $.ajax({
             url: `https://api.frankerfacez.com/v1/set/global`,

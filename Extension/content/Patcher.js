@@ -122,10 +122,24 @@ export default class Patcher{
             let emoteContainer = event.data.dialog.querySelector('div[class*="container"]');
             emoteContainer.style.overflow = "hidden";
             
+            // Priority 100
+            let thisChannelSubscriberEmotesHeader = [...emoteContainer.querySelectorAll('h3[class*="emoteGroupHeader"]')]
+                .filter(x => x.innerText.toLowerCase() === event.sender.channel.name.toLowerCase())[0];
+            // Priority -200
+            let globalEmotesHeader = [...emoteContainer.querySelectorAll('h3[class*="emoteGroupHeader"]')]
+                .filter(x => x.innerText.toLowerCase() === "global")[0];
+            // Priority 50
+            let otherSubscriberEmoteHeader = [...emoteContainer.querySelectorAll('h3[class*="emoteGroupHeader"]')]
+                .filter(x => x !== thisChannelSubscriberEmotesHeader && x !== globalEmotesHeader)[0];
+            let start = document.createElement('div');
+            emoteContainer.insertBefore(start, emoteContainer.children[0]);
+            let end = document.createElement('div');
+            emoteContainer.appendChild(end);
+
             let exampleButton = emoteContainer.querySelector('button[class*="emoteButton"]');
 
             let emoteSets = [];
-            let uncategorizedEmotes = new EmoteSet("Uncategorized");
+            let uncategorizedEmotes = new EmoteSet("Uncategorized", -100);
 
             for (let emotes of gatheredEmotes){
                 if (emotes.constructor === EmoteSet){
@@ -137,12 +151,10 @@ export default class Patcher{
             }
 
             emoteSets.push(uncategorizedEmotes);
+            emoteSets = emoteSets.sort((a, b) => b.priority - a.priority);
 
             let firstEmoteSet = true;
-            function createEmoteSetHeader(title, before){
-                if (!before){
-                    before = emoteContainer[0];
-                }
+            function createEmoteSetHeader(title){
                 let mixerEmoteHeader = document.createElement('h3');
                 mixerEmoteHeader.classList.add('bettermixer-emote-set-header');
                 if (firstEmoteSet){
@@ -182,10 +194,26 @@ export default class Patcher{
                         });
                         emoteSetContainer.appendChild(emoteButton);
                     }
-                    emoteContainer.insertBefore(emoteSetContainer, emoteContainer.children[0]);
-                    emoteContainer.insertBefore(emoteSetHeader, emoteContainer.children[0]);
+
+                    let beforeElement;
+                    if (emoteSet.priority < -200){
+                        beforeElement = end;
+                    }
+                    else if (emoteSet.priority < 50){
+                        beforeElement = globalEmotesHeader;
+                    }
+                    else if (emoteSet.priority < 100){
+                        beforeElement = otherSubscriberEmoteHeader || globalEmotesHeader;
+                    }
+                    else{
+                        beforeElement = thisChannelSubscriberEmotesHeader || start;
+                    }
+                    emoteContainer.insertBefore(emoteSetContainer, beforeElement);
+                    emoteContainer.insertBefore(emoteSetHeader, emoteSetContainer);
                 }
             }
+            emoteContainer.removeChild(start);
+            emoteContainer.removeChild(end);
         });
 
         // Handle config menu

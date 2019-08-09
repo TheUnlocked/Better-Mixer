@@ -11,7 +11,7 @@ export default class BTTVAddon {
      */
     constructor(plugin) {
         this.plugin = plugin;
-        this.globalEmotes = new EmoteSet("BTTV Global Emotes");
+        this.globalEmotes = new EmoteSet("BTTV Global Emotes", -60);
 
         $.ajax({
             url: `https://api.betterttv.net/2/emotes/`,

@@ -42,8 +42,8 @@ export default class Channel {
 
                 this.twitchChannel = plugin.twitch.getSync(this);
                 if (this.twitchChannel){
-                    this.ffzChannel = plugin.ffz.getSync(this.twitchChannel);
                     this.bttvChannel = plugin.bttv.getSync(this.twitchChannel);
+                    this.ffzChannel = plugin.ffz.getSync(this.twitchChannel);
                 }
                 // this.gameWispChannel = plugin.gameWisp.getSync(this);
 

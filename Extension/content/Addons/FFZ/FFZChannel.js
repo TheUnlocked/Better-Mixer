@@ -15,7 +15,7 @@ export default class FFZChannel{
         this.plugin = parent.plugin;
         this.channel = channel.channel;
         this.twitch = channel;
-        this.emotes = new EmoteSet("FFZ Channel Emotes");
+        this.emotes = new EmoteSet("FFZ Channel Emotes", 90);
 
         let load = () => {
             if (!this.twitch.id){

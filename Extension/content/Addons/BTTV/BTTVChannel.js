@@ -15,7 +15,7 @@ export default class BTTVChannel{
         this.plugin = parent.plugin;
         this.channel = channel.channel;
         this.twitch = channel;
-        this.emotes = new EmoteSet("BTTV Channel Emotes");
+        this.emotes = new EmoteSet("BTTV Channel Emotes", 80);
 
         let load = () => {
             if (!this.twitch.login){
