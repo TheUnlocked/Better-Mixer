@@ -59,7 +59,8 @@ div.profile-bio :hover {
 }
 
 [class*="message"] [class*="badge__"]:not(.bettermixer-badge-relocated) {
-    margin-left: 5px;
+    margin-left: 2px;
+    margin-right: 2px;
 }
 
 /* .better-mixer-inline-control {
