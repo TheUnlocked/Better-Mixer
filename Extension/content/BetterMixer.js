@@ -114,10 +114,15 @@ export default class BetterMixer {
         });
     }
 
+    get isEmbeddedWindow(){
+        return this._embedded;
+    }
+    get isUserPage(){
+        return this._userPage;
+    }
+
     reload(){
         let page = window.location.pathname.substring(1).toLowerCase();
-
-        this.dispatchEvent(BetterMixer.Events.ON_PAGE_LOAD, page, this);
 
         if (page == 'me/bounceback'){
             this._page = "";
@@ -125,12 +130,15 @@ export default class BetterMixer {
             return;
         }
 
-        if (page == 'browse/all' || page.startsWith('dashboard') || page == "pro"){
+        this._userPage = !(page == 'browse/all' || page.startsWith('dashboard') || page == "pro");
+        if (!this._userPage){
             this.log(`This is not a user page.`);
+            this.dispatchEvent(BetterMixer.Events.ON_PAGE_LOAD, page, this);
             return;
         }
 
-        if (page.startsWith('embed/chat/')){
+        this._embedded = page.startsWith('embed/chat/');
+        if (this._embedded){
             page = page.substring(11);
             this.log(`Chat is either in a popout or embedded window.`);
         }
@@ -139,16 +147,19 @@ export default class BetterMixer {
 
         if (!page){
             this._page = "";
+            this.dispatchEvent(BetterMixer.Events.ON_PAGE_LOAD, page, this);
             return;
         }
 
         page = page[0];
 
         if (page == this._page){
+            this.dispatchEvent(BetterMixer.Events.ON_PAGE_LOAD, page, this);
             return;
         }
 
         this._page = page;
+        this.dispatchEvent(BetterMixer.Events.ON_PAGE_LOAD, page, this);
 
         this.log(`Switched to page '${this._page}'`);
 
@@ -206,7 +217,7 @@ export default class BetterMixer {
             this._chatObserver = $.initialize('b-chat-client-host-component [class*="chatContainer"]', (_, element) => {
                 reloadChat(element);
             }, { target: document.querySelector('b-channel-chat-section').parentElement });
-            if (!loaded){
+            if (!loaded && document.querySelector('b-chat-client-host-component')){
                 reloadChat(document.querySelector('b-chat-client-host-component').children[0]);
             }
         }

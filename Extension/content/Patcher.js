@@ -321,8 +321,8 @@ export default class Patcher{
 
         // Handle Browse > Filters > Save Filters
         this.plugin.addEventListener(BetterMixer.Events.ON_PAGE_LOAD, () => {
-            let filterConfig = this.plugin.configuration.getConfigAsync('browse_filters', (filterConfig) => {
-                if (document.location.pathname.startsWith("/browse")){
+            if (document.location.pathname.startsWith("/browse")){
+                let filterConfig = this.plugin.configuration.getConfigAsync('browse_filters', (filterConfig) => {    
                     let browseBaseUrl = "https://mixer.com" + document.location.pathname;
                     if (document.location.href == browseBaseUrl && !document.querySelector('b-browse-filters.visible') && filterConfig.state != ""){
                         document.location.href = browseBaseUrl + "?" + filterConfig.state;
@@ -351,9 +351,22 @@ export default class Patcher{
                         else setTimeout(checkFiltersLoaded, 100);
                     };
                     checkFiltersLoaded();
-                }
-            });
+                });
+            }
 
+            const cancelVodAutoplay = () => {
+                if (!plugin.isEmbeddedWindow && plugin.isUserPage){
+                    if (!document.getElementById('player-state-button')){
+                        setTimeout(cancelVodAutoplay, 1000);
+                        return;
+                    }
+                    debugger;
+                    if (!document.querySelector('b-channel-profile header bui-tab-label#tab-1[aria-selected="true"]')){
+                        setTimeout(() => document.getElementById('player-state-button').click(), 1000);
+                    }
+                }
+            }
+            setTimeout(cancelVodAutoplay, 100);
         });
 
         $.initialize('b-went-live-notification', (_, element) => {
