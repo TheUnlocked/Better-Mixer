@@ -101,8 +101,16 @@ export default class BetterMixer {
 
         this.patcher = new Patcher(this);
 
-        this.addEventListener(BetterMixer.Events.ON_CHAT_LOAD, () => {
-            BetterMixer.ClassNames.BADGE = "badge__" + $('style').filter((_, element) => element.innerHTML.includes('.badge__'))[0].innerHTML.split('.badge__')[1].split('{')[0].trim();
+        this.addEventListener(BetterMixer.Events.ON_CHAT_FINISH_LOAD, () => {
+            let badgeElementTimeout = () => {
+                let badgeElement = $('style').filter((_, element) => element.innerHTML.includes('.badge__'))[0];
+                if (!badgeElement){
+                    setTimeout(badgeElementTimeout, 100);
+                    return;
+                }
+                BetterMixer.ClassNames.BADGE = "badge__" +  badgeElement.innerHTML.split('.badge__')[1].split('{')[0].trim();
+            }
+            badgeElementTimeout();
         });
     }
 
@@ -144,6 +152,10 @@ export default class BetterMixer {
 
         this.log(`Switched to page '${this._page}'`);
 
+        if (this._chatObserver){
+            this._chatObserver.disconnect();
+        }
+
         for (let channel of this.activeChannels){
             channel.unload();
         }
@@ -153,12 +165,52 @@ export default class BetterMixer {
         if (mainChannel.id){
             this.activeChannels.push(mainChannel);
         }
+        this.focusedChannel = mainChannel;
 
-        let chatTabBar = document.querySelector('b-channel-chat-tabs>bui-tab-bar');
+        let loaded = false;
+        const reloadChat = element => {
+            loaded = true;
+            let chatTabBar = document.querySelector('b-channel-chat-tabs>bui-tab-bar');
 
-        if (chatTabBar){
-
+            if (chatTabBar){
+                let thisChannelButton = chatTabBar.children[0];
+                let otherChannelButton = chatTabBar.children[1];
+                let selectedButton = thisChannelButton.querySelector('.bui-tab-underline') ? thisChannelButton : otherChannelButton;
+                console.log(selectedButton);
+                if (selectedButton === thisChannelButton || window.location.search.startsWith('?vod=')){
+                    this.focusedChannel = mainChannel;
+                    this.dispatchEvent(BetterMixer.Events.ON_CHAT_START_LOAD, {channel: mainChannel, element: element}, this);
+                }
+                else{
+                    let secondChannel = new Channel(this, otherChannelButton.innerText.toLowerCase());
+                    if (this.activeChannels.length > 1){
+                        this.activeChannels.pop().unload();
+                    }
+                    this.activeChannels.push(secondChannel);
+                    this.focusedChannel = secondChannel;
+                    this.dispatchEvent(BetterMixer.Events.ON_CHAT_START_LOAD, {channel: secondChannel, element: element}, this);
+                }
+            }
+            else{
+                this.focusedChannel = mainChannel;
+                this.dispatchEvent(BetterMixer.Events.ON_CHAT_START_LOAD, {channel: mainChannel, element: element}, this);
+            }
         }
+
+        let chatObserverLoop = () => {
+            if (!document.querySelector('b-channel-chat-section')){
+                setTimeout(chatObserverLoop, 100);
+                return;
+            }
+
+            this._chatObserver = $.initialize('b-chat-client-host-component [class*="chatContainer"]', (_, element) => {
+                reloadChat(element);
+            }, { target: document.querySelector('b-channel-chat-section').parentElement });
+            if (!loaded){
+                reloadChat(document.querySelector('b-chat-client-host-component').children[0]);
+            }
+        }
+        chatObserverLoop();
     }
 
     injectStylesheet(file){
@@ -288,7 +340,8 @@ BetterMixer.LogType = Object.freeze({
 BetterMixer.Events = {
     ON_LOAD: 0,
     ON_CHANNEL_LOAD: 1,
-    ON_CHAT_LOAD: 2,
+    ON_CHAT_FINISH_LOAD: 2,
+    ON_CHAT_START_LOAD: 10,
     ON_USER_LOAD: 3,
     ON_MESSAGE: 4,
     ON_EMOTES_DIALOG_OPEN: 5,
