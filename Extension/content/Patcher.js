@@ -360,7 +360,6 @@ export default class Patcher{
                         setTimeout(cancelVodAutoplay, 1000);
                         return;
                     }
-                    debugger;
                     if (!document.querySelector('b-channel-profile header bui-tab-label#tab-1[aria-selected="true"]')){
                         setTimeout(() => document.getElementById('player-state-button').click(), 1000);
                     }
