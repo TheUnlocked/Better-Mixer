@@ -14,12 +14,12 @@ export default class Chat {
         this.plugin = channel.plugin;
         this.users = { [channel.owner.username]: channel.owner };
 
-        this.load();
-    }
-
-    load(){        
+        this._loaded = false;
         this._chatLoadObserver = event => {
-            this.partialUnload();
+            if (!this._loaded){
+                this.partialUnload();
+                this._loaded = true;
+            }
             if (event.data.channel == this.channel){
                 this._msgObserver = $.initialize('div[class*="message__"]', (_, element) => {
                     let usernameElement = element.querySelectorAll('[class*="Username"]')[0];
@@ -28,9 +28,10 @@ export default class Chat {
                     }
                     let authorName = usernameElement.innerText;
                     let msg = new ChatMessage(this, element, this.users[authorName]);
-                    if (!this.users[authorName]){
-                        this.users[authorName] = msg.author;
-                    }
+                    // Disabled because of potential memory explosion
+                    // if (!this.users[authorName]){
+                    //     this.users[authorName] = msg.author;
+                    // }
                     this.plugin.dispatchEvent(BetterMixer.Events.ON_MESSAGE, null, msg);
                 }, { target: event.data.element });
 
@@ -75,6 +76,7 @@ export default class Chat {
         this._msgObserver && this._msgObserver.disconnect();
         this._emoteDialogObserver && this._emoteDialogObserver.disconnect();
         this._gatherBadges && this.plugin.removeEventListener(BetterMixer.Events.GATHER_BADGES, this._gatherBadges);
+        this._loaded = false;
     }
 
     unload(){
