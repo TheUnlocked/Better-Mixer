@@ -16,6 +16,8 @@ export default class Chat {
 
         this._loaded = false;
         this._chatLoadObserver = event => {
+            this.element = event.data.element;
+
             if (!this._loaded){
                 this.partialUnload();
                 this._loaded = true;
