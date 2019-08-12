@@ -34,10 +34,8 @@ export default class BetterMixer {
         //this.gameWisp = new GameWispAddon(this);
         this.activeChannels = [];
 
-        $.ajax({
+        $.getJSON({
             url: `https://mixer.com/api/v1/users/current`,
-            dataType: 'json',
-            async: false,
             success: data => {
                 this.user = new User(data);
             }

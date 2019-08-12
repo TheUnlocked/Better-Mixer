@@ -13,10 +13,8 @@ export default class FFZAddon {
         this.plugin = plugin;
         this.globalEmotes = new EmoteSet("FFZ Global Emotes", -50);
 
-        $.ajax({
+        $.getJSON({
             url: `https://api.frankerfacez.com/v1/set/global`,
-            dataType: 'json',
-            async: false,
             success: data => {
                 for (let emoteSet in data.sets) {
                     if (data.default_sets.includes(+emoteSet)){

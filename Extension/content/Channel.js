@@ -11,10 +11,8 @@ export default class Channel {
 
         this.plugin = plugin;
 
-        $.ajax({
+        $.getJSON({
             url: `https://mixer.com/api/v1/channels/${channelName}`,
-            dataType: 'json',
-            async: false,
             success: data => {
                 this.id = data.id;
                 this.owner = new User(data.user);

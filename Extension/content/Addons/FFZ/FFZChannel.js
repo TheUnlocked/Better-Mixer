@@ -24,10 +24,8 @@ export default class FFZChannel{
             }
                   /* Backwards Compatibility */
             if (!this.channel.channelSettings.ffz || this.channel.channelSettings.ffz.sync){
-                $.ajax({
+                $.getJSON({
                     url: `https://api.frankerfacez.com/v1/room/${this.twitch.login}`,
-                    dataType: 'json',
-                    async: false,
                     success: data => {
                         for (let emoteSet in data.sets) {
                             for (let emote of data.sets[emoteSet].emoticons) {

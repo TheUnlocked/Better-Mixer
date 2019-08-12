@@ -25,10 +25,8 @@ export default class BTTVChannel{
 
                   /* Backwards Compatibility */
             if (!this.channel.channelSettings.bttv || this.channel.channelSettings.bttv.sync){
-                $.ajax({
+                $.getJSON({
                     url: `https://api.betterttv.net/2/channels/${this.twitch.login}`,
-                    dataType: 'json',
-                    async: false,
                     success: data => {
                         for (let emote of data.emotes) {
                             let animated = ['gif'].includes(emote.imageType);

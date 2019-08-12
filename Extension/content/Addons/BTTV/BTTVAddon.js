@@ -13,10 +13,8 @@ export default class BTTVAddon {
         this.plugin = plugin;
         this.globalEmotes = new EmoteSet("BTTV Global Emotes", -60);
 
-        $.ajax({
+        $.getJSON({
             url: `https://api.betterttv.net/2/emotes/`,
-            dataType: 'json',
-            async: false,
             success: data => {
                 for (let emote of data.emotes) {
                     let animated = ['gif'].includes(emote.imageType);

@@ -355,9 +355,9 @@ export default class Patcher{
             }
 
             const cancelVodAutoplay = () => {
-                if (!plugin.isEmbeddedWindow && plugin.isUserPage){
+                if (!plugin.isEmbeddedWindow && plugin.isUserPage && document.querySelector('b-vod-bar')){
                     if (!document.getElementById('player-state-button')){
-                        setTimeout(cancelVodAutoplay, 1000);
+                        setTimeout(cancelVodAutoplay, 100);
                         return;
                     }
                     if (!document.querySelector('b-channel-profile header bui-tab-label#tab-1[aria-selected="true"]')){
@@ -365,7 +365,7 @@ export default class Patcher{
                     }
                 }
             }
-            setTimeout(cancelVodAutoplay, 100);
+            setTimeout(cancelVodAutoplay, 1500);
         });
 
         $.initialize('b-went-live-notification', (_, element) => {
