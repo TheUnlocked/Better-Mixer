@@ -28,6 +28,9 @@ export default class BTTVChannel{
                 $.getJSON({
                     url: `https://api.betterttv.net/2/channels/${this.twitch.login}`,
                     success: data => {
+                        if (this.cancelLoad){
+                            return;
+                        }
                         for (let emote of data.emotes) {
                             let animated = ['gif'].includes(emote.imageType);
                             this.emotes.addEmote(new Emote(emote.code, `https:${data.urlTemplate.replace('{{id}}', emote.id).replace('{{image}}', '3x')}`, 28, 28, animated));
@@ -42,7 +45,12 @@ export default class BTTVChannel{
 
                         this.plugin.log(`Synced ${this.channel.owner.username} with BTTV emotes from ${this.twitch.login}.`, BetterMixer.LogType.INFO);
                     },
-                    error: xhr => this.plugin.log(`${xhr.statusText}: Failed to load emotes from BTTV.`, BetterMixer.LogType.INFO)
+                    error: xhr => {
+                        if (this.cancelLoad){
+                            return;
+                        }
+                        this.plugin.log(`${xhr.statusText}: Failed to load emotes from BTTV.`, BetterMixer.LogType.INFO);
+                    }
                 });
             }
         };
@@ -50,6 +58,7 @@ export default class BTTVChannel{
     }
 
     unload(){
-        this.plugin.removeEventListener(BetterMixer.Events.GATHER_EMOTES, this._gatherEmotes);
+        this.cancelLoad = true;
+        this._gatherEmotes && this.plugin.removeEventListener(BetterMixer.Events.GATHER_EMOTES, this._gatherEmotes);
     }
 }
