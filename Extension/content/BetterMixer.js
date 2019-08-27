@@ -1,4 +1,4 @@
-import "../lib/js/jquery-3.3.1.min.js";
+import "../lib/js/jquery-3.4.1.min.js";
 import "../lib/js/jquery.initialize.min.js";
 
 import TwitchAddon from "./Addons/Twitch/TwitchAddon.js";
