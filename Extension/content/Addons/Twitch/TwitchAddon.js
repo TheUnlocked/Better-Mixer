@@ -8,13 +8,10 @@ export default class TwitchAddon {
      * @param {BetterMixer} plugin 
      */
     constructor(plugin) {
-
         this.plugin = plugin;
 
-        $.ajax({
+        $.getJSON({
             url: `https://raw.githubusercontent.com/TheUnlocked/Better-Mixer/master/Info/twitchsync.json`,
-            dataType: 'json',
-            async: false,
             success: data => {
                 this._syncList = data;
             },

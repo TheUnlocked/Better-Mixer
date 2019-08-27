@@ -122,10 +122,24 @@ export default class Patcher{
             let emoteContainer = event.data.dialog.querySelector('div[class*="container"]');
             emoteContainer.style.overflow = "hidden";
             
+            // Priority 100
+            let thisChannelSubscriberEmotesHeader = [...emoteContainer.querySelectorAll('h3[class*="emoteGroupHeader"]')]
+                .filter(x => x.innerText.toLowerCase() === event.sender.channel.name.toLowerCase())[0];
+            // Priority -200
+            let globalEmotesHeader = [...emoteContainer.querySelectorAll('h3[class*="emoteGroupHeader"]')]
+                .filter(x => x.innerText.toLowerCase() === "global")[0];
+            // Priority 50
+            let otherSubscriberEmoteHeader = [...emoteContainer.querySelectorAll('h3[class*="emoteGroupHeader"]')]
+                .filter(x => x !== thisChannelSubscriberEmotesHeader && x !== globalEmotesHeader)[0];
+            let start = document.createElement('div');
+            emoteContainer.insertBefore(start, emoteContainer.children[0]);
+            let end = document.createElement('div');
+            emoteContainer.appendChild(end);
+
             let exampleButton = emoteContainer.querySelector('button[class*="emoteButton"]');
 
             let emoteSets = [];
-            let uncategorizedEmotes = new EmoteSet("Uncategorized");
+            let uncategorizedEmotes = new EmoteSet("Uncategorized", -100);
 
             for (let emotes of gatheredEmotes){
                 if (emotes.constructor === EmoteSet){
@@ -137,12 +151,10 @@ export default class Patcher{
             }
 
             emoteSets.push(uncategorizedEmotes);
+            emoteSets = emoteSets.sort((a, b) => b.priority - a.priority);
 
             let firstEmoteSet = true;
-            function createEmoteSetHeader(title, before){
-                if (!before){
-                    before = emoteContainer[0];
-                }
+            function createEmoteSetHeader(title){
                 let mixerEmoteHeader = document.createElement('h3');
                 mixerEmoteHeader.classList.add('bettermixer-emote-set-header');
                 if (firstEmoteSet){
@@ -166,7 +178,8 @@ export default class Patcher{
                     for (let emote of emoteSetEmotes.reverse()){
                         let emoteButton = exampleButton.cloneNode();
                         emoteButton.appendChild(emote.element);
-                        emoteButton.style.width = emote.width + 12 + "px";
+                        emoteButton.style.paddingLeft = '4px';
+                        emoteButton.style.paddingRight = '4px';
                         emoteButton.addEventListener('click', () => {
                             // let doc = document.getElementsByClassName('CodeMirror')[0].CodeMirror.getDoc();
                             // let cursor = doc.getCursor();
@@ -181,10 +194,26 @@ export default class Patcher{
                         });
                         emoteSetContainer.appendChild(emoteButton);
                     }
-                    emoteContainer.insertBefore(emoteSetContainer, emoteContainer.children[0]);
-                    emoteContainer.insertBefore(emoteSetHeader, emoteContainer.children[0]);
+
+                    let beforeElement;
+                    if (emoteSet.priority < -200){
+                        beforeElement = end;
+                    }
+                    else if (emoteSet.priority < 50){
+                        beforeElement = globalEmotesHeader;
+                    }
+                    else if (emoteSet.priority < 100){
+                        beforeElement = otherSubscriberEmoteHeader || globalEmotesHeader;
+                    }
+                    else{
+                        beforeElement = thisChannelSubscriberEmotesHeader || start;
+                    }
+                    emoteContainer.insertBefore(emoteSetContainer, beforeElement);
+                    emoteContainer.insertBefore(emoteSetHeader, emoteSetContainer);
                 }
             }
+            emoteContainer.removeChild(start);
+            emoteContainer.removeChild(end);
         });
 
         // Handle config menu
@@ -336,8 +365,8 @@ export default class Patcher{
 
         // Handle Browse > Filters > Save Filters
         this.plugin.addEventListener(BetterMixer.Events.ON_PAGE_LOAD, () => {
-            let filterConfig = this.plugin.configuration.getConfigAsync('browse_filters', (filterConfig) => {
-                if (document.location.pathname.startsWith("/browse")){
+            if (document.location.pathname.startsWith("/browse")){
+                let filterConfig = this.plugin.configuration.getConfigAsync('browse_filters', (filterConfig) => {    
                     let browseBaseUrl = "https://mixer.com" + document.location.pathname;
                     if (document.location.href == browseBaseUrl && !document.querySelector('b-browse-filters.visible') && filterConfig.state != ""){
                         document.location.href = browseBaseUrl + "?" + filterConfig.state;
@@ -366,9 +395,21 @@ export default class Patcher{
                         else setTimeout(checkFiltersLoaded, 100);
                     };
                     checkFiltersLoaded();
-                }
-            });
+                });
+            }
 
+            const cancelVodAutoplay = () => {
+                if (!plugin.isEmbeddedWindow && plugin.isUserPage && document.querySelector('b-vod-bar')){
+                    if (!document.getElementById('player-state-button')){
+                        setTimeout(cancelVodAutoplay, 100);
+                        return;
+                    }
+                    if (!document.querySelector('b-channel-profile header bui-tab-label#tab-1[aria-selected="true"]')){
+                        setTimeout(() => document.getElementById('player-state-button').click(), 1000);
+                    }
+                }
+            }
+            setTimeout(cancelVodAutoplay, 1500);
         });
 
         $.initialize('b-went-live-notification', (_, element) => {

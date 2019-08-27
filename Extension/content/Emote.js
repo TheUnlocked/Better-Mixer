@@ -5,13 +5,13 @@ export default class Emote{
 
         this.name = name;
         this.image = image;
-        if (height < 32){
+        if (height < 28){
             this.height = height;
             this.width = width;
         }
         else{
-            this.height = 32;
-            this.width = width / height * 32;
+            this.height = 28;
+            this.width = width / height * 28;
         }
         this.animated = animated;
     }

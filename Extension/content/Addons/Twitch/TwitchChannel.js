@@ -19,7 +19,7 @@ export default class TwitchChannel{
                 url: `https://api.twitch.tv/helix/users?login=${username}`,
                 headers: {"Client-ID": "k2dxpcz1dl6fe771vzcsl1bx324osz"},
                 dataType: 'json',
-                async: false,
+                async: true,
                 success: data => {
                     this.id = data.data[0].id;
                     this.displayName = data.data[0].display_name;
@@ -32,7 +32,7 @@ export default class TwitchChannel{
                 url: `https://api.twitch.tv/helix/users?id=${id}`,
                 headers: {"Client-ID": "k2dxpcz1dl6fe771vzcsl1bx324osz"},
                 dataType: 'json',
-                async: false,
+                async: true,
                 success: data => {
                     this.id = data.data[0].id;
                     this.displayName = data.data[0].display_name;

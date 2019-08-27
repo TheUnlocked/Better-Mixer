@@ -4,10 +4,12 @@ export default class EmoteSet {
     /**
      * 
      * @param {String} name
+     * @param {Number} priority {default: 0, uncategorized: -100, mixerGlobal: -200, thisChannelSubs: 100, otherChannelSubs: 50}
      * @param {Array<Emote>} emotes
      */
-    constructor(name, emotes = []){
+    constructor(name, priority = 0, emotes = []){
         this.name = name;
+        this.priority = priority;
         this.emotes = emotes.slice();
     }
 

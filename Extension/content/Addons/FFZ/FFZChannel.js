@@ -11,12 +11,11 @@ export default class FFZChannel{
      * @param {string} username 
      */
     constructor(parent, channel) {
-
         this.ffz = parent;
         this.plugin = parent.plugin;
         this.channel = channel.channel;
         this.twitch = channel;
-        this.emotes = new EmoteSet("FFZ Channel Emotes");
+        this.emotes = new EmoteSet("FFZ Channel Emotes", 90);
 
         let load = () => {
             if (!this.twitch.id){
@@ -25,11 +24,12 @@ export default class FFZChannel{
             }
                   /* Backwards Compatibility */
             if (!this.channel.channelSettings.ffz || this.channel.channelSettings.ffz.sync){
-                $.ajax({
+                $.getJSON({
                     url: `https://api.frankerfacez.com/v1/room/${this.twitch.login}`,
-                    dataType: 'json',
-                    async: false,
                     success: data => {
+                        if (this.cancelLoad){
+                            return;
+                        }
                         for (let emoteSet in data.sets) {
                             for (let emote of data.sets[emoteSet].emoticons) {
                                 let emoteUrl = emote.urls['4'];
@@ -51,12 +51,18 @@ export default class FFZChannel{
                         this.plugin.log(`Synced ${this.channel.owner.username} with FFZ emotes from ${this.twitch.login}.`, BetterMixer.LogType.INFO);
                     },
                     error: xhr => {
+                        if (this.cancelLoad){
+                            return;
+                        }
                         this.plugin.log(`${xhr.statusText}: Failed to load emotes from FFZ. Trying alternate method.`, BetterMixer.LogType.INFO);
                         $.ajax({
                             url: `https://api-test.frankerfacez.com/v1/room/id/${this.twitch.id}`,
                             dataType: 'json',
                             async: false,
                             success: data => {
+                                if (this.cancelLoad){
+                                    return;
+                                }
                                 for (let emoteSet in data.sets) {
                                     for (let emote of data.sets[emoteSet].emoticons) {
                                         let emoteUrl = emote.urls['4'];
@@ -77,7 +83,12 @@ export default class FFZChannel{
                 
                                 this.plugin.log(`Synced ${this.channel.owner.username} with FFZ emotes from ${this.twitch.login}.`, BetterMixer.LogType.INFO);
                             },
-                            error: xhr => this.plugin.log(`${xhr.statusText}: Failed to load emotes from FFZ.`, BetterMixer.LogType.INFO)
+                            error: xhr => {
+                                if (this.cancelLoad){
+                                    return;
+                                }
+                                this.plugin.log(`${xhr.statusText}: Failed to load emotes from FFZ.`, BetterMixer.LogType.INFO);
+                            }
                         });
                     }
                 });
@@ -87,6 +98,7 @@ export default class FFZChannel{
     }
 
     unload(){
-        this.plugin.removeEventListener(BetterMixer.Events.GATHER_EMOTES, this._gatherEmotes);
+        this.cancelLoad = true;
+        this._gatherEmotes && this.plugin.removeEventListener(BetterMixer.Events.GATHER_EMOTES, this._gatherEmotes);
     }
 }

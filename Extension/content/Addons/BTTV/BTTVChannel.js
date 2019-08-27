@@ -11,12 +11,11 @@ export default class BTTVChannel{
      * @param {string} username 
      */
     constructor(parent, channel) {
-
         this.bttv = parent;
         this.plugin = parent.plugin;
         this.channel = channel.channel;
         this.twitch = channel;
-        this.emotes = new EmoteSet("BTTV Channel Emotes");
+        this.emotes = new EmoteSet("BTTV Channel Emotes", 80);
 
         let load = () => {
             if (!this.twitch.login){
@@ -26,11 +25,12 @@ export default class BTTVChannel{
 
                   /* Backwards Compatibility */
             if (!this.channel.channelSettings.bttv || this.channel.channelSettings.bttv.sync){
-                $.ajax({
+                $.getJSON({
                     url: `https://api.betterttv.net/2/channels/${this.twitch.login}`,
-                    dataType: 'json',
-                    async: false,
                     success: data => {
+                        if (this.cancelLoad){
+                            return;
+                        }
                         for (let emote of data.emotes) {
                             let animated = ['gif'].includes(emote.imageType);
                             this.emotes.addEmote(new Emote(emote.code, `https:${data.urlTemplate.replace('{{id}}', emote.id).replace('{{image}}', '3x')}`, 28, 28, animated));
@@ -45,7 +45,12 @@ export default class BTTVChannel{
 
                         this.plugin.log(`Synced ${this.channel.owner.username} with BTTV emotes from ${this.twitch.login}.`, BetterMixer.LogType.INFO);
                     },
-                    error: xhr => this.plugin.log(`${xhr.statusText}: Failed to load emotes from BTTV.`, BetterMixer.LogType.INFO)
+                    error: xhr => {
+                        if (this.cancelLoad){
+                            return;
+                        }
+                        this.plugin.log(`${xhr.statusText}: Failed to load emotes from BTTV.`, BetterMixer.LogType.INFO);
+                    }
                 });
             }
         };
@@ -53,6 +58,7 @@ export default class BTTVChannel{
     }
 
     unload(){
-        this.plugin.removeEventListener(BetterMixer.Events.GATHER_EMOTES, this._gatherEmotes);
+        this.cancelLoad = true;
+        this._gatherEmotes && this.plugin.removeEventListener(BetterMixer.Events.GATHER_EMOTES, this._gatherEmotes);
     }
 }
