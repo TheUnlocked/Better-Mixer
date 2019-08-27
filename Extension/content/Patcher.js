@@ -234,11 +234,7 @@ export default class Patcher{
 
                 let exampleToggle = configSection.querySelector('[class*="control"][class*="toggle"]');
                 let exampleColor = configSection.querySelector('[class*="wrapper"] [class*="currentColor"]').parentElement.parentElement;
-                let exampleDropdown = configSection.querySelector('[role="listbox"]');
 
-                if (!BetterMixer.ClassNames.DROPDOWN_SELECTION){
-                    BetterMixer.ClassNames.DROPDOWN_SELECTION = exampleDropdown.querySelector('[class*="selection"]').classList[0];
-                }
                 if (!BetterMixer.ClassNames.INPUT){
                     BetterMixer.ClassNames.INPUT = exampleColor.querySelector('[class*="input"]').classList[0];
                 }
@@ -287,37 +283,17 @@ export default class Patcher{
                             break;
 
                         case Config.ConfigTypeEnum.DROPDOWN:
-                            configElement = exampleDropdown.cloneNode(true);
-                            configElement.children[0].innerHTML = config.displayText;
-                            let selectElement = document.createElement('select');
-                            configElement.removeChild(configElement.querySelector('[class*="selection"]'));
-                            configElement.insertBefore(selectElement, configElement.children[0]);
-                            configElement.classList.add('bettermixer-dropdown-box');
-                            selectElement.classList.add(BetterMixer.ClassNames.DROPDOWN_SELECTION, BetterMixer.ClassNames.INPUT);
-                            let arrowElement = document.createElement('div');
-                            arrowElement.classList.add(BetterMixer.ClassNames.DROPDOWN_SELECTION);
-                            configElement.appendChild(arrowElement);
-                            for (let option of config.options){
-                                let optionElement = document.createElement('option');
-                                optionElement.value = option;
-                                optionElement.innerHTML = config.getDisplayFromOption(option);
-                                selectElement.appendChild(optionElement);
-                            }
-                            let currentSelectedIndex = config.options.indexOf(config.state);
-                            if (currentSelectedIndex !== -1){
-                                selectElement.children[currentSelectedIndex].toggleAttribute('bettermixer-selected', true);
-                            }
-                            selectElement.value = config.state;
-                            selectElement.addEventListener('change', e => {
-                                configElement.tempState = selectElement.value;
-                                if (currentSelectedIndex !== -1){
-                                    selectElement.children[currentSelectedIndex].toggleAttribute('bettermixer-selected', false);
-                                }
-                                currentSelectedIndex = config.options.indexOf(configElement.tempState);
-                                if (currentSelectedIndex !== -1){
-                                    selectElement.children[currentSelectedIndex].toggleAttribute('bettermixer-selected', true);
-                                }
-                            });
+                            let tmpDiv = document.createElement('div');
+                            
+                            ReactDOM.render(React.createElement(mixerUi.Select, {
+                                label: config.displayText,
+                                options: config.options.map(x => ({key: x, value: config.getDisplayFromOption(x)})),
+                                value: config.state,
+                                children: e => React.createElement("div", { className: BetterMixer.ClassNames.TEXTITEM }, e.value),
+                                onChange: o => console.log(o)
+                            }), tmpDiv);
+
+                            configElement = tmpDiv.children[0];
 
                         case Config.ConfigTypeEnum.NONE:
                             break;

@@ -61,6 +61,8 @@ export default class BetterMixer {
 
         this.injectStylesheet("lib/css/inject.css").disabled = false;
 
+        this.configuration.registerConfig(new BotDetectionConfig());
+
         let botColorConfig = new ColorConfig(
             'botcolor', 'Bot Color', '', '#d37110');
         botColorConfig.update = function() {
@@ -86,8 +88,6 @@ export default class BetterMixer {
 
         this.configuration.registerConfig(new BrowseFiltersConfig());
 
-        this.configuration.registerConfig(new BotDetectionConfig());
-
         setTimeout(() => this.reload(), 0);
 
         window.onbeforeunload = () => {
@@ -102,6 +102,7 @@ export default class BetterMixer {
 
         this.patcher = new Patcher(this);
 
+        // BetterMixer.ClassNames
         this.addEventListener(BetterMixer.Events.ON_CHAT_FINISH_LOAD, () => {
             let badgeElementTimeout = () => {
                 let badgeElement = $('style').filter((_, element) => element.innerHTML.includes('.badge__'))[0];
@@ -112,6 +113,13 @@ export default class BetterMixer {
                 BetterMixer.ClassNames.BADGE = "badge__" +  badgeElement.innerHTML.split('.badge__')[1].split('{')[0].trim();
             }
             badgeElementTimeout();
+
+            if (!BetterMixer.ClassNames.TEXTITEM){
+                fetch($('script[src*="main."]')[0].src).then(x => x.text()).then(x => {
+                    let index = x.indexOf('textItem_');
+                    BetterMixer.ClassNames.TEXTITEM = x.slice(index, index + 14)
+                });
+            }
         });
     }
 
