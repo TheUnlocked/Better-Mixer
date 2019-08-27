@@ -2,7 +2,7 @@
   "manifest_version": 2,
 
   "name": "Better Mixer",
-  "version": "2.6.5",
+  "version": "2.6.5-FF",
 
   "icons": {"128": "Icons/icon.png"},
 
@@ -19,7 +19,7 @@
   "content_scripts": [
     {
       "matches": ["https://mixer.com/*"],
-      "js": ["lib/js/jquery-3.3.1.min.js", "content.js"]
+      "js": ["lib/js/jquery-3.4.1.min.js", "content.js"]
     }
   ],
 
