@@ -80,12 +80,13 @@ export default class Patcher{
             // Handle bot color changes
             {
                 let mode = BetterMixer.instance.configuration.getConfig("botcolor_mode").state;
-                if (mode != "off"){
+                if (mode !== "off"){
                     let regexConfig = BetterMixer.instance.configuration.getConfig("botcolor_regex");
-                    let regex = mode == "auto" ? regexConfig.defaultState : regexConfig.state;
+                    let regex = mode === "auto" ? regexConfig.defaultState : regexConfig.state;
 
                     if (new RegExp(regex).test(message.author.username)){
                         let usernameElement = message.element.querySelector('[class*="Username"]');
+                        usernameElement.mixerColor = usernameElement.style.color;
                         usernameElement.style.color = BetterMixer.instance.configuration.getConfig("botcolor").state;
                         usernameElement.classList.add('bettermixer-role-bot');
                     }
@@ -297,9 +298,9 @@ export default class Patcher{
                                 options: config.options.map(x => ({key: x, value: config.getDisplayFromOption(x)})),
                                 value: config.state,
                                 children: e => React.createElement("div", { className: BetterMixer.ClassNames.TEXTITEM }, e.value),
-                                onChange: o => {
-                                    configElement.tempState = o;
-                                    config.updateImmediate(o);
+                                onChange: v => {
+                                    configElement.tempState = v;
+                                    config.updateImmediate(v);
                                 }
                             }), dropdownHolder);
 

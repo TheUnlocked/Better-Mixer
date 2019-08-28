@@ -63,12 +63,8 @@ export default class BetterMixer {
         this.injectStylesheet("lib/css/inject.css").disabled = false;
 
         let botColorDetectionConfig = new BotDetectionConfig();
-        botColorDetectionConfig.updateImmediate = v => {
-            document.querySelector('[bettermixer-config-name="botcolor_regex"]').hidden = v !== "custom";
-            document.querySelector('[bettermixer-config-name="botcolor"]').hidden = v === "off";
-        } 
         let botColorRegexConfig = new StringConfig(
-            'botcolor_regex', 'Bot Username RegExp', '', 'Bot|bot$');
+            'botcolor_regex', 'Bot Username RegExp', '', 'Bot(?![a-z])|bot$');
         Object.defineProperty(botColorRegexConfig, 'hidden', { get: () => botColorDetectionConfig.state !== "custom" });
         let botColorConfig = new ColorConfig('botcolor', 'Bot Color', '', '#d37110');
         Object.defineProperty(botColorConfig, 'hidden', { get: () => botColorDetectionConfig.state === "off" });
