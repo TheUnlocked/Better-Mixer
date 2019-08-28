@@ -1,6 +1,6 @@
 import Config from "./Config.js";
 
-export default class ColorConfig extends Config {
+export default class StringConfig extends Config {
     constructor(configName, displayText, descriptionText = "", defaultState = ""){
         super();
 
@@ -43,11 +43,10 @@ export default class ColorConfig extends Config {
 
     // Updates the configuration effect
     update(){
-        
     }
 
     // The type of config, currently unused as configs can only be booleans
     get configType(){
-        return Config.ConfigTypeEnum.COLOR;
+        return Config.ConfigTypeEnum.STRING;
     }
 }

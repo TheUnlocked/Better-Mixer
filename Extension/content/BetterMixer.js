@@ -13,6 +13,8 @@ import User from "./User.js";
 import Badge from "./Badge.js";
 import BrowseFiltersConfig from "./Configs/BrowseFiltersConfig.js";
 import ColorConfig from "./Configs/ColorConfig.js";
+import BotDetectionConfig from "./Configs/BotDetectionConfig.js";
+import StringConfig from "./Configs/StringConfig.js";
 
 let SRC = document.getElementById('BetterMixer-module').src;
 let BASE_URL = SRC.split('/').slice(0, -2).join('/') + '/';
@@ -60,11 +62,17 @@ export default class BetterMixer {
 
         this.injectStylesheet("lib/css/inject.css").disabled = false;
 
-        let botColorConfig = new ColorConfig(
-            'botcolor', 'Bot Color', '', '#d37110');
-        botColorConfig.update = function() {
+        let botColorDetectionConfig = new BotDetectionConfig();
+        let botColorRegexConfig = new StringConfig(
+            'botcolor_regex', 'Bot Username RegExp', '', 'Bot(?![a-z])|bot$');
+        Object.defineProperty(botColorRegexConfig, 'hidden', { get: () => botColorDetectionConfig.state !== "custom" });
+        let botColorConfig = new ColorConfig('botcolor', 'Bot Color', '', '#d37110');
+        Object.defineProperty(botColorConfig, 'hidden', { get: () => botColorDetectionConfig.state === "off" });
+        botColorConfig.update = () => {
             $('.bettermixer-role-bot').css('color', this._state);
         };
+        this.configuration.registerConfig(botColorDetectionConfig);
+        this.configuration.registerConfig(botColorRegexConfig);
         this.configuration.registerConfig(botColorConfig);
 
         this.configuration.registerConfig(new StylesheetToggleConfig(
@@ -99,6 +107,7 @@ export default class BetterMixer {
 
         this.patcher = new Patcher(this);
 
+        // BetterMixer.ClassNames
         this.addEventListener(BetterMixer.Events.ON_CHAT_FINISH_LOAD, () => {
             let badgeElementTimeout = () => {
                 let badgeElement = $('style').filter((_, element) => element.innerHTML.includes('.badge__'))[0];
@@ -109,6 +118,13 @@ export default class BetterMixer {
                 BetterMixer.ClassNames.BADGE = "badge__" +  badgeElement.innerHTML.split('.badge__')[1].split('{')[0].trim();
             }
             badgeElementTimeout();
+
+            if (!BetterMixer.ClassNames.TEXTITEM){
+                fetch($('script[src*="main."]')[0].src).then(x => x.text()).then(x => {
+                    let index = x.indexOf('textItem_');
+                    BetterMixer.ClassNames.TEXTITEM = x.slice(index, index + 14)
+                });
+            }
         });
     }
 

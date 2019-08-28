@@ -28,7 +28,7 @@ export default class Chat {
                     if (!usernameElement){
                         return;
                     }
-                    let authorName = usernameElement.innerText;
+                    let authorName = usernameElement.innerText.split(" ")[0];
                     let msg = new ChatMessage(this, element, this.users[authorName]);
                     // Disabled because of potential memory explosion
                     // if (!this.users[authorName]){
