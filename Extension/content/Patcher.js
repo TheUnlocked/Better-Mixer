@@ -38,7 +38,7 @@ export default class Patcher{
                             // End the text element if you find an emote
                             if (textBuilder) {
                                 let newText = textElement.cloneNode();
-                                newText.innerHTML = textBuilder.trimStart();
+                                newText.innerText = textBuilder.trimStart();
                                 messageBuilder.push(newText);
                                 textBuilder = " ";
                             }
@@ -59,7 +59,7 @@ export default class Patcher{
                     // Finish the text buffer, if one exists
                     if (textBuilder) {
                         let newText = textElement.cloneNode();
-                        newText.innerHTML = textBuilder;
+                        newText.innerText = textBuilder;
                         messageBuilder.push(newText);
                     }
 
@@ -167,7 +167,7 @@ export default class Patcher{
                     mixerEmoteHeader.classList.add('bettermixer-emote-set-header-first');
                     firstEmoteSet = false;
                 }
-                mixerEmoteHeader.innerHTML = title;
+                mixerEmoteHeader.innerText = title;
                 return mixerEmoteHeader;
             }
 
@@ -253,7 +253,7 @@ export default class Patcher{
 
                         case Config.ConfigTypeEnum.BOOLEAN:
                             configElement = exampleToggle.cloneNode(true);
-                            configElement.children[2].innerHTML = config.displayText;
+                            configElement.children[2].innerText = config.displayText;
 
                             if (config.state != configElement.classList.contains('checked_37Lzx')){
                                 configElement.classList.toggle('checked_37Lzx');
@@ -267,7 +267,7 @@ export default class Patcher{
 
                         case Config.ConfigTypeEnum.COLOR:
                             configElement = exampleColor.cloneNode(true);
-                            configElement.children[0].innerHTML = config.displayText;
+                            configElement.children[0].innerText = config.displayText;
                             configElement.appendChild(configElement.children[0]);
 
                             let colorIndicator = configElement.querySelector('[class*="currentColor"]');
@@ -412,12 +412,12 @@ export default class Patcher{
             setTimeout(cancelVodAutoplay, 1500);
         });
 
-        $.initialize('b-went-live-notification', (_, element) => {
-            let date = element.querySelector('b-short-human-date');
-            if (!isNaN(date.innerText[date.innerText.length-1])){
-                element.innerHTML = element.innerHTML.replace("live", "live on").replace(" ago!", "!");
-            }
-        });
+        // $.initialize('b-went-live-notification', (_, element) => {
+        //     let date = element.querySelector('b-short-human-date');
+        //     if (!isNaN(date.innerText[date.innerText.length-1])){
+        //         element.innerHTML = element.innerHTML.replace("live", "live on").replace(" ago!", "!");
+        //     }
+        // });
 
         this.plugin.log("Patcher Loaded");
     }
@@ -432,7 +432,7 @@ export default class Patcher{
             let tooltip = document.createElement('div');
             document.body.appendChild(tooltip); // This needs to happen first to make sure tooltip.clientWidth works correctly.
 
-            tooltip.innerHTML = text;
+            tooltip.innerText = text;
             let rect = element.getBoundingClientRect();
             tooltip.classList.add('bettermixer-tooltip');
             tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.clientWidth / 2) + "px";
