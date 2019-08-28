@@ -13,15 +13,13 @@ export default class ConfigurationManager {
         this._configs = {};
         this._registerBuffer = [];
 
-        plugin.postToContent({message: 'getAllConfigs'});
-
         let initializeListener = event => {
             if (event.data[0] == SRC){
                 let data = event.data[1];
                 if (data.message == 'sendAllConfigs'){
                     window.removeEventListener('message', initializeListener);
 
-                    this._recvconfigs = data.data;
+                    this._recvconfigs = data.data || {};
 
                     this._registerBuffer.forEach(config => this.registerConfig(config));
                     
@@ -30,6 +28,7 @@ export default class ConfigurationManager {
             }
         };
         window.addEventListener('message', initializeListener);
+        plugin.postToContent({message: 'getAllConfigs'});
 
         this._configDialogObserver = $.initialize('[class*="wrapper"] h1', (_, element) => {
             if (element.innerText == "CHAT SETTINGS"){
