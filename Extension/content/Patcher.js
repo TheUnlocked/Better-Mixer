@@ -79,11 +79,16 @@ export default class Patcher{
 
             // Handle bot color changes
             {
-                if (message.author.username.includes("Bot") || message.author.username.toLowerCase().endsWith("bot")){
-                    let usernameElement = message.element.querySelector('[class*="Username"]');
-                    usernameElement.style.color = BetterMixer.instance.configuration.getConfig("botcolor").state;
-                    usernameElement.classList.add('bettermixer-role-bot');
+                let mode = BetterMixer.instance.configuration.getConfig("botcolor_mode").state;
+                if (mode != "off"){
+                    let regexConfig = BetterMixer.instance.configuration.getConfig("botcolor_regex");
+                    let regex = mode == "auto" ? regexConfig.defaultState : regexConfig.state;
 
+                    if (new RegExp(regex).test(message.author.username)){
+                        let usernameElement = message.element.querySelector('[class*="Username"]');
+                        usernameElement.style.color = BetterMixer.instance.configuration.getConfig("botcolor").state;
+                        usernameElement.classList.add('bettermixer-role-bot');
+                    }
                 }
             }
 
@@ -255,6 +260,7 @@ export default class Patcher{
                             configElement.getElementsByTagName("input")[0].addEventListener('click', e => {
                                 configElement.classList.toggle('checked_37Lzx');
                                 configElement.tempState = configElement.classList.contains('checked_37Lzx');
+                                config.updateImmediate(configElement.tempState);
                             });
                             break;
 
@@ -274,6 +280,7 @@ export default class Patcher{
                                     configElement.classList.remove('bettermixer-color-config-invalid');
                                     configElement.tempState = valueInput.value;
                                     colorIndicator.style.backgroundColor = valueInput.value;
+                                    config.updateImmediate(valueInput.value);
                                 }
                                 else{
                                     configElement.classList.add('bettermixer-color-config-invalid');
@@ -283,22 +290,38 @@ export default class Patcher{
                             break;
 
                         case Config.ConfigTypeEnum.DROPDOWN:
-                            let tmpDiv = document.createElement('div');
+                            let dropdownHolder = document.createElement('div');
                             
                             ReactDOM.render(React.createElement(mixerUi.Select, {
                                 label: config.displayText,
                                 options: config.options.map(x => ({key: x, value: config.getDisplayFromOption(x)})),
                                 value: config.state,
                                 children: e => React.createElement("div", { className: BetterMixer.ClassNames.TEXTITEM }, e.value),
-                                onChange: o => console.log(o)
-                            }), tmpDiv);
+                                onChange: o => {
+                                    configElement.tempState = o;
+                                    config.updateImmediate(o);
+                                }
+                            }), dropdownHolder);
 
-                            configElement = tmpDiv.children[0];
+                            configElement = dropdownHolder.children[0];
+                            break;
+
+                        case Config.ConfigTypeEnum.STRING:
+                            let stringInputHolder = document.createElement('div');
+                            ReactDOM.render(React.createElement(mixerUi.BuiTextInput, {label: config.displayText}), stringInputHolder);
+                            configElement = stringInputHolder.children[0];
+                            let input = configElement.querySelector('input');
+                            input.value = config.state;
+                            input.addEventListener('change', e => {
+                                configElement.tempState = input.value;
+                            });
 
                         case Config.ConfigTypeEnum.NONE:
                             break;
                     }
                     if (configElement){
+                        configElement.setAttribute('bettermixer-config-name', config.configName);
+                        configElement.hidden = config.hidden;
                         configSection.appendChild(configElement);
                         configsData.push({
                             element: configElement,

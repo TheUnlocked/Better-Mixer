@@ -32,6 +32,16 @@ export default class Config{
     update(){
     }
 
+    // Updates immediately on being changed
+    updateImmediate(newState){
+    }
+
+    // Determines whether or not to hide this config in the menu
+    // Unnecessary if the config type is NONE.
+    get hidden(){
+        return false;
+    }
+
     get configType(){
         return Config.ConfigTypeEnum.NONE;
     }

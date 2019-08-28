@@ -14,6 +14,7 @@ import Badge from "./Badge.js";
 import BrowseFiltersConfig from "./Configs/BrowseFiltersConfig.js";
 import ColorConfig from "./Configs/ColorConfig.js";
 import BotDetectionConfig from "./Configs/BotDetectionConfig.js";
+import StringConfig from "./Configs/StringConfig.js";
 
 let SRC = document.getElementById('BetterMixer-module').src;
 let BASE_URL = SRC.split('/').slice(0, -2).join('/') + '/';
@@ -61,13 +62,21 @@ export default class BetterMixer {
 
         this.injectStylesheet("lib/css/inject.css").disabled = false;
 
-        this.configuration.registerConfig(new BotDetectionConfig());
-
-        let botColorConfig = new ColorConfig(
-            'botcolor', 'Bot Color', '', '#d37110');
-        botColorConfig.update = function() {
+        let botColorDetectionConfig = new BotDetectionConfig();
+        botColorDetectionConfig.updateImmediate = v => {
+            document.querySelector('[bettermixer-config-name="botcolor_regex"]').hidden = v !== "custom";
+            document.querySelector('[bettermixer-config-name="botcolor"]').hidden = v === "off";
+        } 
+        let botColorRegexConfig = new StringConfig(
+            'botcolor_regex', 'Bot Username RegExp', '', 'Bot|bot$');
+        Object.defineProperty(botColorRegexConfig, 'hidden', { get: () => botColorDetectionConfig.state !== "custom" });
+        let botColorConfig = new ColorConfig('botcolor', 'Bot Color', '', '#d37110');
+        Object.defineProperty(botColorConfig, 'hidden', { get: () => botColorDetectionConfig.state === "off" });
+        botColorConfig.update = () => {
             $('.bettermixer-role-bot').css('color', this._state);
         };
+        this.configuration.registerConfig(botColorDetectionConfig);
+        this.configuration.registerConfig(botColorRegexConfig);
         this.configuration.registerConfig(botColorConfig);
 
         this.configuration.registerConfig(new StylesheetToggleConfig(
