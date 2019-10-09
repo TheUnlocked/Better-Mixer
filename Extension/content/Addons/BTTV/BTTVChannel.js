@@ -42,6 +42,7 @@ export default class BTTVChannel{
                             }
                         };
                         this.plugin.addEventListener(BetterMixer.Events.GATHER_EMOTES, this._gatherEmotes);
+                        this.plugin.dispatchEvent(BetterMixer.Events.ON_EMOTES_ADDED, [this._gatherEmotes], this);
 
                         this.plugin.log(`Synced ${this.channel.owner.username} with BTTV emotes from ${this.twitch.login}.`, BetterMixer.LogType.INFO);
                     },

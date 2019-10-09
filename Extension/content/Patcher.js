@@ -1,6 +1,7 @@
 import BetterMixer from "./BetterMixer.js";
 import Config from "./Configs/Config.js";
 import EmoteSet from "./EmoteSet.js";
+import ChatMessage from "./ChatMessage.js";
 
 export default class Patcher{
     /**
@@ -13,68 +14,18 @@ export default class Patcher{
         this.plugin.addEventListener(BetterMixer.Events.ON_MESSAGE, event => {
             let message = event.sender;
 
+            if (!this._emotesAddedListener){
+                this._emotesAddedListener = event => {
+                    for (const msgElement of this.plugin.focusedChannel.chat.element.querySelectorAll('div[class*="message__"]')){
+                        this.parseMessageEmotes(new ChatMessage(this.plugin.focusedChannel.chat, msgElement));
+                    }
+                };
+                this.plugin.addEventListener(BetterMixer.Events.ON_EMOTES_ADDED, this._emotesAddedListener);
+            }
+
             // Handle message emotes
             {
-                let emoteGatherEventData = {
-                    channel: message.chat.channel,
-                    user: message.author,
-                    message: message
-                };
-                let emoteList = plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, message)
-                    .reduce((acc, val) => val.constructor === EmoteSet ? acc.concat(val.emotes) : acc.concat(val), []);
-                let emotes = emoteList.reduce((result, value) => { result[value.name] = value; return result; }, {});
-
-                let textPieces = [...message.element.querySelectorAll('span:not([class*="_"])')];
-                for (let textElement of textPieces) {
-                    // Break it up into text pieces, and check each piece for an emote
-                    let words = textElement.innerHTML.trim().split(" ");
-                    let messageBuilder = [];
-
-                    // Buffer used to retain non-emote text
-                    let textBuilder = "";
-                    for (let word of words) {
-                        let emote = emotes[word];
-                        if (emote) {
-                            // End the text element if you find an emote
-                            if (textBuilder) {
-                                let newText = textElement.cloneNode();
-                                newText.innerText = textBuilder.trimStart();
-                                messageBuilder.push(newText);
-                                textBuilder = " ";
-                            }
-                            else{
-                                let newText = document.createElement('span');
-                                newText.innerHTML = " ";
-                                messageBuilder.push(newText);
-                            }
-                            // Push the emote
-                            messageBuilder.push(emote.element);
-                        } else {
-                            if (!textBuilder && messageBuilder.length != 0){
-                                textBuilder = " ";
-                            }
-                            textBuilder += `${word} `;
-                        }
-                    }
-                    // Finish the text buffer, if one exists
-                    if (textBuilder) {
-                        let newText = textElement.cloneNode();
-                        newText.innerText = textBuilder;
-                        messageBuilder.push(newText);
-                    }
-
-                    // Final padding
-                    let newText = document.createElement('span');
-                    newText.innerHTML = " ";
-                    messageBuilder.push(newText);
-
-                    // Replace the text element with the new text/emote elements
-                    for (let word of messageBuilder){
-                        textElement.parentElement.insertBefore(word, textElement);
-                        //textElement.parentElement.insertBefore(document.createTextNode(' '), textElement);
-                    }
-                    textElement.parentElement.removeChild(textElement);
-                }
+                this.parseMessageEmotes(message);
             }
 
             // Handle bot color changes
@@ -448,5 +399,68 @@ export default class Patcher{
                 window.removeEventListener('scroll', scrollEvent);
             });
         });
+    }
+
+    parseMessageEmotes(message){
+        let emoteGatherEventData = {
+            channel: message.chat.channel,
+            user: message.author,
+            message: message
+        };
+        let emoteList = this.plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, message)
+            .reduce((acc, val) => val.constructor === EmoteSet ? acc.concat(val.emotes) : acc.concat(val), []);
+        let emotes = emoteList.reduce((result, value) => { result[value.name] = value; return result; }, {});
+
+        let textPieces = [...message.element.querySelectorAll('span:not([class*="_"])')];
+        for (let textElement of textPieces) {
+            // Break it up into text pieces, and check each piece for an emote
+            let words = textElement.innerHTML.trim().split(" ");
+            let messageBuilder = [];
+
+            // Buffer used to retain non-emote text
+            let textBuilder = "";
+            for (let word of words) {
+                let emote = emotes[word];
+                if (emote) {
+                    // End the text element if you find an emote
+                    if (textBuilder) {
+                        let newText = textElement.cloneNode();
+                        newText.innerText = textBuilder.trimStart();
+                        messageBuilder.push(newText);
+                        textBuilder = " ";
+                    }
+                    else{
+                        let newText = document.createElement('span');
+                        newText.innerHTML = " ";
+                        messageBuilder.push(newText);
+                    }
+                    // Push the emote
+                    messageBuilder.push(emote.element);
+                } else {
+                    if (!textBuilder && messageBuilder.length != 0){
+                        textBuilder = " ";
+                    }
+                    textBuilder += `${word} `;
+                }
+            }
+            // Finish the text buffer, if one exists
+            if (textBuilder) {
+                let newText = textElement.cloneNode();
+                newText.innerText = textBuilder;
+                messageBuilder.push(newText);
+            }
+
+            // Final padding
+            let newText = document.createElement('span');
+            newText.innerHTML = " ";
+            messageBuilder.push(newText);
+
+            // Replace the text element with the new text/emote elements
+            for (let word of messageBuilder){
+                textElement.parentElement.insertBefore(word, textElement);
+                //textElement.parentElement.insertBefore(document.createTextNode(' '), textElement);
+            }
+            textElement.parentElement.removeChild(textElement);
+        }
     }
 }

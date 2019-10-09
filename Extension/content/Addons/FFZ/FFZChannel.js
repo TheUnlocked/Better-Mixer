@@ -22,34 +22,38 @@ export default class FFZChannel{
                 setTimeout(load, 100);
                 return;
             }
+
+            const success = data => {
+                if (this.cancelLoad){
+                    return;
+                }
+                for (let emoteSet in data.sets) {
+                    for (let emote of data.sets[emoteSet].emoticons) {
+                        let emoteUrl = emote.urls['4'];
+                        if (!emoteUrl)
+                            emoteUrl = emote.urls['2'];
+                        if (!emoteUrl)
+                            emoteUrl = emote.urls['1'];
+                        this.emotes.addEmote(new Emote(emote.name, emoteUrl, emote.width, emote.height));
+                    }
+                }
+                
+                this._gatherEmotes = event => {
+                    if (event.data.channel === this.channel){
+                        return this.emotes;
+                    }
+                };
+                this.plugin.addEventListener(BetterMixer.Events.GATHER_EMOTES, this._gatherEmotes);
+                this.plugin.dispatchEvent(BetterMixer.Events.ON_EMOTES_ADDED, [this._gatherEmotes], this);
+
+                this.plugin.log(`Synced ${this.channel.owner.username} with FFZ emotes from ${this.twitch.login}.`, BetterMixer.LogType.INFO);
+            };
+
                   /* Backwards Compatibility */
             if (!this.channel.channelSettings.ffz || this.channel.channelSettings.ffz.sync){
                 $.getJSON({
                     url: `https://api.frankerfacez.com/v1/room/${this.twitch.login}`,
-                    success: data => {
-                        if (this.cancelLoad){
-                            return;
-                        }
-                        for (let emoteSet in data.sets) {
-                            for (let emote of data.sets[emoteSet].emoticons) {
-                                let emoteUrl = emote.urls['4'];
-                                if (!emoteUrl)
-                                    emoteUrl = emote.urls['2'];
-                                if (!emoteUrl)
-                                    emoteUrl = emote.urls['1'];
-                                this.emotes.addEmote(new Emote(emote.name, emoteUrl, emote.width, emote.height));
-                            }
-                        }
-                        
-                        this._gatherEmotes = event => {
-                            if (event.data.channel === this.channel){
-                                return this.emotes;
-                            }
-                        };
-                        this.plugin.addEventListener(BetterMixer.Events.GATHER_EMOTES, this._gatherEmotes);
-        
-                        this.plugin.log(`Synced ${this.channel.owner.username} with FFZ emotes from ${this.twitch.login}.`, BetterMixer.LogType.INFO);
-                    },
+                    success: success,
                     error: xhr => {
                         if (this.cancelLoad){
                             return;
@@ -59,30 +63,7 @@ export default class FFZChannel{
                             url: `https://api-test.frankerfacez.com/v1/room/id/${this.twitch.id}`,
                             dataType: 'json',
                             async: false,
-                            success: data => {
-                                if (this.cancelLoad){
-                                    return;
-                                }
-                                for (let emoteSet in data.sets) {
-                                    for (let emote of data.sets[emoteSet].emoticons) {
-                                        let emoteUrl = emote.urls['4'];
-                                        if (!emoteUrl)
-                                            emoteUrl = emote.urls['2'];
-                                        if (!emoteUrl)
-                                            emoteUrl = emote.urls['1'];
-                                        this.emotes.addEmote(new Emote(emote.name, emoteUrl, emote.width, emote.height));
-                                    }
-                                }
-                                
-                                this._gatherEmotes = event => {
-                                    if (event.data.channel === this.channel){
-                                        return this.emotes;
-                                    }
-                                };
-                                this.plugin.addEventListener(BetterMixer.Events.GATHER_EMOTES, this._gatherEmotes);
-                
-                                this.plugin.log(`Synced ${this.channel.owner.username} with FFZ emotes from ${this.twitch.login}.`, BetterMixer.LogType.INFO);
-                            },
+                            success: success,
                             error: xhr => {
                                 if (this.cancelLoad){
                                     return;
