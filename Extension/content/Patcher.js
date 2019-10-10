@@ -132,7 +132,7 @@ export default class Patcher{
                     let emoteSetContainer = document.createElement('div');
                     let emoteSetHeader = createEmoteSetHeader(emoteSet.name);
                     emoteSetContainer.appendChild(emoteSetHeader);
-                    for (let emote of emoteSetEmotes.reverse()){
+                    for (let emote of [...emoteSetEmotes].reverse()){
                         let emoteButton = exampleButton.cloneNode();
                         emoteButton.appendChild(emote.element);
                         emoteButton.style.paddingLeft = '4px';
