@@ -25,7 +25,7 @@ export default class Chat {
             if (event.data.channel == this.channel){
                 this._msgObserver = $.initialize('div[class*="message__"]', (_, element) => {
                     let usernameElement = element.querySelectorAll('[class*="Username"]')[0];
-                    if (!usernameElement){
+                    if (element.__bettermixer_sent || !usernameElement){
                         return;
                     }
                     let authorName = usernameElement.innerText.split(" ")[0];
@@ -35,6 +35,7 @@ export default class Chat {
                     //     this.users[authorName] = msg.author;
                     // }
                     this.plugin.dispatchEvent(BetterMixer.Events.ON_MESSAGE, null, msg);
+                    element.__bettermixer_sent = true;
                 }, { target: event.data.element });
 
                 this._gatherBadges = event => {
