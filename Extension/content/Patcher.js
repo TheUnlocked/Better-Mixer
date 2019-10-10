@@ -17,7 +17,7 @@ export default class Patcher{
             if (!this._emotesAddedListener){
                 this._emotesAddedListener = event => {
                     for (const msgElement of this.plugin.focusedChannel.chat.element.querySelectorAll('div[class*="message__"]')){
-                        this.parseMessageEmotes(new ChatMessage(this.plugin.focusedChannel.chat, msgElement));
+                        this.parseMessageEmotes(new ChatMessage(this.plugin.focusedChannel.chat, msgElement), event.data);
                     }
                 };
                 this.plugin.addEventListener(BetterMixer.Events.ON_EMOTES_ADDED, this._emotesAddedListener);
@@ -401,13 +401,13 @@ export default class Patcher{
         });
     }
 
-    parseMessageEmotes(message){
+    parseMessageEmotes(message, emoteSets = undefined){
         let emoteGatherEventData = {
             channel: message.chat.channel,
             user: message.author,
             message: message
         };
-        let emoteList = this.plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, message)
+        let emoteList = (emoteSets || this.plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, message))
             .reduce((acc, val) => val.constructor === EmoteSet ? acc.concat(val.emotes) : acc.concat(val), []);
         let emotes = emoteList.reduce((result, value) => { result[value.name] = value; return result; }, {});
 
