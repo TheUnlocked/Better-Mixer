@@ -54,8 +54,8 @@ div.profile-bio :hover {
 
 
 [class*="message"] [class*="badge__"] {
-    bottom: 2px;
     position: relative;
+    margin-bottom: 1px;
 }
 
 [class*="message"] [class*="badge__"]:not(.bettermixer-badge-relocated) {
