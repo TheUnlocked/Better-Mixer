@@ -51,9 +51,10 @@ export default class Chat {
                             }
                             badges.push(this.subBadge);
                         }
-                        else if (badgeElement.children.length > 0 && badgeElement.children[0].alt == 'Staff'){
+                        else if (badgeElement.alt == 'Staff'){
                             if (!this.staffBadge){
-                                this.staffBadge = new Badge('Staff', badgeElement.children[0].src, 'A member of the Mixer staff', badgeElement);
+                                badgeElement.style.margin = "0";
+                                this.staffBadge = new Badge('Staff', badgeElement.src, 'A member of the Mixer staff', badgeElement);
                             }
                             badges.push(this.staffBadge);
                         }

@@ -19,13 +19,16 @@ export default class Badge{
     }
 
     get element(){
+        let badge;
         if (this.example){
-            return this.example.cloneNode(true);
+            badge = this.example.cloneNode(true);
         }
-        let badge = document.createElement('img');
-        badge.classList.add(BetterMixer.ClassNames.BADGE);
-        badge.src = this.image;
-        badge.alt = this.name;
+        else{
+            badge = document.createElement('img');
+            badge.classList.add(BetterMixer.ClassNames.BADGE);
+            badge.src = this.image;
+            badge.alt = this.name;
+        }
 
         Patcher.addTooltip(badge, this.name);
 
