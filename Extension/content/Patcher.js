@@ -138,14 +138,6 @@ export default class Patcher{
                         emoteButton.style.paddingLeft = '4px';
                         emoteButton.style.paddingRight = '4px';
                         emoteButton.addEventListener('click', () => {
-                            // let doc = document.getElementsByClassName('CodeMirror')[0].CodeMirror.getDoc();
-                            // let cursor = doc.getCursor();
-
-                            // let insertText = (doc.getLine(cursor.line)[cursor.ch - 1] == ' ' ? '' : ' ') +
-                            //                 emote.name +
-                            //                 (doc.getLine(cursor.line)[cursor.ch] == ' ' ? '' : ' ');
-                            // doc.replaceSelection(insertText);
-
                             let inputBox = event.sender.element.querySelector('textarea');
                             inputBox.value += `${inputBox.value.length == 0 || inputBox.value.endsWith(' ') ? '' : ' '}${emote.name} `;
                         });
@@ -312,6 +304,33 @@ export default class Patcher{
                     this.plugin.log("Updated configurations.");
                 });
             }, { target: event.data.dialog });
+        });
+
+        // Handle chat load
+        this.plugin.addEventListener(BetterMixer.Events.ON_CHAT_FINISH_LOAD, event => {
+            // Handle emote pre-loading
+            {
+                let emoteGatherEventData = {
+                    channel: event.sender.channel,
+                    user: event.sender.plugin.user,
+                    message: null
+                };
+                const gatheredEmotes = plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, event.sender);
+                for (const emotes of gatheredEmotes){
+                    if (emotes.constructor === EmoteSet){
+                        for (const emote of emotes.emotes){
+                            const img = document.createElement('img');
+                            img.src = emote.image;
+                        }
+                    }
+                    else{
+                        for (const emote of emotes){
+                            const img = document.createElement('img');
+                            img.src = emote.image;
+                        }
+                    }
+                }
+            }
         });
 
         // Handle Browse > Filters > Save Filters
