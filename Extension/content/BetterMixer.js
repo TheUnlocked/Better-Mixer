@@ -157,7 +157,7 @@ export default class BetterMixer {
             this.log(`Chat is either in a popout or embedded window.`);
         }
 
-        page = page.match(/^[a-z0-9_]+/i);
+        page = page.match(/^[a-z0-9_-]+/i);
 
         if (!page){
             this._page = "";
