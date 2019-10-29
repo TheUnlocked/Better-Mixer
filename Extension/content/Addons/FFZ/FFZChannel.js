@@ -3,6 +3,7 @@ import BetterMixer from "../../BetterMixer.js";
 import FFZAddon from "./FFZAddon.js";
 import TwitchChannel from "../Twitch/TwitchChannel.js";
 import EmoteSet from "../../EmoteSet.js";
+import { requestJson } from "../../Util.js";
 
 export default class FFZChannel{
     /**
@@ -51,28 +52,22 @@ export default class FFZChannel{
 
                   /* Backwards Compatibility */
             if (!this.channel.channelSettings.ffz || this.channel.channelSettings.ffz.sync){
-                $.getJSON({
-                    url: `https://api.frankerfacez.com/v1/room/${this.twitch.login}`,
-                    success: success,
-                    error: xhr => {
+                requestJson(`https://api.frankerfacez.com/v1/room/${this.twitch.login}`)
+                    .then(success)
+                    .catch(err => {
                         if (this.cancelLoad){
                             return;
                         }
-                        this.plugin.log(`${xhr.statusText}: Failed to load emotes from FFZ. Trying alternate method.`, BetterMixer.LogType.INFO);
-                        $.ajax({
-                            url: `https://api-test.frankerfacez.com/v1/room/id/${this.twitch.id}`,
-                            dataType: 'json',
-                            async: false,
-                            success: success,
-                            error: xhr => {
+                        this.plugin.log(`${err.message}: Failed to load emotes from FFZ. Trying alternate method.`, BetterMixer.LogType.INFO);
+                        return requestJson(`https://api-test.frankerfacez.com/v1/room/id/${this.twitch.id}`)
+                            .then(success)
+                            .catch(err => {
                                 if (this.cancelLoad){
                                     return;
                                 }
-                                this.plugin.log(`${xhr.statusText}: Failed to load emotes from FFZ.`, BetterMixer.LogType.INFO);
-                            }
-                        });
-                    }
-                });
+                                this.plugin.log(`${err.message}: Failed to load emotes from FFZ.`, BetterMixer.LogType.INFO);
+                            });
+                    });
             }
         };
         load();

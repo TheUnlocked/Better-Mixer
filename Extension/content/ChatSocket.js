@@ -1,3 +1,5 @@
+import { requestJson } from "./Util.js";
+
 export default class ChatSocket {
     constructor(chat){
 
@@ -11,36 +13,38 @@ export default class ChatSocket {
     }
 
     loadChat(){
-        return new Promise((resolve, _) => { 
-            $.getJSON(`https://mixer.com/api/v1/chats/${id}`, function (data) {
-                this.socket = new WebSocket(data.endpoints[0]);
-    
-                this.socket.onopen = e => {
-                    this.permissions = data.permissions;
-    
-                    $.getJSON('https://mixer.com/api/v1/users/current', (userData) => {
-                        this.send("auth", id, userData.id, data.authkey);
-                        this.plugin.log("Connected to chat!");
-    
-                        resolve(chat);
-                    });
-                };
+        // Untested since it's unused and seems broken already
+        return new Promise(resolve => {
+            requestJson(`https://mixer.com/api/v1/chats/${id}`)
+                .then(data => {
+                    this.socket = new WebSocket(data.endpoints[0]);
 
-                this.socket.onmessage = event => {
-                    let data = JSON.parse(event.data);
-                    if (data.type == "reply"){
-                        if (callbackBuffer[data.id]){
-                            if (!data.error){
-                                callbackBuffer[data.id][0](data.data);
+                    this.socket.onopen = e => {
+                        this.permissions = data.permissions;
+                        requestJson('https://mixer.com/api/v1/users/current')    
+                            .then(userData => {
+                                this.send("auth", id, userData.id, data.authkey);
+                                this.plugin.log("Connected to chat!");
+                                // Undefined variable?
+                                resolve(chat);
+                            });
+                    };
+                    
+                    this.socket.onmessage = event => {
+                        let data = JSON.parse(event.data);
+                        if (data.type == "reply"){
+                            if (callbackBuffer[data.id]){
+                                if (!data.error){
+                                    callbackBuffer[data.id][0](data.data);
+                                }
+                                else{
+                                    callbackBuffer[data.id][1](data.error);
+                                }
+                                delete callbackBuffer[data.id];
                             }
-                            else{
-                                callbackBuffer[data.id][1](data.error);
-                            }
-                            delete callbackBuffer[data.id];
                         }
-                    }
-                };
-            });
+                    };
+                });
         });
     }
 

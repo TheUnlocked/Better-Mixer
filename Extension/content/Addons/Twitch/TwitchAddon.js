@@ -1,6 +1,7 @@
 import BetterMixer from "../../BetterMixer.js";
 import Channel from "../../Channel.js";
 import TwitchChannel from "./TwitchChannel.js";
+import { requestJson } from "../../Util.js";
 
 export default class TwitchAddon {
     /**
@@ -10,13 +11,13 @@ export default class TwitchAddon {
     constructor(plugin) {
         this.plugin = plugin;
 
-        $.getJSON({
-            url: `https://raw.githubusercontent.com/TheUnlocked/Better-Mixer/master/Info/twitchsync.json`,
-            success: data => {
+        requestJson('https://raw.githubusercontent.com/TheUnlocked/Better-Mixer/master/Info/twitchsync.json')
+            .then(data => {
                 this._syncList = data;
-            },
-            error: xhr => this.plugin.log(`${xhr.statusText}: Failed to access Twitch sync list.`, BetterMixer.LogType.ERROR)
-        });
+            })
+            .catch(err => {
+                this.plugin.log(`${err.message}: Failed to access Twitch sync list.`, BetterMixer.LogType.ERROR);
+            });
     }
 
     /**

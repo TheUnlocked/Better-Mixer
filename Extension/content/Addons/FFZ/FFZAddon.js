@@ -3,6 +3,7 @@ import BetterMixer from "../../BetterMixer.js";
 import TwitchChannel from "../Twitch/TwitchChannel.js";
 import EmoteSet from "../../EmoteSet.js";
 import Emote from "../../Emote.js";
+import { requestJson } from "../../Util.js";
 
 export default class FFZAddon {
     /**
@@ -13,9 +14,8 @@ export default class FFZAddon {
         this.plugin = plugin;
         this.globalEmotes = new EmoteSet("FFZ Global Emotes", -50);
 
-        $.getJSON({
-            url: `https://api.frankerfacez.com/v1/set/global`,
-            success: data => {
+        requestJson('https://api.frankerfacez.com/v1/set/global')
+            .then(data => {
                 for (let emoteSet in data.sets) {
                     if (data.default_sets.includes(+emoteSet)){
                         for (let emote of data.sets[emoteSet].emoticons) {
@@ -38,9 +38,10 @@ export default class FFZAddon {
                 this.plugin.dispatchEvent(BetterMixer.Events.ON_EMOTES_ADDED, [this.emotes], this);
 
                 this.plugin.log(`Fetched global FFZ emotes.`, BetterMixer.LogType.INFO);
-            },
-            error: xhr => this.plugin.log(`${xhr.statusText}: Failed to load global emotes from FFZ.`, BetterMixer.LogType.INFO)
-        });
+            })
+            .catch(err => {
+                this.plugin.log(`${err.message}: Failed to load global emotes from FFZ.`, BetterMixer.LogType.INFO);
+            });
     }
 
     /**

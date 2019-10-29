@@ -3,6 +3,7 @@ import BetterMixer from "../../BetterMixer.js";
 import BTTVAddon from "./BTTVAddon.js";
 import TwitchChannel from "../Twitch/TwitchChannel.js";
 import EmoteSet from "../../EmoteSet.js";
+import { requestJson } from "../../Util.js";
 
 export default class BTTVChannel{
     /**
@@ -23,11 +24,10 @@ export default class BTTVChannel{
                 return;
             }
 
-                  /* Backwards Compatibility */
+            /* Backwards Compatibility */
             if (!this.channel.channelSettings.bttv || this.channel.channelSettings.bttv.sync){
-                $.getJSON({
-                    url: `https://api.betterttv.net/2/channels/${this.twitch.login}`,
-                    success: data => {
+                requestJson(`https://api.betterttv.net/2/channels/${this.twitch.login}`)
+                    .then(data => {
                         if (this.cancelLoad){
                             return;
                         }
@@ -45,14 +45,13 @@ export default class BTTVChannel{
                         this.plugin.dispatchEvent(BetterMixer.Events.ON_EMOTES_ADDED, [this.emotes], this);
 
                         this.plugin.log(`Synced ${this.channel.owner.username} with BTTV emotes from ${this.twitch.login}.`, BetterMixer.LogType.INFO);
-                    },
-                    error: xhr => {
+                    })
+                    .catch(err => {
                         if (this.cancelLoad){
                             return;
                         }
-                        this.plugin.log(`${xhr.statusText}: Failed to load emotes from BTTV.`, BetterMixer.LogType.INFO);
-                    }
-                });
+                        this.plugin.log(`${err.message}: Failed to load emotes from BTTV.`, BetterMixer.LogType.INFO);
+                    });
             }
         };
         load();

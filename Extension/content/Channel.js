@@ -1,6 +1,7 @@
 import BetterMixer from "./BetterMixer.js";
 import Chat from "./Chat.js";
 import User from "./User.js";
+import { requestJson } from "./Util.js";
 
 export default class Channel {
     /**
@@ -11,9 +12,8 @@ export default class Channel {
 
         this.plugin = plugin;
 
-        $.getJSON({
-            url: `https://mixer.com/api/v1/channels/${channelName}`,
-            success: data => {
+        requestJson(`https://mixer.com/api/v1/channels/${channelName}`)
+            .then(data => {
                 this.id = data.id;
                 this.owner = new User(data.user);
                 this.name = data.name;
@@ -47,9 +47,10 @@ export default class Channel {
 
                 this.chat = new Chat(this);
                 this.plugin.log(`Loaded channel '${channelName}'`, BetterMixer.LogType.INFO);
-            },
-            error: xhr => this.plugin.log(`${xhr.statusText}: Failed to get channel ${channelName}`, BetterMixer.LogType.ERROR)
-        });
+            })
+            .catch(err => {
+                this.plugin.log(`${err.message}: Failed to get channel ${channelName}`, BetterMixer.LogType.ERROR);
+            });
     }
 
     unload(){

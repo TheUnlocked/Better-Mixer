@@ -1,6 +1,7 @@
 import BetterMixer from "../../BetterMixer.js";
 import TwitchAddon from "./TwitchAddon.js";
 import Channel from "../../Channel.js";
+import { requestJson } from "../../Util.js";
 
 export default class TwitchChannel{
     /**
@@ -15,30 +16,26 @@ export default class TwitchChannel{
         this.login = username;
 
         if (username && !id){
-            $.ajax({
-                url: `https://api.twitch.tv/helix/users?login=${username}`,
-                headers: {"Client-ID": "k2dxpcz1dl6fe771vzcsl1bx324osz"},
-                dataType: 'json',
-                async: true,
-                success: data => {
+            const requestConfig = { headers: { "Client-ID": "k2dxpcz1dl6fe771vzcsl1bx324osz" } };
+            requestJson(`https://api.twitch.tv/helix/users?login=${username}`, requestConfig)
+                .then(data => {
                     this.id = data.data[0].id;
                     this.displayName = data.data[0].display_name;
-                },
-                error: xhr => this.plugin.log(`${xhr.statusText}: Failed to obtain ID from Twitch username.`, BetterMixer.LogType.WARN)
-            });
+                })
+                .catch(err => {
+                    this.plugin.log(`${err.message}: Failed to obtain ID from Twitch username.`, BetterMixer.LogType.WARN);
+                });
         }
         else {
-            $.ajax({
-                url: `https://api.twitch.tv/helix/users?id=${id}`,
-                headers: {"Client-ID": "k2dxpcz1dl6fe771vzcsl1bx324osz"},
-                dataType: 'json',
-                async: true,
-                success: data => {
+            const requestConfig = { headers: { "Client-ID": "k2dxpcz1dl6fe771vzcsl1bx324osz" } };
+            requestJson(`https://api.twitch.tv/helix/users?id=${id}`)
+                .then(data => {
                     this.id = data.data[0].id;
                     this.displayName = data.data[0].display_name;
-                },
-                error: xhr => this.plugin.log(`${xhr.statusText}: Failed to obtain Twitch user information from provided data.`, BetterMixer.LogType.WARN)
-            });
+                })
+                .catch(err => {
+                    this.plugin.log(`${err.message}: Failed to obtain Twitch user information from provided data.`, BetterMixer.LogType.WARN);
+                });
         }
     }
 
