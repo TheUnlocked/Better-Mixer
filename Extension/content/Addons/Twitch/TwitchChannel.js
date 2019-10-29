@@ -15,8 +15,9 @@ export default class TwitchChannel{
         this.channel = channel;
         this.login = username;
 
+        const requestConfig = { headers: { "Client-ID": "k2dxpcz1dl6fe771vzcsl1bx324osz" } };
+
         if (username && !id){
-            const requestConfig = { headers: { "Client-ID": "k2dxpcz1dl6fe771vzcsl1bx324osz" } };
             requestJson(`https://api.twitch.tv/helix/users?login=${username}`, requestConfig)
                 .then(data => {
                     this.id = data.data[0].id;
@@ -27,7 +28,6 @@ export default class TwitchChannel{
                 });
         }
         else {
-            const requestConfig = { headers: { "Client-ID": "k2dxpcz1dl6fe771vzcsl1bx324osz" } };
             requestJson(`https://api.twitch.tv/helix/users?id=${id}`)
                 .then(data => {
                     this.id = data.data[0].id;
