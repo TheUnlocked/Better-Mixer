@@ -430,8 +430,13 @@ export default class Patcher{
             .reduce((acc, val) => val.constructor === EmoteSet ? acc.concat(val.emotes) : acc.concat(val), []);
         let emotes = emoteList.reduce((result, value) => { result[value.name] = value; return result; }, {});
 
-        let textPieces = [...message.element.querySelectorAll('span:not([class*="_"])')];
+        let textPieces = [...message.element.querySelectorAll('span')];
         for (let textElement of textPieces) {
+            // If the text piece is an actual html element, skip it.
+            if (!(textElement.children.length == 0 && textElement.childNodes.length > 0)){
+                continue;
+            }
+
             // Break it up into text pieces, and check each piece for an emote
             let words = textElement.innerHTML.trim().split(" ");
             let messageBuilder = [];
