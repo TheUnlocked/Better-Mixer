@@ -1,1 +1,1 @@
-In order to streamline the syncing process, the pull request to sync option is no longer available. Please go to [https://goo.gl/forms/v3pbTB1jliUyRgm22]() to sync your Twitch and Mixer.
+In order to streamline the syncing process, the pull request to sync option is no longer available. Please go to [https://theunlocked.github.io/bettermixer/selfservice/]() to sync your Twitch and Mixer.
