@@ -1,6 +1,3 @@
-import "../lib/js/jquery-3.4.1.min.js";
-import "../lib/js/jquery.initialize.min.js";
-
 import TwitchAddon from "./Addons/Twitch/TwitchAddon.js";
 import FFZAddon from "./Addons/FFZ/FFZAddon.js";
 import BTTVAddon from "./Addons/BTTV/BTTVAddon.js";
@@ -15,6 +12,7 @@ import BrowseFiltersConfig from "./Configs/BrowseFiltersConfig.js";
 import ColorConfig from "./Configs/ColorConfig.js";
 import BotDetectionConfig from "./Configs/BotDetectionConfig.js";
 import StringConfig from "./Configs/StringConfig.js";
+import { fetchJson, waitFor, observeNewElements } from "./Utility/Util.js";
 
 let SRC = document.getElementById('BetterMixer-module').src;
 let BASE_URL = SRC.split('/').slice(0, -2).join('/') + '/';
@@ -36,12 +34,7 @@ export default class BetterMixer {
         //this.gameWisp = new GameWispAddon(this);
         this.activeChannels = [];
 
-        $.getJSON({
-            url: `https://mixer.com/api/v1/users/current`,
-            success: data => {
-                this.user = new User(data);
-            }
-        });
+        this.loadUser();
 
         // Reload on page change
         (function(history){
@@ -53,7 +46,7 @@ export default class BetterMixer {
         
                 let ret = pushState.apply(history, arguments);
 
-                setTimeout(() => BetterMixer.instance.reload(), 0);
+                BetterMixer.instance.reload();
 
                 return ret;
             };
@@ -69,7 +62,9 @@ export default class BetterMixer {
         let botColorConfig = new ColorConfig('botcolor', 'Bot Color', '', '#d37110');
         Object.defineProperty(botColorConfig, 'hidden', { get: () => botColorDetectionConfig.state === "off" });
         botColorConfig.update = () => {
-            $('.bettermixer-role-bot').css('color', this._state);
+            document.querySelectorAll('.bettermixer-role-bot').forEach(element => {
+                element.style.color = this._state;
+            });
         };
         this.configuration.registerConfig(botColorDetectionConfig);
         this.configuration.registerConfig(botColorRegexConfig);
@@ -93,7 +88,7 @@ export default class BetterMixer {
 
         this.configuration.registerConfig(new BrowseFiltersConfig());
 
-        setTimeout(() => this.reload(), 0);
+        this.reload();
 
         window.onbeforeunload = () => {
             for (let channel of this.activeChannels){
@@ -108,24 +103,27 @@ export default class BetterMixer {
         this.patcher = new Patcher(this);
 
         // BetterMixer.ClassNames
-        this.addEventListener(BetterMixer.Events.ON_CHAT_FINISH_LOAD, () => {
-            let badgeElementTimeout = () => {
-                let badgeElement = $('style').filter((_, element) => element.innerHTML.includes('.badge__'))[0];
-                if (!badgeElement){
-                    setTimeout(badgeElementTimeout, 100);
-                    return;
-                }
-                BetterMixer.ClassNames.BADGE = "badge__" +  badgeElement.innerHTML.split('.badge__')[1].split('{')[0].trim();
-            }
-            badgeElementTimeout();
+        this.addEventListener(BetterMixer.Events.ON_CHAT_FINISH_LOAD, async () => {
+            let badgeElement;
+            await waitFor(() => badgeElement = [...document.querySelectorAll('style')].filter(element => element.innerHTML.includes('.badge__'))[0]);
+
+            BetterMixer.ClassNames.BADGE = "badge__" +  badgeElement.innerHTML.split('.badge__')[1].split('{')[0].trim();
 
             if (!BetterMixer.ClassNames.TEXTITEM){
-                fetch($('script[src*="main."]')[0].src).then(x => x.text()).then(x => {
-                    let index = x.indexOf('textItem_');
-                    BetterMixer.ClassNames.TEXTITEM = x.slice(index, index + 14)
-                });
+                const scriptText = await (await fetch(document.querySelector('script[src*="main."]').src)).text();
+                let index = scriptText.indexOf('textItem_');
+                BetterMixer.ClassNames.TEXTITEM = scriptText.slice(index, index + 14)
             }
         });
+    }
+
+    async loadUser(){
+        try {
+            const data = await fetchJson('https://mixer.com/api/v1/users/current');
+            this.user = new User(data);
+        } catch(err){
+            // do nothing?
+        }
     }
 
     get isEmbeddedWindow(){
@@ -135,14 +133,10 @@ export default class BetterMixer {
         return this._userPage;
     }
 
-    reload(){
-        let page = window.location.pathname.substring(1).toLowerCase();
+    async reload(){
+        let page;
 
-        if (page == 'me/bounceback'){
-            this._page = "";
-            setTimeout(() => this.reload(), 100);
-            return;
-        }
+        await waitFor(() => (page = window.location.pathname.substring(1).toLowerCase()) !== 'me/bounceback');
 
         this._userPage = !(page == 'browse/all' || page.startsWith('dashboard') || page == "pro");
         if (!this._userPage){
@@ -219,20 +213,16 @@ export default class BetterMixer {
             }
         }
 
-        let chatObserverLoop = () => {
-            if (!document.querySelector('b-channel-chat-section')){
-                setTimeout(chatObserverLoop, 100);
-                return;
-            }
+        await waitFor(() => document.querySelector('b-channel-chat-section'));
 
-            this._chatObserver = $.initialize('b-chat-client-host-component [class*="chatContainer"]', (_, element) => {
-                reloadChat(element);
-            }, { target: document.querySelector('b-channel-chat-section').parentElement });
-            if (!loaded && document.querySelector('b-chat-client-host-component')){
-                reloadChat(document.querySelector('b-chat-client-host-component').children[0]);
-            }
+        this._chatObserver = observeNewElements('b-chat-client-host-component [class*="chatContainer"]',
+            document.querySelector('b-channel-chat-section').parentElement,
+            element => {
+            reloadChat(element);
+        });
+        if (!loaded && document.querySelector('b-chat-client-host-component')){
+            reloadChat(document.querySelector('b-chat-client-host-component').children[0]);
         }
-        chatObserverLoop();
     }
 
     injectStylesheet(file){

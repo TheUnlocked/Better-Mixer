@@ -1,5 +1,6 @@
 import Config from "./Config.js";
 import BetterMixer from "../BetterMixer.js";
+import { observeNewElements } from "../Utility/Util.js";
 
 let SRC = document.getElementById('BetterMixer-module').src;
 
@@ -30,7 +31,7 @@ export default class ConfigurationManager {
         window.addEventListener('message', initializeListener);
         plugin.postToContent({message: 'getAllConfigs'});
 
-        this._configDialogObserver = $.initialize('[class*="wrapper"] h1', (_, element) => {
+        this._configDialogObserver = observeNewElements('[class*="wrapper"] h1', document.documentElement, element => {
             if (element.innerText == "CHAT SETTINGS"){
                 this.plugin.dispatchEvent(BetterMixer.Events.ON_SETTINGS_DIALOG_OPEN, { dialog: element.parentElement }, this);
             }

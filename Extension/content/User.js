@@ -1,4 +1,5 @@
 import Badge from "./Badge.js";
+import { fetchJson } from "./Utility/Util.js";
 
 export default class User {
     /**
@@ -29,7 +30,6 @@ export default class User {
                             break;
                         case "Staff":
                             this.staff = true;
-
                             break;
                     }
                 }
@@ -41,18 +41,17 @@ export default class User {
 
     populateUser(){
         if (this._populated){
-            return;
+            return Promise.resolve();
         }
-        $.ajax({
-            url: `https://mixer.com/api/v1/channels/${this.username}`,
-            dataType: 'json',
-            async: false,
-            success: data => {
+
+        return fetchJson(`https://mixer.com/api/v1/channels/${this.username}`)
+            .then(data => {
                 this._populated = true;
                 this._loadUser(data);
-            },
-            error: xhr => this.plugin.log(`${xhr.statusText}: Failed to get channel ${this.username}`, BetterMixer.LogType.ERROR)
-        });
+            })
+            .catch(err => {
+                this.plugin.log(`${err.message}: Failed to get channel ${this.username}`, BetterMixer.LogType.ERROR);
+            });
     }
 
     /**
