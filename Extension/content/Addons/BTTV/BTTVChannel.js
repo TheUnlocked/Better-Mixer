@@ -3,6 +3,7 @@ import BetterMixer from "../../BetterMixer.js";
 import BTTVAddon from "./BTTVAddon.js";
 import TwitchChannel from "../Twitch/TwitchChannel.js";
 import EmoteSet from "../../EmoteSet.js";
+import { requestJson } from "../../Util.js";
 
 export default class BTTVChannel{
     /**
@@ -16,46 +17,47 @@ export default class BTTVChannel{
         this.channel = channel.channel;
         this.twitch = channel;
         this.emotes = new EmoteSet("BTTV Channel Emotes", 80);
+        this.init();
+    }
 
-        let load = () => {
-            if (!this.twitch.login){
-                setTimeout(load, 100);
-                return;
-            }
+    init(){
+        if (!this.twitch.login){
+            setTimeout(() => {
+                this.plugin.log(`Retrying to load emotes from BTTV.`, BetterMixer.LogType.INFO);
+                this.init();
+            }, 100);
+            return;
+        }
+        this._load();
+    }
 
-                  /* Backwards Compatibility */
-            if (!this.channel.channelSettings.bttv || this.channel.channelSettings.bttv.sync){
-                $.getJSON({
-                    url: `https://api.betterttv.net/2/channels/${this.twitch.login}`,
-                    success: data => {
-                        if (this.cancelLoad){
-                            return;
-                        }
-                        for (let emote of data.emotes) {
-                            let animated = ['gif'].includes(emote.imageType);
-                            this.emotes.addEmote(new Emote(emote.code, `https:${data.urlTemplate.replace('{{id}}', emote.id).replace('{{image}}', '3x')}`, 28, 28, animated));
-                        }
-                        
-                        this._gatherEmotes = event => {
-                            if (event.data.channel === this.channel){
-                                return this.emotes;
-                            }
-                        };
-                        this.plugin.addEventListener(BetterMixer.Events.GATHER_EMOTES, this._gatherEmotes);
-                        this.plugin.dispatchEvent(BetterMixer.Events.ON_EMOTES_ADDED, [this.emotes], this);
+    async _load(){
+        /* Backwards Compatibility */
+        if (!this.channel.channelSettings.bttv || this.channel.channelSettings.bttv.sync){
+            try {
+                const data = await requestJson(`https://api.betterttv.net/2/channels/${this.twitch.login}`);
+                if (this.cancelLoad) return;
 
-                        this.plugin.log(`Synced ${this.channel.owner.username} with BTTV emotes from ${this.twitch.login}.`, BetterMixer.LogType.INFO);
-                    },
-                    error: xhr => {
-                        if (this.cancelLoad){
-                            return;
-                        }
-                        this.plugin.log(`${xhr.statusText}: Failed to load emotes from BTTV.`, BetterMixer.LogType.INFO);
+                for (let emote of data.emotes){
+                    let animated = ['gif'].includes(emote.imageType);
+                    this.emotes.addEmote(new Emote(emote.code, `https:${data.urlTemplate.replace('{{id}}', emote.id).replace('{{image}}', '3x')}`, 28, 28, animated));
+                }
+                
+                this._gatherEmotes = event => {
+                    if (event.data.channel === this.channel){
+                        return this.emotes;
                     }
-                });
+                };
+
+                this.plugin.addEventListener(BetterMixer.Events.GATHER_EMOTES, this._gatherEmotes);
+                this.plugin.dispatchEvent(BetterMixer.Events.ON_EMOTES_ADDED, [this.emotes], this);
+
+                this.plugin.log(`Synced ${this.channel.owner.username} with BTTV emotes from ${this.twitch.login}.`, BetterMixer.LogType.INFO);
+            } catch(err){
+                if (this.cancelLoad) return;
+                this.plugin.log(`${err.message}: Failed to load emotes from BTTV.`, BetterMixer.LogType.INFO);
             }
-        };
-        load();
+        }
     }
 
     unload(){

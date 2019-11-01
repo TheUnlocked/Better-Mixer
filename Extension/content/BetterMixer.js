@@ -1,4 +1,4 @@
-import "../lib/js/jquery-3.4.1.min.js";
+import "../lib/js/jquery-3.4.1.slim.min.js";
 import "../lib/js/jquery.initialize.min.js";
 
 import TwitchAddon from "./Addons/Twitch/TwitchAddon.js";
@@ -15,6 +15,7 @@ import BrowseFiltersConfig from "./Configs/BrowseFiltersConfig.js";
 import ColorConfig from "./Configs/ColorConfig.js";
 import BotDetectionConfig from "./Configs/BotDetectionConfig.js";
 import StringConfig from "./Configs/StringConfig.js";
+import { requestJson } from "./Util.js";
 
 let SRC = document.getElementById('BetterMixer-module').src;
 let BASE_URL = SRC.split('/').slice(0, -2).join('/') + '/';
@@ -36,12 +37,7 @@ export default class BetterMixer {
         //this.gameWisp = new GameWispAddon(this);
         this.activeChannels = [];
 
-        $.getJSON({
-            url: `https://mixer.com/api/v1/users/current`,
-            success: data => {
-                this.user = new User(data);
-            }
-        });
+        this.loadUser();
 
         // Reload on page change
         (function(history){
@@ -69,7 +65,9 @@ export default class BetterMixer {
         let botColorConfig = new ColorConfig('botcolor', 'Bot Color', '', '#d37110');
         Object.defineProperty(botColorConfig, 'hidden', { get: () => botColorDetectionConfig.state === "off" });
         botColorConfig.update = () => {
-            $('.bettermixer-role-bot').css('color', this._state);
+            document.querySelectorAll('.bettermixer-role-bot').forEach(element => {
+                element.style.color = this._state;
+            });
         };
         this.configuration.registerConfig(botColorDetectionConfig);
         this.configuration.registerConfig(botColorRegexConfig);
@@ -110,7 +108,7 @@ export default class BetterMixer {
         // BetterMixer.ClassNames
         this.addEventListener(BetterMixer.Events.ON_CHAT_FINISH_LOAD, () => {
             let badgeElementTimeout = () => {
-                let badgeElement = $('style').filter((_, element) => element.innerHTML.includes('.badge__'))[0];
+                const badgeElement = [...document.querySelectorAll('style')].filter(element => element.innerHTML.includes('.badge__'))[0];
                 if (!badgeElement){
                     setTimeout(badgeElementTimeout, 100);
                     return;
@@ -120,12 +118,21 @@ export default class BetterMixer {
             badgeElementTimeout();
 
             if (!BetterMixer.ClassNames.TEXTITEM){
-                fetch($('script[src*="main."]')[0].src).then(x => x.text()).then(x => {
+                fetch(document.querySelector('script[src*="main."]').src).then(x => x.text()).then(x => {
                     let index = x.indexOf('textItem_');
                     BetterMixer.ClassNames.TEXTITEM = x.slice(index, index + 14)
                 });
             }
         });
+    }
+
+    async loadUser(){
+        try {
+            const data = await requestJson('https://mixer.com/api/v1/users/current');
+            this.user = new User(data);
+        } catch(err){
+            // do nothing?
+        }
     }
 
     get isEmbeddedWindow(){

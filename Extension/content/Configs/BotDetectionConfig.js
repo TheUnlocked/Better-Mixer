@@ -29,8 +29,8 @@ export default class BotDetectionConfig extends DropdownConfig {
         }
     }
 
-    updateImmediate(mewState){
-        document.querySelector('[bettermixer-config-name="botcolor_regex"]').hidden = mewState !== "custom";
-        document.querySelector('[bettermixer-config-name="botcolor"]').hidden = mewState === "off";
+    updateImmediate(newState){
+        document.querySelector('[bettermixer-config-name="botcolor_regex"]').hidden = newState !== "custom";
+        document.querySelector('[bettermixer-config-name="botcolor"]').hidden = newState === "off";
     }
 }
