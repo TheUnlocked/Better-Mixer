@@ -82,10 +82,10 @@ export default class Patcher{
             
             // Priority 100
             let thisChannelSubscriberEmotesHeader = [...emoteContainer.querySelectorAll('h3[class*="emoteGroupHeader"]')]
-                .filter(x => x.innerText.toLowerCase() === event.sender.channel.name.toLowerCase())[0];
+                .filter(x => x.innerHTML.toLowerCase() === event.sender.channel.name.toLowerCase())[0];
             // Priority -200
             let globalEmotesHeader = [...emoteContainer.querySelectorAll('h3[class*="emoteGroupHeader"]')]
-                .filter(x => x.innerText.toLowerCase() === "global")[0];
+                .filter(x => x.innerHTML.toLowerCase() === "global")[0];
             // Priority 50
             let otherSubscriberEmoteHeader = [...emoteContainer.querySelectorAll('h3[class*="emoteGroupHeader"]')]
                 .filter(x => x !== thisChannelSubscriberEmotesHeader && x !== globalEmotesHeader)[0];
@@ -119,7 +119,7 @@ export default class Patcher{
                     mixerEmoteHeader.classList.add('bettermixer-emote-set-header-first');
                     firstEmoteSet = false;
                 }
-                mixerEmoteHeader.innerText = title;
+                mixerEmoteHeader.innerHTML = title;
                 return mixerEmoteHeader;
             }
 
@@ -190,7 +190,7 @@ export default class Patcher{
 
                         case Config.ConfigTypeEnum.BOOLEAN:
                             configElement = exampleToggle.cloneNode(true);
-                            configElement.children[2].innerText = config.displayText;
+                            configElement.children[2].innerHTML = config.displayText;
 
                             if (config.state != configElement.classList.contains('checked_37Lzx')){
                                 configElement.classList.toggle('checked_37Lzx');
@@ -204,7 +204,7 @@ export default class Patcher{
 
                         case Config.ConfigTypeEnum.COLOR:
                             configElement = exampleColor.cloneNode(true);
-                            configElement.children[0].innerText = config.displayText;
+                            configElement.children[0].innerHTML = config.displayText;
                             configElement.appendChild(configElement.children[0]);
 
                             let colorIndicator = configElement.querySelector('[class*="currentColor"]');
@@ -345,7 +345,7 @@ export default class Patcher{
                     let saveFiltersButton = resetFiltersButton.cloneNode(true);
                     saveFiltersButton.classList.remove('reset-filters');
                     saveFiltersButton.classList.add('bettermixer-save-filters');
-                    saveFiltersButton.querySelector('div > span > span').innerText = "Save Filters";
+                    saveFiltersButton.querySelector('div > span > span').innerHTML = "Save Filters";
                     filtersWindow.insertBefore(saveFiltersButton, resetFiltersButton);
 
                     //Patcher.addTooltip(saveFiltersButton, 'The "Games" and "Share Controller" filters are currently not supported.');
@@ -395,7 +395,7 @@ export default class Patcher{
             let tooltip = document.createElement('div');
             document.body.appendChild(tooltip); // This needs to happen first to make sure tooltip.clientWidth works correctly.
 
-            tooltip.innerText = text;
+            tooltip.innerHTML = text;
             let rect = element.getBoundingClientRect();
             tooltip.classList.add('bettermixer-tooltip');
             tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.clientWidth / 2) + "px";
@@ -442,7 +442,7 @@ export default class Patcher{
                     // End the text element if you find an emote
                     if (textBuilder) {
                         let newText = textElement.cloneNode();
-                        newText.innerText = textBuilder.trimStart();
+                        newText.innerHTML = textBuilder.trimStart();
                         messageBuilder.push(newText);
                         textBuilder = " ";
                     }
@@ -463,7 +463,7 @@ export default class Patcher{
             // Finish the text buffer, if one exists
             if (textBuilder) {
                 let newText = textElement.cloneNode();
-                newText.innerText = textBuilder;
+                newText.innerHTML = textBuilder;
                 messageBuilder.push(newText);
             }
 

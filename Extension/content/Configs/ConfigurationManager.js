@@ -32,7 +32,7 @@ export default class ConfigurationManager {
         plugin.postToContent({message: 'getAllConfigs'});
 
         this._configDialogObserver = observeNewElements('[class*="wrapper"] h1', document.documentElement, element => {
-            if (element.innerText == "CHAT SETTINGS"){
+            if (element.innerHTML === "Chat Settings"){
                 this.plugin.dispatchEvent(BetterMixer.Events.ON_SETTINGS_DIALOG_OPEN, { dialog: element.parentElement }, this);
             }
         });

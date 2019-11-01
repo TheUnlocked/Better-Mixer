@@ -30,7 +30,7 @@ export default class Emote{
         }
         let text = document.createElement('span');
         text.classList.add('bettermixer-emote-text');
-        text.innerText = this.name;
+        text.innerHTML = this.name;
 
         // let emoteWidth = document.createElement('div');
         // emoteWidth.style.width = this.width + "px";
