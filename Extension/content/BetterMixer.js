@@ -37,13 +37,7 @@ export default class BetterMixer {
         //this.gameWisp = new GameWispAddon(this);
         this.activeChannels = [];
 
-        requestJson('https://mixer.com/api/v1/users/current')
-            .then(data => {
-                this.user = new User(data);
-            })
-            .catch(err => {
-                // do nothing?
-            });
+        this.loadUser();
 
         // Reload on page change
         (function(history){
@@ -130,6 +124,15 @@ export default class BetterMixer {
                 });
             }
         });
+    }
+
+    async loadUser(){
+        try {
+            const data = await requestJson('https://mixer.com/api/v1/users/current');
+            this.user = new User(data);
+        } catch(err){
+            // do nothing?
+        }
     }
 
     get isEmbeddedWindow(){

@@ -10,14 +10,17 @@ export default class TwitchAddon {
      */
     constructor(plugin) {
         this.plugin = plugin;
+        this.init();
+    }
 
-        requestJson('https://raw.githubusercontent.com/TheUnlocked/Better-Mixer/master/Info/twitchsync.json')
-            .then(data => {
-                this._syncList = data;
-            })
-            .catch(err => {
-                this.plugin.log(`${err.message}: Failed to access Twitch sync list.`, BetterMixer.LogType.ERROR);
-            });
+    async init(){
+        try {
+            const data = await requestJson('https://raw.githubusercontent.com/TheUnlocked/Better-Mixer/master/Info/twitchsync.json');
+            this._syncList = data;
+            this.plugin.log('Synced Twitch data from github.', BetterMixer.LogType.INFO);
+        } catch (err){
+            this.plugin.log(`${err.message}: Failed to access Twitch sync list.`, BetterMixer.LogType.ERROR);
+        }
     }
 
     /**

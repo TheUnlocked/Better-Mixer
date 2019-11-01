@@ -13,27 +13,29 @@ export default class BTTVAddon {
     constructor(plugin) {
         this.plugin = plugin;
         this.globalEmotes = new EmoteSet("BTTV Global Emotes", -60);
+        this.init();
+    }
 
-        requestJson('https://api.betterttv.net/2/emotes/')
-            .then(data => {
-                for (let emote of data.emotes) {
-                    let animated = ['gif'].includes(emote.imageType);
-                    this.globalEmotes.addEmote(new Emote(emote.code, `https:${data.urlTemplate.replace('{{id}}', emote.id).replace('{{image}}', '3x')}`, undefined, 28, animated));
+    async init(){
+        try {
+            const data = await requestJson('https://api.betterttv.net/2/emotes/');
+            for (let emote of data.emotes) {
+                let animated = ['gif'].includes(emote.imageType);
+                this.globalEmotes.addEmote(new Emote(emote.code, `https:${data.urlTemplate.replace('{{id}}', emote.id).replace('{{image}}', '3x')}`, undefined, 28, animated));
+            }
+            
+            this._gatherEmotes = event => {
+                if (event.data.channel.channelSettings.bttv && event.data.channel.channelSettings.bttv.globals){
+                    return this.globalEmotes;
                 }
-                
-                this._gatherEmotes = event => {
-                    if (event.data.channel.channelSettings.bttv && event.data.channel.channelSettings.bttv.globals){
-                        return this.globalEmotes;
-                    }
-                };
-                this.plugin.addEventListener(BetterMixer.Events.GATHER_EMOTES, this._gatherEmotes);
-                this.plugin.dispatchEvent(BetterMixer.Events.ON_EMOTES_ADDED, [this.emotes], this);
+            };
+            this.plugin.addEventListener(BetterMixer.Events.GATHER_EMOTES, this._gatherEmotes);
+            this.plugin.dispatchEvent(BetterMixer.Events.ON_EMOTES_ADDED, [this.emotes], this);
 
-                this.plugin.log(`Fetched global BTTV emotes.`, BetterMixer.LogType.INFO);
-            })
-            .catch(err => {
-                this.plugin.log(`${err.message}: Failed to load global emotes from BTTV.`, BetterMixer.LogType.INFO);
-            });
+            this.plugin.log(`Fetched global BTTV emotes.`, BetterMixer.LogType.INFO);
+        } catch (err){
+            this.plugin.log(`${err.message}: Failed to load global emotes from BTTV.`, BetterMixer.LogType.INFO);
+        }
     }
 
     /**

@@ -17,44 +17,47 @@ export default class BTTVChannel{
         this.channel = channel.channel;
         this.twitch = channel;
         this.emotes = new EmoteSet("BTTV Channel Emotes", 80);
+        this.init();
+    }
 
-        let load = () => {
-            if (!this.twitch.login){
-                setTimeout(load, 100);
-                return;
+    init(){
+        if (!this.twitch.login){
+            setTimeout(() => {
+                this.plugin.log(`Retrying to load emotes from BTTV.`, BetterMixer.LogType.INFO);
+                this.init();
+            }, 100);
+            return;
+        }
+        this._load();
+    }
+
+    async _load(){
+        /* Backwards Compatibility */
+        if (!this.channel.channelSettings.bttv || this.channel.channelSettings.bttv.sync){
+            try {
+                const data = await requestJson(`https://api.betterttv.net/2/channels/${this.twitch.login}`);
+                if (this.cancelLoad) return;
+
+                for (let emote of data.emotes){
+                    let animated = ['gif'].includes(emote.imageType);
+                    this.emotes.addEmote(new Emote(emote.code, `https:${data.urlTemplate.replace('{{id}}', emote.id).replace('{{image}}', '3x')}`, 28, 28, animated));
+                }
+                
+                this._gatherEmotes = event => {
+                    if (event.data.channel === this.channel){
+                        return this.emotes;
+                    }
+                };
+
+                this.plugin.addEventListener(BetterMixer.Events.GATHER_EMOTES, this._gatherEmotes);
+                this.plugin.dispatchEvent(BetterMixer.Events.ON_EMOTES_ADDED, [this.emotes], this);
+
+                this.plugin.log(`Synced ${this.channel.owner.username} with BTTV emotes from ${this.twitch.login}.`, BetterMixer.LogType.INFO);
+            } catch(err){
+                if (this.cancelLoad) return;
+                this.plugin.log(`${err.message}: Failed to load emotes from BTTV.`, BetterMixer.LogType.INFO);
             }
-
-            /* Backwards Compatibility */
-            if (!this.channel.channelSettings.bttv || this.channel.channelSettings.bttv.sync){
-                requestJson(`https://api.betterttv.net/2/channels/${this.twitch.login}`)
-                    .then(data => {
-                        if (this.cancelLoad){
-                            return;
-                        }
-                        for (let emote of data.emotes) {
-                            let animated = ['gif'].includes(emote.imageType);
-                            this.emotes.addEmote(new Emote(emote.code, `https:${data.urlTemplate.replace('{{id}}', emote.id).replace('{{image}}', '3x')}`, 28, 28, animated));
-                        }
-                        
-                        this._gatherEmotes = event => {
-                            if (event.data.channel === this.channel){
-                                return this.emotes;
-                            }
-                        };
-                        this.plugin.addEventListener(BetterMixer.Events.GATHER_EMOTES, this._gatherEmotes);
-                        this.plugin.dispatchEvent(BetterMixer.Events.ON_EMOTES_ADDED, [this.emotes], this);
-
-                        this.plugin.log(`Synced ${this.channel.owner.username} with BTTV emotes from ${this.twitch.login}.`, BetterMixer.LogType.INFO);
-                    })
-                    .catch(err => {
-                        if (this.cancelLoad){
-                            return;
-                        }
-                        this.plugin.log(`${err.message}: Failed to load emotes from BTTV.`, BetterMixer.LogType.INFO);
-                    });
-            }
-        };
-        load();
+        }
     }
 
     unload(){

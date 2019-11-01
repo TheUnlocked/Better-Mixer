@@ -41,7 +41,7 @@ export default class User {
 
     populateUser(){
         if (this._populated){
-            return;
+            return Promise.resolve();
         }
 
         return requestJson(`https://mixer.com/api/v1/channels/${this.username}`)
