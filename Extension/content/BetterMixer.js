@@ -194,9 +194,7 @@ export default class BetterMixer {
         this.activeChannels = [];
 
         let mainChannel = new Channel(this, this._page);
-        if (mainChannel.id){
-            this.activeChannels.push(mainChannel);
-        }
+        this.activeChannels.push(mainChannel);
         this.focusedChannel = mainChannel;
 
         let loaded = false;
@@ -208,7 +206,6 @@ export default class BetterMixer {
                 let thisChannelButton = chatTabBar.children[0];
                 let otherChannelButton = chatTabBar.children[1];
                 let selectedButton = thisChannelButton.querySelector('.bui-tab-underline') ? thisChannelButton : otherChannelButton;
-                console.log(selectedButton);
                 if (selectedButton === thisChannelButton || window.location.search.startsWith('?vod=')){
                     this.focusedChannel = mainChannel;
                     this.dispatchEvent(BetterMixer.Events.ON_CHAT_START_LOAD, {channel: mainChannel, element: element}, this);
@@ -220,12 +217,12 @@ export default class BetterMixer {
                     }
                     this.activeChannels.push(secondChannel);
                     this.focusedChannel = secondChannel;
-                    this.dispatchEvent(BetterMixer.Events.ON_CHAT_START_LOAD, {channel: secondChannel, element: element}, this);
+                    secondChannel.loadChat(element);
                 }
             }
             else{
                 this.focusedChannel = mainChannel;
-                this.dispatchEvent(BetterMixer.Events.ON_CHAT_START_LOAD, {channel: mainChannel, element: element}, this);
+                mainChannel.loadChat(element);
             }
         }
 

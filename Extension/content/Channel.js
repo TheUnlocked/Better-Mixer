@@ -49,9 +49,24 @@ export default class Channel {
             // this.gameWispChannel = plugin.gameWisp.getSync(this);
 
             this.chat = new Chat(this);
+            this.plugin.dispatchEvent(BetterMixer.Events.ON_CHAT_START_LOAD, this.chat, this);
             this.plugin.log(`Loaded channel '${this.channelName}'`, BetterMixer.LogType.INFO);
         } catch (err){
             this.plugin.log(`${err.message}: Failed to get channel ${this.channelName}`, BetterMixer.LogType.ERROR);
+        }
+    }
+
+    loadChat(element){
+        if (this.chat){
+            this.chat.load(element);
+        }
+        else{
+            const loader = this.plugin.addEventListener(BetterMixer.Events.ON_CHAT_START_LOAD, e => {
+                if (e.data === this.chat){
+                    e.data.load(element);
+                    this.plugin.removeEventListener(BetterMixer.Events.ON_CHAT_START_LOAD, loader);    
+                }
+            });
         }
     }
 
