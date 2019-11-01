@@ -1,7 +1,7 @@
 import BetterMixer from "../../BetterMixer.js";
 import TwitchAddon from "./TwitchAddon.js";
 import Channel from "../../Channel.js";
-import { requestJson } from "../../Util.js";
+import { fetchJson } from "../../Utility/Util.js";
 
 export default class TwitchChannel{
     /**
@@ -29,7 +29,7 @@ export default class TwitchChannel{
 
     async _loadByUserName(username){
         try {
-            this._successHandler(await requestJson(`https://api.twitch.tv/helix/users?login=${username}`, this._requestConfig));
+            this._successHandler(await fetchJson(`https://api.twitch.tv/helix/users?login=${username}`, this._requestConfig));
         } catch (err){
             this.plugin.log(`${err.message}: Failed to obtain ID from Twitch username.`, BetterMixer.LogType.WARN);
         }
@@ -37,7 +37,7 @@ export default class TwitchChannel{
 
     async _loadByUserId(id){
         try {
-            this._successHandler(await requestJson(`https://api.twitch.tv/helix/users?id=${id}`, this._requestConfig));
+            this._successHandler(await fetchJson(`https://api.twitch.tv/helix/users?id=${id}`, this._requestConfig));
         } catch (err){
             this.plugin.log(`${err.message}: Failed to obtain Twitch user information from provided data.`, BetterMixer.LogType.WARN);
         }

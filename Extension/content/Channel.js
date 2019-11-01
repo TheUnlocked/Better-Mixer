@@ -1,7 +1,7 @@
 import BetterMixer from "./BetterMixer.js";
 import Chat from "./Chat.js";
 import User from "./User.js";
-import { requestJson } from "./Util.js";
+import { fetchJson } from "./Utility/Util.js";
 
 export default class Channel {
     /**
@@ -16,7 +16,7 @@ export default class Channel {
 
     async init(){
         try {
-            const data = await requestJson(`https://mixer.com/api/v1/channels/${this.channelName}`);
+            const data = await fetchJson(`https://mixer.com/api/v1/channels/${this.channelName}`);
             this.id = data.id;
             this.owner = new User(data.user);
             this.name = data.name;

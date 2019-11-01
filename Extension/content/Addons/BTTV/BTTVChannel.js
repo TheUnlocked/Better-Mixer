@@ -3,7 +3,7 @@ import BetterMixer from "../../BetterMixer.js";
 import BTTVAddon from "./BTTVAddon.js";
 import TwitchChannel from "../Twitch/TwitchChannel.js";
 import EmoteSet from "../../EmoteSet.js";
-import { requestJson } from "../../Util.js";
+import { fetchJson, waitFor } from "../../Utility/Util.js";
 
 export default class BTTVChannel{
     /**
@@ -20,22 +20,13 @@ export default class BTTVChannel{
         this.init();
     }
 
-    init(){
-        if (!this.twitch.login){
-            setTimeout(() => {
-                this.plugin.log(`Retrying to load emotes from BTTV.`, BetterMixer.LogType.INFO);
-                this.init();
-            }, 100);
-            return;
-        }
-        this._load();
-    }
+    async init(){
+        await waitFor(() => this.twitch.login);
 
-    async _load(){
         /* Backwards Compatibility */
         if (!this.channel.channelSettings.bttv || this.channel.channelSettings.bttv.sync){
             try {
-                const data = await requestJson(`https://api.betterttv.net/2/channels/${this.twitch.login}`);
+                const data = await fetchJson(`https://api.betterttv.net/2/channels/${this.twitch.login}`);
                 if (this.cancelLoad) return;
 
                 for (let emote of data.emotes){

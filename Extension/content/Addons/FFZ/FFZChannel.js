@@ -3,7 +3,7 @@ import BetterMixer from "../../BetterMixer.js";
 import FFZAddon from "./FFZAddon.js";
 import TwitchChannel from "../Twitch/TwitchChannel.js";
 import EmoteSet from "../../EmoteSet.js";
-import { requestJson } from "../../Util.js";
+import { fetchJson, waitFor } from "../../Utility/Util.js";
 
 export default class FFZChannel{
     /**
@@ -20,32 +20,26 @@ export default class FFZChannel{
         this.init();
     }
 
-    init(){
-        if (!this.twitch.id){
-            setTimeout(() => {
-                this.plugin.log(`Retrying to load emotes from FFZ.`, BetterMixer.LogType.INFO);
-                this.init();
-            }, 100);
-            return;
-        }
-        this._load();
-    }
-
-    async _load(){
+    async init(){
         if (!this.channel.channelSettings.ffz || this.channel.channelSettings.ffz.sync){
+            await waitFor(() => this.twitch.login);
+
             try {
-                this._successHandler(await requestJson(`https://api.frankerfacez.com/v1/room/${this.twitch.login}`));
+                this._successHandler(await fetchJson(`https://api.frankerfacez.com/v1/room/${this.twitch.login}`));
             } catch(err){
                 if (this.cancelLoad) return;
                 this.plugin.log(`${err.message}: Failed to load emotes from FFZ. Trying alternate method.`, BetterMixer.LogType.INFO);
+                
                 await this._loadAlternate();
             }
         }
     }
 
     async _loadAlternate(){
+        await waitFor(() => this.twitch.id);
+
         try {
-            this._successHandler(await requestJson(`https://api-test.frankerfacez.com/v1/room/id/${this.twitch.id}`));
+            this._successHandler(await fetchJson(`https://api-test.frankerfacez.com/v1/room/id/${this.twitch.id}`));
         } catch(err){
             if (this.cancelLoad) return;
             this.plugin.log(`${err.message}: Failed to load emotes from FFZ.`, BetterMixer.LogType.INFO);

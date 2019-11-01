@@ -1,7 +1,7 @@
 import BetterMixer from "../../BetterMixer.js";
 import Channel from "../../Channel.js";
 import TwitchChannel from "./TwitchChannel.js";
-import { requestJson } from "../../Util.js";
+import { fetchJson } from "../../Utility/Util.js";
 
 export default class TwitchAddon {
     /**
@@ -15,7 +15,7 @@ export default class TwitchAddon {
 
     async init(){
         try {
-            const data = await requestJson('https://raw.githubusercontent.com/TheUnlocked/Better-Mixer/master/Info/twitchsync.json');
+            const data = await fetchJson('https://raw.githubusercontent.com/TheUnlocked/Better-Mixer/master/Info/twitchsync.json');
             this._syncList = data;
             this.plugin.log('Synced Twitch data from github.', BetterMixer.LogType.INFO);
         } catch (err){

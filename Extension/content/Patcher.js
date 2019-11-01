@@ -2,6 +2,7 @@ import BetterMixer from "./BetterMixer.js";
 import Config from "./Configs/Config.js";
 import EmoteSet from "./EmoteSet.js";
 import ChatMessage from "./ChatMessage.js";
+import { waitFor } from "./Utility/Util.js";
 
 export default class Patcher{
     /**
@@ -167,14 +168,7 @@ export default class Patcher{
 
         // Handle config menu
         this.plugin.addEventListener(BetterMixer.Events.ON_SETTINGS_DIALOG_OPEN, event => {
-            let disconnected = false;
-
-            let waitForLoadObserver = $.initialize('h2[class*="title"]', () => {
-                if (disconnected) return;
-
-                waitForLoadObserver.disconnect();
-                disconnected = true;
-
+            waitFor(() => event.data.dialog.querySelector('h2[class*="title"]')).then(() => {
                 let configSection = event.data.dialog.querySelector('section');
 
                 let label = configSection.firstChild.cloneNode();
@@ -303,7 +297,7 @@ export default class Patcher{
                     this.plugin.configuration.updateConfig();
                     this.plugin.log("Updated configurations.");
                 });
-            }, { target: event.data.dialog });
+            });
         });
 
         // Handle chat load
@@ -336,50 +330,49 @@ export default class Patcher{
         // Handle Browse > Filters > Save Filters
         this.plugin.addEventListener(BetterMixer.Events.ON_PAGE_LOAD, () => {
             if (document.location.pathname.startsWith("/browse")){
-                let filterConfig = this.plugin.configuration.getConfigAsync('browse_filters', (filterConfig) => {    
+                let filterConfig = this.plugin.configuration.getConfigAsync('browse_filters', async (filterConfig) => {    
                     let browseBaseUrl = "https://mixer.com" + document.location.pathname;
                     if (document.location.href == browseBaseUrl && !document.querySelector('b-browse-filters.visible') && filterConfig.state != ""){
                         document.location.href = browseBaseUrl + "?" + filterConfig.state;
                     }
 
-                    let checkFiltersLoaded = () => {
-                        let filtersWindow = document.querySelector('b-browse-filters');
-                        if (filtersWindow && !filtersWindow.querySelector('button.bettermixer-save-filters')){
-                            let resetFiltersButton = filtersWindow.querySelector('button.reset-filters');
-                            let saveFiltersButton = resetFiltersButton.cloneNode(true);
-                            saveFiltersButton.classList.remove('reset-filters');
-                            saveFiltersButton.classList.add('bettermixer-save-filters');
-                            saveFiltersButton.querySelector('div > span > span').innerText = "Save Filters";
-                            filtersWindow.insertBefore(saveFiltersButton, resetFiltersButton);
+                    let filtersWindow;
+                    await waitFor(
+                        (filtersWindow = document.querySelector('b-browse-filters')) &&
+                        !filtersWindow.querySelector('button.bettermixer-save-filters'));
 
-                            //Patcher.addTooltip(saveFiltersButton, 'The "Games" and "Share Controller" filters are currently not supported.');
+                    let resetFiltersButton = filtersWindow.querySelector('button.reset-filters');
+                    let saveFiltersButton = resetFiltersButton.cloneNode(true);
+                    saveFiltersButton.classList.remove('reset-filters');
+                    saveFiltersButton.classList.add('bettermixer-save-filters');
+                    saveFiltersButton.querySelector('div > span > span').innerText = "Save Filters";
+                    filtersWindow.insertBefore(saveFiltersButton, resetFiltersButton);
 
-                            saveFiltersButton.addEventListener('click', e => {
-                                if (window.location.href.includes('?'))
-                                    filterConfig.state = window.location.href.split('?')[1];
-                                else
-                                    filterConfig.state = "";
-                                this.plugin.configuration.saveConfig();
-                            });
-                        }
-                        else setTimeout(checkFiltersLoaded, 100);
-                    };
-                    checkFiltersLoaded();
+                    //Patcher.addTooltip(saveFiltersButton, 'The "Games" and "Share Controller" filters are currently not supported.');
+
+                    saveFiltersButton.addEventListener('click', e => {
+                        if (window.location.href.includes('?'))
+                            filterConfig.state = window.location.href.split('?')[1];
+                        else
+                            filterConfig.state = "";
+                        this.plugin.configuration.saveConfig();
+                    });
                 });
             }
 
-            const cancelVodAutoplay = () => {
-                if (!plugin.isEmbeddedWindow && plugin.isUserPage && document.querySelector('b-vod-bar')){
-                    if (!document.getElementById('player-state-button')){
-                        setTimeout(cancelVodAutoplay, 100);
-                        return;
-                    }
-                    if (!document.querySelector('b-channel-profile header bui-tab-label#tab-1[aria-selected="true"]')){
-                        setTimeout(() => document.getElementById('player-state-button').click(), 1000);
-                    }
-                }
-            }
-            setTimeout(cancelVodAutoplay, 1500);
+            // This feature is currently mostly broken.
+            // const cancelVodAutoplay = () => {
+            //     if (!plugin.isEmbeddedWindow && plugin.isUserPage && document.querySelector('b-vod-bar')){
+            //         if (!document.getElementById('player-state-button')){
+            //             setTimeout(cancelVodAutoplay, 100);
+            //             return;
+            //         }
+            //         if (!document.querySelector('b-channel-profile header bui-tab-label#tab-1[aria-selected="true"]')){
+            //             setTimeout(() => document.getElementById('player-state-button').click(), 1000);
+            //         }
+            //     }
+            // }
+            // setTimeout(cancelVodAutoplay, 1500);
         });
 
         // $.initialize('b-went-live-notification', (_, element) => {

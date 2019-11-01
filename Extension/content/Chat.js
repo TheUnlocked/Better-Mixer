@@ -1,8 +1,8 @@
 import Channel from "./Channel.js";
-import ChatSocket from "./ChatSocket.js";
 import ChatMessage from "./ChatMessage.js";
 import BetterMixer from "./BetterMixer.js";
 import Badge from "./Badge.js";
+import { observeNewElements } from "./Utility/Util.js";
 
 export default class Chat {
     /**
@@ -26,7 +26,7 @@ export default class Chat {
         else{
             this._loaded = true;
         }
-        this._msgObserver = $.initialize('div[class*="message__"]', (_, element) => {
+        this._msgObserver = observeNewElements('div[class*="message__"]', this.element, element => {
             let usernameElement = element.querySelectorAll('[class*="Username"]')[0];
             if (element.__bettermixer_sent || !usernameElement){
                 return;
@@ -39,7 +39,7 @@ export default class Chat {
             // }
             this.plugin.dispatchEvent(BetterMixer.Events.ON_MESSAGE, null, msg);
             element.__bettermixer_sent = true;
-        }, { target: this.element });
+        });
 
         this._gatherBadges = event => {
             if (event.data.channel.chat !== this){
@@ -66,11 +66,11 @@ export default class Chat {
         };
         this.plugin.addEventListener(BetterMixer.Events.GATHER_BADGES, this._gatherBadges);
 
-        this._emoteDialogObserver = $.initialize('[class*="wrapper"] h1', (_, element) => {
+        this._emoteDialogObserver = observeNewElements('[class*="wrapper"] h1', element, element => {
             if (element.innerText == "EMOTICONS" || element.innerText == "EMOTES"){
                 this.plugin.dispatchEvent(BetterMixer.Events.ON_EMOTES_DIALOG_OPEN, { dialog: element.parentElement }, this);
             }
-        }, { target: element });
+        });
 
         this.plugin.dispatchEvent(BetterMixer.Events.ON_CHAT_FINISH_LOAD, this, this);
     }

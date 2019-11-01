@@ -3,7 +3,7 @@ import BetterMixer from "../../BetterMixer.js";
 import TwitchChannel from "../Twitch/TwitchChannel.js";
 import EmoteSet from "../../EmoteSet.js";
 import Emote from "../../Emote.js";
-import { requestJson } from "../../Util.js";
+import { fetchJson } from "../../Utility/Util.js";
 
 export default class FFZAddon {
     /**
@@ -18,7 +18,7 @@ export default class FFZAddon {
 
     async init(){
         try {
-            const data = await requestJson('https://api.frankerfacez.com/v1/set/global');
+            const data = await fetchJson('https://api.frankerfacez.com/v1/set/global');
             for (let emoteSet in data.sets) {
                 if (data.default_sets.includes(+emoteSet)){
                     for (let emote of data.sets[emoteSet].emoticons) {

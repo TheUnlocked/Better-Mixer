@@ -1,5 +1,5 @@
 import Badge from "./Badge.js";
-import { requestJson } from "./Util.js";
+import { fetchJson } from "./Utility/Util.js";
 
 export default class User {
     /**
@@ -44,7 +44,7 @@ export default class User {
             return Promise.resolve();
         }
 
-        return requestJson(`https://mixer.com/api/v1/channels/${this.username}`)
+        return fetchJson(`https://mixer.com/api/v1/channels/${this.username}`)
             .then(data => {
                 this._populated = true;
                 this._loadUser(data);
