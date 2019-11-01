@@ -1,5 +1,3 @@
-import { requestJson } from "./Util.js";
-
 export default class ChatSocket {
     constructor(chat){
 
