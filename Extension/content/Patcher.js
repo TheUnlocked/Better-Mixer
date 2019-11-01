@@ -119,7 +119,7 @@ export default class Patcher{
                     mixerEmoteHeader.classList.add('bettermixer-emote-set-header-first');
                     firstEmoteSet = false;
                 }
-                mixerEmoteHeader.innerHTML = title;
+                mixerEmoteHeader.textContent = title;
                 return mixerEmoteHeader;
             }
 
@@ -172,7 +172,7 @@ export default class Patcher{
                 let configSection = event.data.dialog.querySelector('section');
 
                 let label = configSection.firstChild.cloneNode();
-                label.innerHTML = "Better Mixer Preferences";
+                label.textContent = "Better Mixer Preferences";
                 configSection.appendChild(label);
 
                 let exampleToggle = configSection.querySelector('[class*="control"][class*="toggle"]');
@@ -190,7 +190,7 @@ export default class Patcher{
 
                         case Config.ConfigTypeEnum.BOOLEAN:
                             configElement = exampleToggle.cloneNode(true);
-                            configElement.children[2].innerHTML = config.displayText;
+                            configElement.children[2].textContent = config.displayText;
 
                             if (config.state != configElement.classList.contains('checked_37Lzx')){
                                 configElement.classList.toggle('checked_37Lzx');
@@ -204,7 +204,7 @@ export default class Patcher{
 
                         case Config.ConfigTypeEnum.COLOR:
                             configElement = exampleColor.cloneNode(true);
-                            configElement.children[0].innerHTML = config.displayText;
+                            configElement.children[0].textContent = config.displayText;
                             configElement.appendChild(configElement.children[0]);
 
                             let colorIndicator = configElement.querySelector('[class*="currentColor"]');
@@ -345,7 +345,7 @@ export default class Patcher{
                     let saveFiltersButton = resetFiltersButton.cloneNode(true);
                     saveFiltersButton.classList.remove('reset-filters');
                     saveFiltersButton.classList.add('bettermixer-save-filters');
-                    saveFiltersButton.querySelector('div > span > span').innerHTML = "Save Filters";
+                    saveFiltersButton.querySelector('div > span > span').textContent = "Save Filters";
                     filtersWindow.insertBefore(saveFiltersButton, resetFiltersButton);
 
                     //Patcher.addTooltip(saveFiltersButton, 'The "Games" and "Share Controller" filters are currently not supported.');
@@ -395,7 +395,7 @@ export default class Patcher{
             let tooltip = document.createElement('div');
             document.body.appendChild(tooltip); // This needs to happen first to make sure tooltip.clientWidth works correctly.
 
-            tooltip.innerHTML = text;
+            tooltip.textContent = text;
             let rect = element.getBoundingClientRect();
             tooltip.classList.add('bettermixer-tooltip');
             tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.clientWidth / 2) + "px";
@@ -442,13 +442,13 @@ export default class Patcher{
                     // End the text element if you find an emote
                     if (textBuilder) {
                         let newText = textElement.cloneNode();
-                        newText.innerHTML = textBuilder.trimStart();
+                        newText.textContent = textBuilder.trimStart();
                         messageBuilder.push(newText);
                         textBuilder = " ";
                     }
                     else{
                         let newText = document.createElement('span');
-                        newText.innerHTML = " ";
+                        newText.textContent = " ";
                         messageBuilder.push(newText);
                     }
                     // Push the emote
@@ -463,13 +463,13 @@ export default class Patcher{
             // Finish the text buffer, if one exists
             if (textBuilder) {
                 let newText = textElement.cloneNode();
-                newText.innerHTML = textBuilder;
+                newText.textContent = textBuilder;
                 messageBuilder.push(newText);
             }
 
             // Final padding
             let newText = document.createElement('span');
-            newText.innerHTML = " ";
+            newText.textContent = " ";
             messageBuilder.push(newText);
 
             // Replace the text element with the new text/emote elements
