@@ -3,3 +3,24 @@ Improvements to Mixer, similar to FFZ for Twitch.
 
 
 Works on both Google Chrome and Mozilla Firefox.
+
+# How to contribute
+## How to file bug reports/feature requests
+Visit the Issues tab and check if your bug report/feature request has already been submitted. If it has not (or if the issue has been erronously closed), you may open a new issue. Please describe what occurred or what you want in as much detail as possible.
+
+In the case of a bug report, if you know how to do so, provide the console logs (either as a screenshot or saved as a .log file) and, if the issue is memory-related, provide a heap snapshot.
+
+## How to develop
+1. Clone this repo.
+2. If developing on Chrome (recommended), go to chrome://extensions and enable developer mode in the upper left if you have not already done so (Firefox development follows a similar process, but I won't go over that explicitly).
+3. Click the "Load Unpacked" button and select the "Extension" folder.
+4. You're good to go. Make sure to disable the Chrome Webstore version so you don't have two instances of Better Mixer running at once. Visual Studio Code is the recommended editor (and it's the one I use), but any JavaScript editor should suffice.
+
+Complying with a strict set of style guidelines is not required, but try to use async/await when possible and follow the style that existing code is written in as best as you can.
+
+_Note: Do NOT add additional dependencies without first asking to see if it's okay. This includes JavaScript libraries, build tools, and external stylesheets._
+
+## How to submit changes
+1. Before starting work on your contribution, it's advised to say something in the Issues tab, either by opening a feature request or saying that you'll work on a bug fix. This is not required, but it will give me an opportunity to let you know if your contribution is likely to be rejected before you spend a large amount of time on it.
+2. Write your fix/feature (see above).
+3. Make a pull request. Feel free to PR into master (I'll redirect the PR into a new branch if necessary).
