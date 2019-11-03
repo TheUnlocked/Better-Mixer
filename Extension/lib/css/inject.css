@@ -48,10 +48,6 @@
     display: none;
 }
 
-div.profile-bio :hover {
-    width: auto;
-}
-
 
 [class*="message"] [class*="badge__"] {
     position: relative;
@@ -62,12 +58,6 @@ div.profile-bio :hover {
     margin-left: 2px;
     margin-right: 2px;
 }
-
-/* .better-mixer-inline-control {
-    padding-left: 2px;
-    padding-right: 2px;
-    display: none;
-} */
 
 
 h3.bettermixer-emote-set-header {
@@ -88,23 +78,6 @@ h3.bettermixer-emote-set-header {
     position: absolute;
     right: 162px;
     top: 8px;
-}
-
-/* Color config visual correction */
-[class*="input"]:focus ~ span[class*="label"]::before {
-    border-color: #0075d5;
-}
-[class*="input"]:focus ~ span[class*="label"]::after {
-    border-color: #0075d5;
-}
-.bettermixer-color-config-invalid > [class*="input"]:focus ~ span[class*="label"]::before {
-    border-color: #cc0202;
-}
-.bettermixer-color-config-invalid > [class*="input"]:focus ~ span[class*="label"]::after {
-    border-color: #cc0202;
-}
-.bettermixer-color-config-invalid > [class*="input"]:focus {
-    border-color: #cc0202;
 }
 
 /* Minor Graphical Fixes for Mixer */

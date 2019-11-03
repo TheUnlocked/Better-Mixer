@@ -203,28 +203,24 @@ export default class Patcher{
                             break;
 
                         case Config.ConfigTypeEnum.COLOR:
-                            configElement = exampleColor.cloneNode(true);
-                            configElement.children[0].textContent = config.displayText;
-                            configElement.appendChild(configElement.children[0]);
+                            const colorHolder = document.createElement('div');
+                            const colorLengths = [3, 4, 6, 8];
 
-                            let colorIndicator = configElement.querySelector('[class*="currentColor"]');
-                            colorIndicator.style.backgroundColor = config.state;
-                            let valueInput = configElement.getElementsByTagName('input')[0];
-                            valueInput.value = config.state;
-                            
-                            valueInput.addEventListener('input', e => {
-                                const colorLengths = [3, 4, 6, 8];
-                                if (valueInput.value.match(/^#[a-fA-F0-9]*$/) && colorLengths.includes(valueInput.value.length - 1)){
-                                    configElement.classList.remove('bettermixer-color-config-invalid');
-                                    configElement.tempState = valueInput.value;
-                                    colorIndicator.style.backgroundColor = valueInput.value;
-                                    config.updateImmediate(valueInput.value);
+                            ReactDOM.render(React.createElement(mixerUi.SimpleColorPicker, {
+                                label: config.displayText,
+                                value: config.state,
+                                onChange: v => {
+                                    if (v.match(/^#[a-fA-F0-9]*$/) && colorLengths.includes(v.length - 1)){
+                                        configElement.tempState = v;
+                                        config.updateImmediate(v);
+                                    }
+                                    else{
+                                        configElement.tempState = undefined;
+                                    }
                                 }
-                                else{
-                                    configElement.classList.add('bettermixer-color-config-invalid');
-                                    configElement.tempState = undefined;
-                                }
-                            });
+                            }), colorHolder);
+
+                            configElement = colorHolder.children[0];
                             break;
 
                         case Config.ConfigTypeEnum.DROPDOWN:
@@ -246,7 +242,9 @@ export default class Patcher{
 
                         case Config.ConfigTypeEnum.STRING:
                             let stringInputHolder = document.createElement('div');
-                            ReactDOM.render(React.createElement(mixerUi.BuiTextInput, {label: config.displayText}), stringInputHolder);
+                            ReactDOM.render(React.createElement(mixerUi.BuiTextInput, {
+                                label: config.displayText
+                            }), stringInputHolder);
                             configElement = stringInputHolder.children[0];
                             let input = configElement.querySelector('input');
                             input.value = config.state;
