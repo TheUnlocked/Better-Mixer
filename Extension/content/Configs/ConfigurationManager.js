@@ -31,7 +31,7 @@ export default class ConfigurationManager {
         window.addEventListener('message', initializeListener);
         plugin.postToContent({message: 'getAllConfigs'});
 
-        this._configDialogObserver = observeNewElements('[class*="wrapper"] h1', document.documentElement, element => {
+        this._configDialogObserver = observeNewElements('[class*="modal"] h1', document.documentElement, element => {
             if (element.innerHTML === "Chat Settings"){
                 this.plugin.dispatchEvent(BetterMixer.Events.ON_SETTINGS_DIALOG_OPEN, { dialog: element.parentElement }, this);
             }
