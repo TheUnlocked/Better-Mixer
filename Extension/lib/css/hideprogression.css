@@ -1,0 +1,7 @@
+[class*="webComposerBlock"] > [class*="host"][aria-label*="rank"] {
+    display: none;
+}
+
+[class*="message"] span[class*="badge"][style*="progression"] {
+    display: none;
+}

@@ -83,6 +83,10 @@ export default class BetterMixer {
             'hide_avatars', 'Hide Avatars', '', false, true));
 
         this.configuration.registerConfig(new StylesheetToggleConfig(
+            this.injectStylesheet("lib/css/hideprogression.css"),
+            'hide_progression', 'Hide Fan Progression', '', false, true));
+
+        this.configuration.registerConfig(new StylesheetToggleConfig(
             this.injectStylesheet("lib/css/hidechatresizer.css"),
             'hide_chat_resizer', 'Disable Chat Resizer', '', false, true));
 
