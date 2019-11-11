@@ -16,11 +16,35 @@ In the case of a bug report, if you know how to do so, provide the console logs 
 3. Click the "Load Unpacked" button and select the "Extension" folder.
 4. You're good to go. Make sure to disable the Chrome Webstore version so you don't have two instances of Better Mixer running at once. Visual Studio Code is the recommended editor (and it's the one I use), but any JavaScript editor should suffice.
 
-Complying with a strict set of style guidelines is not required, but try to use async/await when possible and follow the style that existing code is written in as best as you can.
-
 _Note: Do NOT add additional dependencies without first asking to see if it's okay. This includes JavaScript libraries, build tools, and external stylesheets._
 
 ## How to submit changes
 1. Before starting work on your contribution, it's advised to say something in the Issues tab, either by opening a feature request or saying that you'll work on a bug fix. This is not required, but it will give me an opportunity to let you know if your contribution is likely to be rejected before you spend a large amount of time on it.
 2. Write your fix/feature (see above).
 3. Make a pull request. Feel free to PR into master (I'll redirect the PR into a new branch if necessary).
+
+# Development Environment
+I use ESLint to guarantee code style compliance. While PRs are not required to be fully compliant (in fact many of mine will not be), compliance should be followed according to your own judgement. To set up ESLint, install node, and then run
+```sh
+npm install
+```
+If you're using Visual Studio Code, make sure to add this line to your settings:
+```json5
+{
+    "eslint.enable": true,
+}
+```
+Optionally, you can also add these lines which provide the schema for `manifest.json`, though it's unlikely that they will be necessary.
+```json5
+{
+    "eslint.enable": true,
+    "json.schemas": [
+        {
+            "fileMatch": [
+                "/Extension/manifest.json"
+            ],
+            "url": "http://json.schemastore.org/chrome-manifest"
+        }
+    ]
+}
+```

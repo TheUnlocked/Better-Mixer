@@ -7,7 +7,7 @@ export default class EmoteSet {
      * @param {Number} priority {default: 0, uncategorized: -100, mixerGlobal: -200, thisChannelSubs: 100, otherChannelSubs: 50}
      * @param {Array<Emote>} emotes
      */
-    constructor(name, priority = 0, emotes = []){
+    constructor(name, priority = 0, emotes = []) {
         this.name = name;
         this.priority = priority;
         this.emotes = emotes.slice();
@@ -17,7 +17,7 @@ export default class EmoteSet {
      * 
      * @param {Emote} emote 
      */
-    addEmote(emote){
+    addEmote(emote) {
         this.emotes.push(emote);
     }
 
@@ -25,7 +25,7 @@ export default class EmoteSet {
      * 
      * @param {Array<Emote>} emote 
      */
-    addEmotes(emote){
+    addEmotes(emote) {
         this.emotes = this.emotes.concat(emote);
     }
 
@@ -33,11 +33,11 @@ export default class EmoteSet {
      * 
      * @param {Emote} emote 
      */
-    removeEmote(emote){
+    removeEmote(emote) {
         this.emotes = this.emotes.filter(e => e !== emote);
     }
 
-    clearEmotes(){
+    clearEmotes() {
         this.emotes = [];
     }
 }

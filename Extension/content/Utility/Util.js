@@ -6,7 +6,7 @@
 export const fetchJson = async (url, init) => {
     return fetch(url, init)
         .then(resp => {
-            if(resp.status < 200 || resp.status > 299) {
+            if (resp.status < 200 || resp.status > 299) {
                 throw new Error(resp.statusText);
             }
             return resp.json();
@@ -22,22 +22,22 @@ export const fetchJson = async (url, init) => {
  * }} [options]
  * @returns {Promise<void>}
  */
-export const waitFor = (pred, options) => new Promise((resolve, reject) => {
-    options = {
+export const waitFor = (pred, _options) => new Promise((resolve, reject) => {
+    const options = {
         delay: 100,
         maxAttempts: -1,
-        ...options
+        ..._options
     };
     let attempts = options.maxAttempts;
     const loop = () => {
-        if (attempts-- === 0){
+        if (attempts-- === 0) {
             reject(new Error("Max attempts exceeded."));
         }
-        if (pred()){
+        if (pred()) {
             resolve();
         }
         setTimeout(loop, options.delay);
-    }
+    };
     loop();
 });
 
@@ -50,10 +50,10 @@ export const waitFor = (pred, options) => new Promise((resolve, reject) => {
 export const observeNewElements = (selector, parent, callback) => {
     const observer = new MutationObserver(muts => {
         const matches = [];
-        for (const mut of muts){
-            for (const node of mut.addedNodes){
-                if (node instanceof Element){
-                    if (node.matches(selector)){
+        for (const mut of muts) {
+            for (const node of mut.addedNodes) {
+                if (node instanceof Element) {
+                    if (node.matches(selector)) {
                         matches.push(node);
                     }
                     matches.push(...node.querySelectorAll(selector));

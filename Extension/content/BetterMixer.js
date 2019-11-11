@@ -5,7 +5,7 @@ import BTTVAddon from "./Addons/BTTV/BTTVAddon.js";
 import ConfigurationManager from "./Configs/ConfigurationManager.js";
 import StylesheetToggleConfig from "./Configs/StylesheetToggleConfig.js";
 import Channel from "./Channel.js";
-import Patcher from "./Patcher.js";
+import Patcher from "./Patchers/Patcher.js";
 import User from "./User.js";
 import Badge from "./Badge.js";
 import BrowseFiltersConfig from "./Configs/BrowseFiltersConfig.js";
@@ -14,16 +14,16 @@ import BotDetectionConfig from "./Configs/BotDetectionConfig.js";
 import StringConfig from "./Configs/StringConfig.js";
 import { fetchJson, waitFor, observeNewElements } from "./Utility/Util.js";
 
-let SRC = document.getElementById('BetterMixer-module').src;
-let BASE_URL = SRC.split('/').slice(0, -2).join('/') + '/';
+const SRC = document.getElementById('BetterMixer-module').src;
+const BASE_URL = SRC.split('/').slice(0, -2).join('/') + '/';
 
 export default class BetterMixer {
-    constructor(){
+    constructor() {
 
         this.log("Base loaded.");
 
         this._events = [];
-        for (let _ in BetterMixer.Events){
+        for (const _ in BetterMixer.Events) {
             this._events.push([]);
         }
 
@@ -37,14 +37,16 @@ export default class BetterMixer {
         this.loadUser();
 
         // Reload on page change
-        (function(history){
-            var pushState = history.pushState;
+        /* eslint-disable prefer-arrow/prefer-arrow-functions */
+        (function(history) {
+            const pushState = history.pushState;
             history.pushState = function(state) {
-                if (typeof history.onpushstate == "function") {
+                if (typeof history.onpushstate === "function") {
                     history.onpushstate({state: state});
                 }
         
-                let ret = pushState.apply(history, arguments);
+                // eslint-disable-next-line prefer-rest-params
+                const ret = pushState.apply(history, arguments);
 
                 BetterMixer.instance.reload();
 
@@ -52,14 +54,15 @@ export default class BetterMixer {
             };
             window.onpopstate = e => BetterMixer.instance.reload();
         })(window.history);
+        /* eslint-enable prefer-arrow/prefer-arrow-functions */
 
         this.injectStylesheet("lib/css/inject.css").disabled = false;
 
-        let botColorDetectionConfig = new BotDetectionConfig();
-        let botColorRegexConfig = new StringConfig(
+        const botColorDetectionConfig = new BotDetectionConfig();
+        const botColorRegexConfig = new StringConfig(
             'botcolor_regex', 'Bot Username RegExp', '', 'Bot(?![a-z])|bot$');
         Object.defineProperty(botColorRegexConfig, 'hidden', { get: () => botColorDetectionConfig.state !== "custom" });
-        let botColorConfig = new ColorConfig('botcolor', 'Bot Color', '', '#d37110');
+        const botColorConfig = new ColorConfig('botcolor', 'Bot Color', '', '#d37110');
         Object.defineProperty(botColorConfig, 'hidden', { get: () => botColorDetectionConfig.state === "off" });
         botColorConfig.update = () => {
             document.querySelectorAll('.bettermixer-role-bot').forEach(element => {
@@ -95,14 +98,14 @@ export default class BetterMixer {
         this.reload();
 
         window.onbeforeunload = () => {
-            for (let channel of this.activeChannels){
+            for (const channel of this.activeChannels) {
                 channel.unload();
             }
         };
 
-        let creatorBadge = new Badge("Better Mixer Creator", "https://i.imgur.com/HfmDsUC.png", "Creator of the Better Mixer Chrome extension.");
+        const creatorBadge = new Badge("Better Mixer Creator", "https://i.imgur.com/HfmDsUC.png", "Creator of the Better Mixer Chrome extension.");
 
-        this.addEventListener(BetterMixer.Events.GATHER_BADGES, event => event.data.user.username == "Unlocked" ? creatorBadge : undefined);
+        this.addEventListener(BetterMixer.Events.GATHER_BADGES, event => event.data.user.username === "Unlocked" ? creatorBadge : undefined);
 
         this.patcher = new Patcher(this);
 
@@ -113,51 +116,52 @@ export default class BetterMixer {
 
             BetterMixer.ClassNames.BADGE = "badge__" +  badgeElement.innerHTML.split('.badge__')[1].split('{')[0].trim();
 
-            if (!BetterMixer.ClassNames.TEXTITEM){
+            if (!BetterMixer.ClassNames.TEXTITEM) {
                 const scriptText = await (await fetch(document.querySelector('script[src*="main."]').src)).text();
-                let index = scriptText.indexOf('textItem_');
-                BetterMixer.ClassNames.TEXTITEM = scriptText.slice(index, index + 14)
+                const index = scriptText.indexOf('textItem_');
+                // eslint-disable-next-line require-atomic-updates
+                BetterMixer.ClassNames.TEXTITEM = scriptText.slice(index, index + 14);
             }
         });
     }
 
-    async loadUser(){
+    async loadUser() {
         try {
             const data = await fetchJson('https://mixer.com/api/v1/users/current');
             this.user = new User(data);
-        } catch(err){
+        } catch (err) {
             // do nothing?
         }
     }
 
-    get isEmbeddedWindow(){
+    get isEmbeddedWindow() {
         return this._embedded;
     }
-    get isUserPage(){
+    get isUserPage() {
         return this._userPage;
     }
 
-    async reload(){
+    async reload() {
         let page;
 
         await waitFor(() => (page = window.location.pathname.substring(1).toLowerCase()) !== 'me/bounceback');
 
-        this._userPage = !(page == 'browse/all' || page.startsWith('dashboard') || page == "pro");
-        if (!this._userPage){
+        this._userPage = !(page === 'browse/all' || page.startsWith('dashboard') || page === "pro");
+        if (!this._userPage) {
             this.log(`This is not a user page.`);
             this.dispatchEvent(BetterMixer.Events.ON_PAGE_LOAD, page, this);
             return;
         }
 
         this._embedded = page.startsWith('embed/chat/');
-        if (this._embedded){
+        if (this._embedded) {
             page = page.substring(11);
             this.log(`Chat is either in a popout or embedded window.`);
         }
 
         page = page.match(/^[a-z0-9_-]+/i);
 
-        if (!page){
+        if (!page) {
             this._page = "";
             this.dispatchEvent(BetterMixer.Events.ON_PAGE_LOAD, page, this);
             return;
@@ -165,7 +169,7 @@ export default class BetterMixer {
 
         page = page[0];
 
-        if (page == this._page){
+        if (page === this._page) {
             this.dispatchEvent(BetterMixer.Events.ON_PAGE_LOAD, page, this);
             return;
         }
@@ -175,35 +179,35 @@ export default class BetterMixer {
 
         this.log(`Switched to page '${this._page}'`);
 
-        if (this._chatObserver){
+        if (this._chatObserver) {
             this._chatObserver.disconnect();
         }
 
-        for (let channel of this.activeChannels){
+        for (const channel of this.activeChannels) {
             channel.unload();
         }
         this.activeChannels = [];
 
-        let mainChannel = new Channel(this, this._page);
+        const mainChannel = new Channel(this, this._page);
         this.activeChannels.push(mainChannel);
         this.focusedChannel = mainChannel;
 
         let loaded = false;
         const reloadChat = element => {
             loaded = true;
-            let chatTabBar = document.querySelector('b-channel-chat-tabs>bui-tab-bar');
+            const chatTabBar = document.querySelector('b-channel-chat-tabs>bui-tab-bar');
 
-            if (chatTabBar){
-                let thisChannelButton = chatTabBar.children[0];
-                let otherChannelButton = chatTabBar.children[1];
-                let selectedButton = thisChannelButton.querySelector('.bui-tab-underline') ? thisChannelButton : otherChannelButton;
-                if (selectedButton === thisChannelButton || window.location.search.startsWith('?vod=')){
+            if (chatTabBar) {
+                const thisChannelButton = chatTabBar.children[0];
+                const otherChannelButton = chatTabBar.children[1];
+                const selectedButton = thisChannelButton.querySelector('.bui-tab-underline') ? thisChannelButton : otherChannelButton;
+                if (selectedButton === thisChannelButton || window.location.search.startsWith('?vod=')) {
                     this.focusedChannel = mainChannel;
                     this.dispatchEvent(BetterMixer.Events.ON_CHAT_START_LOAD, {channel: mainChannel, element: element}, this);
                 }
-                else{
-                    let secondChannel = new Channel(this, otherChannelButton.innerText.toLowerCase());
-                    if (this.activeChannels.length > 1){
+                else {
+                    const secondChannel = new Channel(this, otherChannelButton.innerText.toLowerCase());
+                    if (this.activeChannels.length > 1) {
                         this.activeChannels.pop().unload();
                     }
                     this.activeChannels.push(secondChannel);
@@ -211,11 +215,11 @@ export default class BetterMixer {
                     secondChannel.loadChat(element);
                 }
             }
-            else{
+            else {
                 this.focusedChannel = mainChannel;
                 mainChannel.loadChat(element);
             }
-        }
+        };
 
         await waitFor(() => document.querySelector('b-channel-chat-section'));
 
@@ -224,14 +228,13 @@ export default class BetterMixer {
             element => {
             reloadChat(element);
         });
-        if (!loaded && document.querySelector('b-chat-client-host-component')){
+        if (!loaded && document.querySelector('b-chat-client-host-component')) {
             reloadChat(document.querySelector('b-chat-client-host-component').children[0]);
         }
     }
 
-    injectStylesheet(file){
-        let injection;
-        injection = document.createElement('link');
+    injectStylesheet(file) {
+        const injection = document.createElement('link');
         injection.rel = 'stylesheet';
         injection.href = BASE_URL + file;
         injection.disabled = true;
@@ -239,8 +242,8 @@ export default class BetterMixer {
         return injection;
     }
 
-    log(msg, logType = BetterMixer.LogType.INFO){
-        switch(logType){
+    log(msg, logType = BetterMixer.LogType.INFO) {
+        switch (logType) {
             case BetterMixer.LogType.INFO:
                 console.log(`[Better Mixer] ${msg}`);
                 break;
@@ -252,37 +255,37 @@ export default class BetterMixer {
         }
     }
 
-    postToContent(message){
+    postToContent(message) {
         window.postMessage([SRC, message], '*');
     }
 
-    getActiveChannel(index = 0){
+    getActiveChannel(index = 0) {
         return this.activeChannels[index];
     }
 
-    registerEventType(eventName){
-        if (!(eventName in BetterMixer.Events)){
+    registerEventType(eventName) {
+        if (!(eventName in BetterMixer.Events)) {
             BetterMixer.Events[eventName] = BetterMixer.Events.length;
             this._events.push([]);
             return BetterMixer.Events[eventName];
         }
-        else{
+        else {
             this.log(`${eventName} is already an event!`, BetterMixer.LogType.WARN);
         }
     }
 
-    addEventListener(eventType, callback){
+    addEventListener(eventType, callback) {
         this._events[eventType].push(callback);
     }
 
-    removeEventListener(eventType, callback){
-        if (eventType >= Object.keys(BetterMixer.Events).length){
+    removeEventListener(eventType, callback) {
+        if (eventType >= Object.keys(BetterMixer.Events).length) {
             this.log(`Event ${eventType} does not exist.`, BetterMixer.LogType.ERROR);
             return;
         }
 
-        let index = this._events[eventType].indexOf(callback);
-        if (index == -1){
+        const index = this._events[eventType].indexOf(callback);
+        if (index === -1) {
             this.log("That event listener does not exist!", BetterMixer.LogType.WARN);
             return;
         }
@@ -290,14 +293,14 @@ export default class BetterMixer {
         this._events[eventType].splice(index, 1);
     }
 
-    dispatchEvent(eventType, data, sender){
-        let event = {
+    dispatchEvent(eventType, data, sender) {
+        const event = {
             event: eventType,
             sender: sender,
             data: data
         };
 
-        if (eventType >= Object.keys(BetterMixer.Events).length){
+        if (eventType >= Object.keys(BetterMixer.Events).length) {
             this.log(`Event ${eventType} does not exist.`, BetterMixer.LogType.ERROR);
             return;
         }
@@ -306,33 +309,33 @@ export default class BetterMixer {
             try {
                 handler(event);
             }
-            catch(error){
+            catch (error) {
                 this.log(error.stack, BetterMixer.LogType.ERROR);
             }
         });
     }
 
-    dispatchGather(eventType, data, sender){
-        let event = {
+    dispatchGather(eventType, data, sender) {
+        const event = {
             event: eventType,
             sender: sender,
             data: data
         };
 
-        let collected = [];
-        if (eventType >= Object.keys(BetterMixer.Events).length){
+        const collected = [];
+        if (eventType >= Object.keys(BetterMixer.Events).length) {
             this.log(`Event ${eventType} does not exist.`, BetterMixer.LogType.ERROR);
             return;
         }
 
         this._events[eventType].forEach(handler => {
             try {
-                let result = handler(event);
-                if (result){
+                const result = handler(event);
+                if (result) {
                     collected.push(result);
                 }
             }
-            catch(error){
+            catch (error) {
                 console.error(error);
             }
         });

@@ -1,7 +1,7 @@
-import Patcher from "./Patcher.js";
+import Patcher from "./Patchers/Patcher.js";
 import BetterMixer from "./BetterMixer.js";
 
-export default class Badge{
+export default class Badge {
     /**
      * 
      * @param {String} name 
@@ -9,7 +9,7 @@ export default class Badge{
      * @param {String} description 
      * @param {String} vanillaSelector
      */
-    constructor(name, image, description, example = undefined){
+    constructor(name, image, description, example = undefined) {
 
         this.name = name;
         this.image = image;
@@ -18,12 +18,12 @@ export default class Badge{
 
     }
 
-    get element(){
+    get element() {
         let badge;
-        if (this.example){
+        if (this.example) {
             badge = this.example.cloneNode(true);
         }
-        else{
+        else {
             badge = document.createElement('img');
             badge.classList.add(BetterMixer.ClassNames.BADGE);
             badge.src = this.image;

@@ -6,7 +6,7 @@ export default class User {
      * A new user only must have a username. populateUser() must be called in order to fill the user with all relevant information.
      * @param {Object} data 
      */
-    constructor(data){
+    constructor(data) {
 
         this._loadUser = (data) => {
             this.username = data.username;
@@ -19,9 +19,9 @@ export default class User {
             this.staff = false;
             this.badges = [];
 
-            if ('groups' in data){
-                for (let group of data.groups){
-                    switch(group.name){
+            if ('groups' in data) {
+                for (const group of data.groups) {
+                    switch (group.name) {
                         case "Pro":
                             this.pro = true;
                             break;
@@ -39,8 +39,8 @@ export default class User {
         this._loadUser(data);
     }
 
-    populateUser(){
-        if (this._populated){
+    populateUser() {
+        if (this._populated) {
             return Promise.resolve();
         }
 
@@ -58,8 +58,8 @@ export default class User {
      * 
      * @param {Badge} badge 
      */
-    addBadge(badge){
-        if (!this.badges.includes(badge)){
+    addBadge(badge) {
+        if (!this.badges.includes(badge)) {
             this.badges.push(badge);
         }
     }

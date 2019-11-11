@@ -5,7 +5,7 @@ import TwitchChannel from "../Twitch/TwitchChannel.js";
 import EmoteSet from "../../EmoteSet.js";
 import { fetchJson, waitFor } from "../../Utility/Util.js";
 
-export default class BTTVChannel{
+export default class BTTVChannel {
     /**
      * @param {BTTVAddon} parent 
      * @param {TwitchChannel} channel
@@ -20,22 +20,22 @@ export default class BTTVChannel{
         this.init();
     }
 
-    async init(){
+    async init() {
         await waitFor(() => this.twitch.login);
 
         /* Backwards Compatibility */
-        if (!this.channel.channelSettings.bttv || this.channel.channelSettings.bttv.sync){
+        if (!this.channel.channelSettings.bttv || this.channel.channelSettings.bttv.sync) {
             try {
                 const data = await fetchJson(`https://api.betterttv.net/2/channels/${this.twitch.login}`);
                 if (this.cancelLoad) return;
 
-                for (let emote of data.emotes){
-                    let animated = ['gif'].includes(emote.imageType);
+                for (const emote of data.emotes) {
+                    const animated = ['gif'].includes(emote.imageType);
                     this.emotes.addEmote(new Emote(emote.code, `https:${data.urlTemplate.replace('{{id}}', emote.id).replace('{{image}}', '3x')}`, 28, 28, animated));
                 }
                 
                 this._gatherEmotes = event => {
-                    if (event.data.channel === this.channel){
+                    if (event.data.channel === this.channel) {
                         return this.emotes;
                     }
                 };
@@ -44,14 +44,14 @@ export default class BTTVChannel{
                 this.plugin.dispatchEvent(BetterMixer.Events.ON_EMOTES_ADDED, [this.emotes], this);
 
                 this.plugin.log(`Synced ${this.channel.owner.username} with BTTV emotes from ${this.twitch.login}.`, BetterMixer.LogType.INFO);
-            } catch(err){
+            } catch (err) {
                 if (this.cancelLoad) return;
                 this.plugin.log(`${err.message}: Failed to load emotes from BTTV.`, BetterMixer.LogType.INFO);
             }
         }
     }
 
-    unload(){
+    unload() {
         this.cancelLoad = true;
         this._gatherEmotes && this.plugin.removeEventListener(BetterMixer.Events.GATHER_EMOTES, this._gatherEmotes);
     }

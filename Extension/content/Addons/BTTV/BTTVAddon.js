@@ -16,16 +16,16 @@ export default class BTTVAddon {
         this.init();
     }
 
-    async init(){
+    async init() {
         try {
             const data = await fetchJson('https://api.betterttv.net/2/emotes/');
-            for (let emote of data.emotes) {
-                let animated = ['gif'].includes(emote.imageType);
+            for (const emote of data.emotes) {
+                const animated = ['gif'].includes(emote.imageType);
                 this.globalEmotes.addEmote(new Emote(emote.code, `https:${data.urlTemplate.replace('{{id}}', emote.id).replace('{{image}}', '3x')}`, undefined, 28, animated));
             }
             
             this._gatherEmotes = event => {
-                if (event.data.channel.channelSettings.bttv && event.data.channel.channelSettings.bttv.globals){
+                if (event.data.channel.channelSettings.bttv && event.data.channel.channelSettings.bttv.globals) {
                     return this.globalEmotes;
                 }
             };
@@ -33,7 +33,7 @@ export default class BTTVAddon {
             this.plugin.dispatchEvent(BetterMixer.Events.ON_EMOTES_ADDED, [this.emotes], this);
 
             this.plugin.log(`Fetched global BTTV emotes.`, BetterMixer.LogType.INFO);
-        } catch (err){
+        } catch (err) {
             this.plugin.log(`${err.message}: Failed to load global emotes from BTTV.`, BetterMixer.LogType.INFO);
         }
     }
@@ -41,7 +41,7 @@ export default class BTTVAddon {
     /**
      * @param {TwitchChannel} channel 
      */
-    getSync(channel){
+    getSync(channel) {
         return new BTTVChannel(this, channel);
     }
 }

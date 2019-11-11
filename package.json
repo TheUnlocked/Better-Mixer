@@ -1,0 +1,22 @@
+{
+  "name": "better-mixer",
+  "description": "Improvements to Mixer, similar to FFZ for Twitch.",
+  "dependencies": {
+    "eslint-plugin-prefer-arrow": "^1.1.6"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.0.3",
+    "eslint": "^6.6.0",
+    "eslint-plugin-babel": "^5.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TheUnlocked/Better-Mixer.git"
+  },
+  "author": "Unlocked",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TheUnlocked/Better-Mixer/issues"
+  },
+  "homepage": "https://github.com/TheUnlocked/Better-Mixer"
+}

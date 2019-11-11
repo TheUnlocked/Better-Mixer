@@ -1,48 +1,48 @@
-export default class Config{
+export default class Config {
     // The name used internally
-    get configName(){
+    get configName() {
         return "";
     }
 
     // The name seen in the settings menu
-    get displayText(){
+    get displayText() {
         return "";
     }
 
     // A currently unused property explaining the config
-    get descriptionText(){
+    get descriptionText() {
         return "";
     }
 
     // Set the config state
-    set state(state){
+    set state(state) {
     }
 
     // Get the config state
-    get state(){
+    get state() {
         return null;
     }
 
     // The state to be held before the config is modified
-    get defaultState(){
+    get defaultState() {
         return null;
     }
 
     // Updates the configuration effect
-    update(){
+    update() {
     }
 
     // Updates immediately on being changed
-    updateImmediate(newState){
+    updateImmediate(newState) {
     }
 
     // Determines whether or not to hide this config in the menu
     // Unnecessary if the config type is NONE.
-    get hidden(){
+    get hidden() {
         return false;
     }
 
-    get configType(){
+    get configType() {
         return Config.ConfigTypeEnum.NONE;
     }
 }

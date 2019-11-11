@@ -1,8 +1,8 @@
 import Config from "./Config.js";
 import { ChannelAudienceRating, ChannelLanguage } from "../Constants.js";
 
-export default class BrowseFiltersConfig extends Config{
-    constructor(){
+export default class BrowseFiltersConfig extends Config {
+    constructor() {
         super();
 
         this.queryParams = "";
@@ -20,17 +20,17 @@ export default class BrowseFiltersConfig extends Config{
     }
 
     // The name used internally
-    get configName(){
+    get configName() {
         return "browse_filters";
     }
 
     // Set the config state
-    set state(state){
+    set state(state) {
         this.queryParams = state;
     }
 
     // Get the config state
-    get state(){
+    get state() {
 
         return this.queryParams;
         
@@ -53,7 +53,7 @@ export default class BrowseFiltersConfig extends Config{
     }
 
     // The state to be held before the config is modified
-    get defaultState(){
+    get defaultState() {
 
         return "";
 
@@ -76,12 +76,12 @@ export default class BrowseFiltersConfig extends Config{
     }
 
     // Updates the configuration effect
-    update(){
+    update() {
         
     }
 
     // The type of config, currently unused as configs can only be booleans
-    get configType(){
+    get configType() {
         return Config.ConfigTypeEnum.NONE;
     }
 }

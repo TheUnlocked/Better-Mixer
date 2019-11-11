@@ -1,0 +1,52 @@
+{
+    "extends": "eslint:recommended",
+    "rules": {
+        "arrow-spacing": "warn",
+        "dot-location": ["warn", "property"],
+        "dot-notation": "warn",
+        "eqeqeq": ["warn", "always", { "null": "ignore" }],
+        "comma-dangle": "off",
+        "no-delete-var": "error",
+        "no-unused-vars": "off" /* ["warn", { "vars": "local" }] */,
+        "babel/new-cap": "warn",
+        "babel/camelcase": "warn",
+        "babel/no-invalid-this": "warn",
+        "babel/quotes": "off",
+        "babel/semi": ["error", "always"],
+        "babel/no-unused-expressions": ["warn", { "allowShortCircuit": true, "allowTernary": true, "allowTaggedTemplates": true }],
+        "babel/valid-typeof": "error",
+        "object-curly-newline": ["warn", { "multiline": true, "consistent": true }],
+        "prefer-rest-params": "error",
+        "prefer-spread": "error",
+        "no-var": "error",
+        "prefer-const": "warn",
+        "rest-spread-spacing": ["error", "never"],
+        "no-param-reassign": ["error", { "props": false }],
+        "yoda": ["warn", "never"],
+        "space-before-blocks": ["warn", "always"],
+        "keyword-spacing": "warn",
+        "space-unary-ops": ["warn", { "words": true }],
+        "no-void": "error",
+        "prefer-arrow/prefer-arrow-functions": "error"
+    },
+    "env": {
+        "webextensions": true,
+        "browser": true,
+        "es2020": true
+    },
+    "parser": "babel-eslint",
+    "parserOptions": {
+        "ecmaVersion": 2020,
+        "sourceType": "module"
+    },
+    "plugins": [
+        "babel",
+        "prefer-arrow"
+    ],
+    "globals": {
+        "BetterMixer": "writable",
+        "React": "readonly",
+        "ReactDOM": "readonly",
+        "mixerUi": "readonly"
+    }
+}
