@@ -3,14 +3,20 @@
   "version": "2.7.2",
   "description": "Improvements to Mixer, similar to FFZ for Twitch.",
   "scripts": {
-    "serve": "web-ext run --source-dir ./Extension/",
-    "package": "web-ext build --source-dir ./Extension/"
+    "serve": "web-ext run --source-dir ./build/",
+    "package": "npm run build && web-ext build --source-dir ./build/",
+    "build": "gulp",
+    "build:watch": "gulp watch"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.3",
     "eslint": "^6.6.0",
     "eslint-plugin-babel": "^5.3.0",
     "eslint-plugin-prefer-arrow": "^1.1.6",
+    "gulp": "^4.0.2",
+    "gulp-sourcemaps": "^2.6.5",
+    "gulp-typescript": "^5.0.1",
+    "typescript": "^3.7.2",
     "web-ext": "^3.2.1"
   },
   "repository": {

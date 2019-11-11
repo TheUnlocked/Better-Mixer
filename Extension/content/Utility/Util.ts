@@ -1,9 +1,4 @@
-/**
- * 
- * @param {RequestInfo} url
- * @param {RequestInit} [init]
- */
-export const fetchJson = async (url, init) => {
+export const fetchJson = async (url: RequestInfo, init: RequestInit) => {
     return fetch(url, init)
         .then(resp => {
             if (resp.status < 200 || resp.status > 299) {
@@ -13,16 +8,7 @@ export const fetchJson = async (url, init) => {
         });
 };
 
-/**
- * 
- * @param {() => boolean} pred
- * @param {{
- *  delay?: number,
- *  maxAttempts?: number
- * }} [options]
- * @returns {Promise<void>}
- */
-export const waitFor = (pred, _options) => new Promise((resolve, reject) => {
+export const waitFor = (pred: () => boolean, _options: { delay?: number, maxAttempts?: number }) => new Promise((resolve, reject) => {
     const options = {
         delay: 100,
         maxAttempts: -1,
@@ -41,15 +27,9 @@ export const waitFor = (pred, _options) => new Promise((resolve, reject) => {
     loop();
 });
 
-/**
- * 
- * @param {string} selector 
- * @param {Node} parent 
- * @param {(element: Element) => any} callback 
- */
-export const observeNewElements = (selector, parent, callback) => {
+export const observeNewElements = (selector: string, parent: Node, callback: (element: Element) => void) => {
     const observer = new MutationObserver(muts => {
-        const matches = [];
+        const matches = [] as Element[];
         for (const mut of muts) {
             for (const node of mut.addedNodes) {
                 if (node instanceof Element) {
@@ -60,7 +40,7 @@ export const observeNewElements = (selector, parent, callback) => {
                 }
             }
         }
-        const uniqueMatches = matches.reduce((result, next) => result.includes(next) ? result : (result.push(next), result), []);
+        const uniqueMatches = matches.reduce((result, next) => result.includes(next) ? result : (result.push(next), result), [] as Element[]);
         uniqueMatches.forEach(callback);
     });
 
