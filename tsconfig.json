@@ -13,6 +13,7 @@
       "dom.iterable",
       "scripthost"
     ],
+    "outDir": "build/"
   },
   "include": [
     "Extension/**/*"
