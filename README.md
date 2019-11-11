@@ -28,18 +28,18 @@ I use ESLint to guarantee code style compliance. While PRs are not required to b
 ```sh
 npm install
 ```
-If you're using Visual Studio Code, make sure to add these lines to your workspace settings:
+If you're using Visual Studio Code, install the ESLint extension and add these lines to your workspace settings:
 ```json
 {
     "eslint.enable": true,
     "eslint.options": {
-		"configFile": ".eslintrc",
-		"extensions": [".js"]
-	},
-	"eslint.lintTask.enable": true,
-	"eslint.validate": [
-		"javascript"
-	]
+        "configFile": ".eslintrc",
+        "extensions": [".js"]
+    },
+    "eslint.lintTask.enable": true,
+    "eslint.validate": [
+        "javascript"
+    ]
 }
 ```
 Optionally, you can also add these lines which provide the schema for `manifest.json`, though it's unlikely that they will be necessary.
