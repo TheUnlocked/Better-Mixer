@@ -2,3 +2,4 @@
 .vscode/*
 Extension.zip
 node_modules
+web-ext-artifacts/

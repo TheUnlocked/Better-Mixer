@@ -1,13 +1,17 @@
 {
   "name": "better-mixer",
+  "version": "2.7.2",
   "description": "Improvements to Mixer, similar to FFZ for Twitch.",
-  "dependencies": {
-    "eslint-plugin-prefer-arrow": "^1.1.6"
+  "scripts": {
+    "serve": "web-ext run --source-dir ./Extension/",
+    "package": "web-ext build --source-dir ./Extension/"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.3",
     "eslint": "^6.6.0",
-    "eslint-plugin-babel": "^5.3.0"
+    "eslint-plugin-babel": "^5.3.0",
+    "eslint-plugin-prefer-arrow": "^1.1.6",
+    "web-ext": "^3.2.1"
   },
   "repository": {
     "type": "git",
