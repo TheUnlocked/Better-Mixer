@@ -26,6 +26,12 @@ _Note: Do NOT add additional dependencies without first asking to see if it's ok
 # Building the extension
 *Gulp is used for building Typescript and copying assets*
 ```sh
+# Run ESLint manually
+npm run lint
+
+# Fix linting errors where possible
+npm run lint:fix
+
 # Build the extension
 npm run build
 

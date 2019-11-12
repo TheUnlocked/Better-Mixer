@@ -4,6 +4,7 @@
   "description": "Improvements to Mixer, similar to FFZ for Twitch.",
   "scripts": {
     "lint": "eslint -c .eslintrc ./Extension/**/*.{ts,js}",
+    "lint:fix": "eslint -c .eslintrc ./Extension/**/*.{ts,js} --fix",
     "serve": "web-ext run --source-dir ./build/",
     "package": "npm run build && web-ext build --source-dir ./build/",
     "build": "gulp",
