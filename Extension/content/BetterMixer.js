@@ -109,15 +109,15 @@ export default class BetterMixer {
                 badges[badge.id] = new Badge(badge.name, badge.src);
             }
             this.addEventListener(BetterMixer.Events.GATHER_BADGES, event => {
-                const badges = [];
+                const userBadges = [];
 
                 for (const group of data.groups) {
-                    if (group.members.includes(event.data.user.username)) {
-                        badges.push(...(group.badges.map(id => badges[id])));
+                    if (group.members.includes(event.data.user.username.toLowerCase())) {
+                        userBadges.push(...(group.badges.map(id => badges[id])));
                     }
                 }
 
-                return badges;
+                return userBadges;
             });
         });
 

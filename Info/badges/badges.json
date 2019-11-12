@@ -3,13 +3,13 @@
         {
             "id": "creator",
             "name": "Better Mixer Creator",
-            "src": "https://raw.githubusercontent.com/TheUnlocked/Better-Mixer/master/Info/badges/creator.png",
+            "src": "https://github.com/TheUnlocked/Better-Mixer/raw/master/Info/badges/creator.png",
             "description": "The creator of Better Mixer"
         },
         {
             "id": "developer",
             "name": "Better Mixer Developer",
-            "src": "https://raw.githubusercontent.com/TheUnlocked/Better-Mixer/master/Info/badges/developer.png",
+            "src": "https://github.com/TheUnlocked/Better-Mixer/raw/master/Info/badges/developer.png",
             "description": "A substantial contributor to Better Mixer"
         }
     ],
@@ -21,7 +21,6 @@
         {
             "badges": ["developer"],
             "members": [
-                "unlocked"
             ]
         }
     ]

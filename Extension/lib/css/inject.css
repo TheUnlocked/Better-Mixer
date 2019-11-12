@@ -55,7 +55,7 @@
 }
 
 [class*="message"] [class*="badge__"]:not(.bettermixer-badge-relocated) {
-    margin-left: 2px;
+    /* margin-left: 2px; */
     margin-right: 2px;
 }
 

@@ -116,7 +116,7 @@ export default class Patcher {
                     }
 
                     let filtersWindow;
-                    await waitFor(
+                    await waitFor(() =>
                         (filtersWindow = document.querySelector('b-browse-filters')) &&
                         !filtersWindow.querySelector('button.bettermixer-save-filters'));
 
