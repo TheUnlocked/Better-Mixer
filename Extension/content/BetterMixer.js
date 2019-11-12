@@ -103,9 +103,23 @@ export default class BetterMixer {
             }
         };
 
-        const creatorBadge = new Badge("Better Mixer Creator", "https://i.imgur.com/HfmDsUC.png", "Creator of the Better Mixer Chrome extension.");
+        fetchJson('https://raw.githubusercontent.com/TheUnlocked/Better-Mixer/master/Info/badges/badges.json').then(data => {
+            const badges = {};
+            for (const badge of data.badges) {
+                badges[badge.id] = new Badge(badge.name, badge.src);
+            }
+            this.addEventListener(BetterMixer.Events.GATHER_BADGES, event => {
+                const badges = [];
 
-        this.addEventListener(BetterMixer.Events.GATHER_BADGES, event => event.data.user.username === "Unlocked" ? creatorBadge : undefined);
+                for (const group of data.groups) {
+                    if (group.members.includes(event.data.user.username)) {
+                        badges.push(...(group.badges.map(id => badges[id])));
+                    }
+                }
+
+                return badges;
+            });
+        });
 
         this.patcher = new Patcher(this);
 

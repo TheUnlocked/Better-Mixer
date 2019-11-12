@@ -24,7 +24,7 @@ _Note: Do NOT add additional dependencies without first asking to see if it's ok
 3. Make a pull request. Feel free to PR into master (I'll redirect the PR into a new branch if necessary).
 
 # Development Environment
-I use ESLint to guarantee code style compliance. While PRs are not required to be fully compliant, compliance should be followed as best as possible. To set up ESLint, install node, and then run
+Beter Mixer uses ESLint to guarantee code style compliance. While PRs are not required to be fully compliant, compliance should be followed as best as possible. To set up ESLint, install node, and then run
 ```sh
 npm install
 ```

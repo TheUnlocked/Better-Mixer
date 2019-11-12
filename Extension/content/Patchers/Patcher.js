@@ -54,8 +54,7 @@ export default class Patcher {
                     user: message.author,
                     message: message
                 };
-                const badges = plugin.dispatchGather(BetterMixer.Events.GATHER_BADGES, badgeGatherEventData, message)
-                    .reduce((acc, val) => acc.concat(val), []); // Upgrade to .flat(1) when that becomes mainstream tech
+                const badges = plugin.dispatchGather(BetterMixer.Events.GATHER_BADGES, badgeGatherEventData, message).flat(1);
 
                 const authorElement = message.element.querySelector('[class*="Username"]');
                 for (const badge of badges) {
