@@ -8,7 +8,7 @@ export const fetchJson = async (url: RequestInfo, init: RequestInit) => {
         });
 };
 
-export const waitFor = (pred: () => boolean, _options: { delay?: number, maxAttempts?: number }) => new Promise((resolve, reject) => {
+export const waitFor = (pred: () => boolean, _options: { delay?: number; maxAttempts?: number }) => new Promise((resolve, reject) => {
     const options = {
         delay: 100,
         maxAttempts: -1,

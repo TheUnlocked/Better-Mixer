@@ -1,5 +1,9 @@
 {
-    "extends": "eslint:recommended",
+    "parser": "@typescript-eslint/parser",
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
     "rules": {
         "arrow-spacing": "warn",
         "dot-location": ["warn", "property"],
@@ -27,17 +31,19 @@
         "keyword-spacing": "warn",
         "space-unary-ops": ["warn", { "words": true }],
         "no-void": "error",
-        "prefer-arrow/prefer-arrow-functions": "error"
+        "prefer-arrow/prefer-arrow-functions": "error",
+        "space-infix-ops": "warn",
+        "@typescript-eslint/explicit-function-return-type": "off"
     },
     "env": {
         "webextensions": true,
         "browser": true,
         "es2020": true
     },
-    "parser": "babel-eslint",
     "parserOptions": {
         "ecmaVersion": 2020,
-        "sourceType": "module"
+        "sourceType": "module",
+        "parser": "babel-eslint"
     },
     "plugins": [
         "babel",

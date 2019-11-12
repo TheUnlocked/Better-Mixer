@@ -3,12 +3,16 @@
   "version": "2.7.2",
   "description": "Improvements to Mixer, similar to FFZ for Twitch.",
   "scripts": {
+    "lint": "eslint -c .eslintrc ./Extension/**/*.{ts,js}",
     "serve": "web-ext run --source-dir ./build/",
     "package": "npm run build && web-ext build --source-dir ./build/",
     "build": "gulp",
     "build:watch": "gulp watch"
   },
   "devDependencies": {
+    "@types/chrome": "0.0.91",
+    "@typescript-eslint/eslint-plugin": "^2.7.0",
+    "@typescript-eslint/parser": "^2.7.0",
     "babel-eslint": "^10.0.3",
     "eslint": "^6.6.0",
     "eslint-plugin-babel": "^5.3.0",
