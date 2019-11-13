@@ -1,8 +1,7 @@
 # Better-Mixer
-Improvements to Mixer, similar to FFZ for Twitch.
+Improvements to Mixer, similar to FFZ for Twitch. Available for both [Google Chrome](https://bit.ly/bettermixer) and [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/bettermixer/).
 
-
-Works on both Google Chrome and Mozilla Firefox.
+Join the [Better Mixer Discord server](https://discord.gg/mrr5Vtf) to report bugs, get help, request features, and chat with the developers!
 
 # How to contribute
 ## How to file bug reports/feature requests

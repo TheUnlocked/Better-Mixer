@@ -7,7 +7,7 @@ if (DEBUG_MODE) {
     console.log("%cBetterMixer.instance.postToContent({message: 'clearAllConfigs'})", hintFormatting);
 }
 
-document.body.onload = () => {
+const onLoad = () => {
     const injection = document.createElement('script');
     injection.src = chrome.runtime.getURL('content/BetterMixer.js');
     injection.id = "BetterMixer-module";
@@ -42,3 +42,8 @@ document.body.onload = () => {
         }
     }, false);
 };
+
+if (document.readyState === "complete") {
+    onLoad();
+}
+document.body.onload = onLoad();
