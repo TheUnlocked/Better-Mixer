@@ -13,6 +13,7 @@ export default class EmoteAutocomplete {
     showing = false;
     _query;
     _kbEvent;
+    _animatedEmotesWereOn;
 
     constructor(plugin, chat) {
         this.plugin = plugin;
@@ -87,7 +88,8 @@ export default class EmoteAutocomplete {
         this.emoteCache = this.vanillaEmotes
             .concat(this.plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, this)
                 .reduce((acc, val) => !val ? acc : val instanceof EmoteSet ? acc.concat(val.emotes) : acc.concat(val), []));
-        if (!this.plugin.configuration.getConfig('show_emotes_animated').state) {
+        this._animatedEmotesWereOn = this.plugin.configuration.getConfig('show_emotes_animated').state;
+        if (!this._animatedEmotesWereOn) {
             this.emoteCache = this.emoteCache.filter(emote => !emote.animated);
         }
         this.plugin.log(`Reloaded autocomplete cache; ${this.emoteCache.length} emotes loaded, including ${this.vanillaEmotes.length} vanilla emotes`);
@@ -118,7 +120,10 @@ export default class EmoteAutocomplete {
     get query() { return this._query; }
 
     updateContents() {
-        if (!this.emoteCache) this.reloadCache();
+        if (!this.emoteCache ||
+            this.plugin.configuration.getConfig('show_emotes_animated').state !== this._animatedEmotesWereOn) {
+            this.reloadCache();
+        }
 
         this.autocompleteEmotes = this.emoteCache
             .filter(x => x.name.toLowerCase().includes(this.query))
