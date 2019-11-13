@@ -75,6 +75,7 @@ h3.bettermixer-emote-set-header {
 }
 
 /* Emote Autocomplete Menu */
+.bettermixer-emote-autocomplete-container {
     position: absolute;
     z-index: 1;
     left: 16px;
