@@ -35,7 +35,7 @@ export const patchEmoteDialog = (plugin, settingsDialogElement, chat) => {
         if (emotes instanceof EmoteSet) {
             emoteSets.push(emotes);
         }
-        else {
+        else if (emotes) {
             uncategorizedEmotes.addEmotes(emotes);
         }
     }

@@ -7,9 +7,10 @@
         "eqeqeq": ["warn", "always", { "null": "ignore" }],
         "comma-dangle": "off",
         "no-delete-var": "error",
-        "no-unused-vars": "off" /* ["warn", { "vars": "local" }] */,
+        "no-unused-vars": "off", /* ["warn", { "vars": "local" }] */
         "babel/new-cap": "warn",
-        "babel/camelcase": "warn",
+        "camelcase": ["warn", { "allow": ["__bettermixer_poly"] }],
+        "babel/camelcase": "off",
         "babel/no-invalid-this": "warn",
         "babel/quotes": "off",
         "babel/semi": ["error", "always"],
@@ -27,7 +28,9 @@
         "keyword-spacing": "warn",
         "space-unary-ops": ["warn", { "words": true }],
         "no-void": "error",
-        "prefer-arrow/prefer-arrow-functions": "error"
+        "prefer-arrow/prefer-arrow-functions": "error",
+        "no-empty": "off",
+        "no-fallthrough": "warn"
     },
     "env": {
         "webextensions": true,
@@ -47,6 +50,7 @@
         "BetterMixer": "writable",
         "React": "readonly",
         "ReactDOM": "readonly",
-        "mixerUi": "readonly"
+        "mixerUi": "readonly",
+        "__bettermixer_poly": "readonly"
     }
 }

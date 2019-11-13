@@ -11,6 +11,7 @@ export default class User {
         this._loadUser = (data) => {
             this.username = data.username;
             this.id = data.id;
+            this.userId = data.userId;
             this.level = data.level;
             this.experience = data.experience;
             this.sparks = data.sparks;
@@ -39,19 +40,19 @@ export default class User {
         this._loadUser(data);
     }
 
-    populateUser() {
+    async populateUser() {
         if (this._populated) {
-            return Promise.resolve();
+            return;
         }
 
-        return fetchJson(`https://mixer.com/api/v1/channels/${this.username}`)
-            .then(data => {
-                this._populated = true;
-                this._loadUser(data);
-            })
-            .catch(err => {
-                this.plugin.log(`${err.message}: Failed to get channel ${this.username}`, BetterMixer.LogType.ERROR);
-            });
+        try {
+            const data = await fetchJson(`https://mixer.com/api/v1/channels/${this.username}`);
+            this._populated = true;
+            this._loadUser(data);
+        }
+        catch (err) {
+            this.plugin.log(`${err.message}: Failed to get channel ${this.username}`, BetterMixer.LogType.ERROR);
+        }
     }
 
     /**

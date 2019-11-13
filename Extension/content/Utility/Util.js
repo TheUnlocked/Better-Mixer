@@ -45,14 +45,14 @@ export const waitFor = (pred, _options) => new Promise((resolve, reject) => {
  * 
  * @param {string} selector 
  * @param {Node} parent 
- * @param {(element: Element) => any} callback 
+ * @param {(element: HTMLElement) => any} callback 
  */
 export const observeNewElements = (selector, parent, callback) => {
     const observer = new MutationObserver(muts => {
         const matches = [];
         for (const mut of muts) {
             for (const node of mut.addedNodes) {
-                if (node instanceof Element) {
+                if (node instanceof HTMLElement) {
                     if (node.matches(selector)) {
                         matches.push(node);
                     }

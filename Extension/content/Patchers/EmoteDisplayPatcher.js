@@ -6,14 +6,8 @@ export const parseMessageEmotes = (plugin, message, emoteSets = undefined) => {
         user: message.author,
         message: message
     };
-    let emoteList;
-    if (!emoteSets) {
-        emoteList = (emoteSets || plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, message));
-    }
-    else {
-        emoteList = emoteSets;
-    }
-    emoteList = emoteList.reduce((acc, val) => val instanceof EmoteSet ? acc.concat(val.emotes) : acc.concat(val), []);
+    const emoteList = (emoteSets || plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, message))
+        .reduce((acc, val) => !val ? acc : val instanceof EmoteSet ? acc.concat(val.emotes) : acc.concat(val), []);
     const emotes = emoteList.reduce((result, value) => { result[value.name] = value; return result; }, {});
 
     const textPieces = [...message.element.querySelectorAll('span')];

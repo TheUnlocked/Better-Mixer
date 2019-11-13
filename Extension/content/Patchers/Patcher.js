@@ -1,10 +1,11 @@
 import BetterMixer from "../BetterMixer.js";
 import EmoteSet from "../EmoteSet.js";
 import ChatMessage from "../ChatMessage.js";
-import { waitFor } from "../Utility/Util.js";
+import { waitFor, observeNewElements } from "../Utility/Util.js";
 import { patchEmoteDialog } from "./EmoteDialogPatcher.js";
 import { parseMessageEmotes } from "./EmoteDisplayPatcher.js";
 import { patchSettingsDialog } from "./SettingsDialogPatcher.js";
+import EmoteAutocomplete from "./EmoteAutocomplete.js";
 
 export default class Patcher {
     /**
@@ -81,14 +82,16 @@ export default class Patcher {
 
         // Handle chat load
         this.plugin.addEventListener(BetterMixer.Events.ON_CHAT_FINISH_LOAD, event => {
+            const chat = event.data;
+
             // Handle emote pre-loading
             {
                 const emoteGatherEventData = {
-                    channel: event.sender.channel,
-                    user: event.sender.plugin.user,
+                    channel: chat.channel,
+                    user: chat.plugin.user,
                     message: null
                 };
-                const gatheredEmotes = plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, event.sender);
+                const gatheredEmotes = plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, chat);
                 for (const emotes of gatheredEmotes) {
                     if (emotes instanceof EmoteSet) {
                         for (const emote of emotes.emotes) {
@@ -103,6 +106,56 @@ export default class Patcher {
                         }
                     }
                 }
+            }
+
+            // Handle emote auto-complete
+            {
+                const autocompleter = new EmoteAutocomplete(this.plugin, chat);
+                // Purge built-in autocompleter
+                observeNewElements('#chat-listbox[class*="autocomplete"]', chat.element, x => {
+                    // Deleting the element outright breaks chat for some reason.
+                    x.style.display = "none";
+                });
+                const inputBox = chat.element.querySelector('textarea');
+
+                // We need to establish our keydown event listener HERE in order
+                // to beat Mixer to the race.
+                // Note: If necessary in the future, hacky stuff can be done with
+                // the convienent removeAllEventListeners() and eventListeners()
+                // functions on each object provided by Mixer's framework.
+                // If other extensions want to defend themselves, they can simply
+                // name their keydown events.
+                inputBox.addEventListener('input', () => {
+                    let backIndex = inputBox.value.lastIndexOf(' ', inputBox.selectionEnd - 1);
+                    let frontIndex = inputBox.value.indexOf(' ', inputBox.selectionEnd);
+                    if (backIndex === -1) backIndex = 0;
+                    if (frontIndex === -1) frontIndex = inputBox.value.length;
+                    const query = inputBox.value.slice(backIndex, frontIndex+1).trim().toLowerCase();
+                    if (query.length >= 2 || query[0] === ":") {
+                        autocompleter.query = query;
+                    }
+                    else {
+                        autocompleter.close();
+                    }
+                });
+
+                // Handle message sending when enter is pressed since removing
+                // the vanilla emote menu also borks that.
+                // The keydown event needs a name so it doesn't get destroyed.
+                let _sendFixer;
+                inputBox.addEventListener('keydown', _sendFixer = e => {
+                    if (e.code === "Enter") {
+                        if (!autocompleter.showing) {
+                            const sendMessageBtn = chat.element.querySelector('[aria-label="Send message"]');
+                            if (sendMessageBtn) {
+                                sendMessageBtn.click();
+                            }
+                            e.preventDefault();
+                            e.stopPropagation();
+                            return false;
+                        }
+                    }
+                });
             }
         });
 
