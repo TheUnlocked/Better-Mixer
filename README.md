@@ -18,7 +18,7 @@ In the case of a bug report, if you know how to do so, provide the console logs 
 3. Click the "Load Unpacked" button and select the "Extension" folder.
 4. You're good to go. Make sure to disable the Chrome Webstore version so you don't have two instances of Better Mixer running at once. Visual Studio Code is the recommended editor (and it's the one I use), but any JavaScript editor should suffice.
 
-For Firefox, set up the developer environment below and run the `serve:firefox` npm script.
+For Firefox, set up the development environment below and run the `serve:firefox` npm script.
 
 _Note: Do NOT add additional dependencies without first asking to see if it's okay. This includes JavaScript libraries, build tools, and external stylesheets._
 
