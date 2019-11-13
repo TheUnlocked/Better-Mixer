@@ -3,21 +3,10 @@ import { fetchJson } from "../Utility/Util.js";
 import { VanillaEmote } from "../Emote.js";
 
 export default class EmoteAutocomplete {
-    plugin;
-    chat;
-    emoteCache;
-    element;
-    vanillaEmotes;
-    autocompleteEmotes;
-    _selectionIndex;
-    showing = false;
-    _query;
-    _kbEvent;
-    _animatedEmotesWereOn;
-
     constructor(plugin, chat) {
         this.plugin = plugin;
         this.chat = chat;
+        this.showing = false;
 
         this.element = document.createElement('div');
         this.element.classList.add('bettermixer-emote-autocomplete-container');
