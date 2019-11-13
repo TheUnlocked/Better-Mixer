@@ -46,4 +46,4 @@ const onLoad = () => {
 if (document.readyState === "complete") {
     onLoad();
 }
-document.body.onload = onLoad();
+document.body.onload = onLoad;
