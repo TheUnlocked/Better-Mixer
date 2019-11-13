@@ -50,19 +50,7 @@ export default class EmoteAutocomplete {
                 }
             })
             .catch(() => this.plugin.log("Failed to load vanilla global emotes", BetterMixer.LogType.WARN));
-        fetch1.finally(() => fetch2.finally(() => {
-            // Remove the built-in event listener
-            const ta = this.chat.element.querySelector('textarea');
-            const initialCount = ta.eventListeners().length;
-            for (const listener of ta.eventListeners()) {
-                if (listener.name === "") {
-                    ta.removeEventListener('keydown', listener);
-                    if (ta.eventListeners().length !== initialCount) {
-                        break;
-                    }
-                }
-            }
-            
+        fetch1.finally(() => fetch2.finally(() => {            
             this.reloadCache();
         }));
         this.plugin.addEventListener(BetterMixer.Events.ON_EMOTES_ADDED, () => this.reloadCache());    
@@ -89,13 +77,11 @@ export default class EmoteAutocomplete {
         this.showing = true;
         this.chat.element.querySelector('[class*="webComposerBlock"]').prepend(this.element);
         this.selectionIndex = this.autocompleteEmotes.length - 1;
-        this.loadKeyboardEvents();
     }
 
     close() {
         this.showing = false;
         this.element.remove();
-        this.unloadKeyboardEvents();
     }
 
     /**
@@ -103,7 +89,9 @@ export default class EmoteAutocomplete {
      */
     set query(value) {
         this._query = value;
-        this.updateContents();
+        if (this._query !== "") {
+            this.updateContents();
+        }
     }
 
     get query() { return this._query; }
@@ -154,37 +142,35 @@ export default class EmoteAutocomplete {
         }
     }
 
-    loadKeyboardEvents() {
+    keydownEvent(e) {
         const ta = this.chat.element.querySelector('textarea');
 
         const updateCursorAfter = () => setTimeout(() => ta.dispatchEvent(new Event('input')), 0);
 
-        ta.addEventListener('keydown', this._kbEvent = e => {
-            switch (e.code) {
-                case "Enter":
-                case "Tab":
-                    this.fillSelectedEmote();
+        switch (e.code) {
+            case "Enter":
+            case "Tab":
+                this.fillSelectedEmote();
+                updateCursorAfter();
+                break;
+            case "ArrowUp":
+                this.selectionIndex--;
+                break;
+            case "ArrowDown":
+                this.selectionIndex++;
+                break;
+            case "Escape":
+                this.close();
+                break;
+            default:
+                if (["ArrowLeft", "ArrowRight"].includes(e.code)) {
                     updateCursorAfter();
-                    break;
-                case "ArrowUp":
-                    this.selectionIndex--;
-                    break;
-                case "ArrowDown":
-                    this.selectionIndex++;
-                    break;
-                case "Escape":
-                    this.close();
-                    break;
-                default:
-                    if (["ArrowLeft", "ArrowRight"].includes(e.code)) {
-                        updateCursorAfter();
-                    }
-                    return;
-            }
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-        });
+                }
+                return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
     }
 
     fillSelectedEmote() {
@@ -197,10 +183,6 @@ export default class EmoteAutocomplete {
         }
         ta.selectionEnd = queryStart + selectedEmote.length + 2;
         ta.selectionStart = ta.selectionEnd;
-    }
-
-    unloadKeyboardEvents() {
-        this._kbEvent && this.chat.element.querySelector('textarea').removeEventListener('keydown', this._kbEvent);
     }
 
     get selectionIndex() {

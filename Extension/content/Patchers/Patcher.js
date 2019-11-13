@@ -113,8 +113,9 @@ export default class Patcher {
                 const autocompleter = new EmoteAutocomplete(this.plugin, chat);
                 // Purge built-in autocompleter
                 observeNewElements('#chat-listbox[class*="autocomplete"]', chat.element, x => {
-                    // Deleting the element outright breaks chat for some reason.
-                    x.style.display = "none";
+                    if (!x.querySelector('[class*="viewer"]')) {
+                        x.style.display = "none";
+                    }
                 });
                 const inputBox = chat.element.querySelector('textarea');
 
@@ -126,13 +127,6 @@ export default class Patcher {
                     return inputBox.value.slice(backIndex, frontIndex+1).trim().toLowerCase();
                 };
 
-                // We need to establish our keydown event listener HERE in order
-                // to beat Mixer to the race.
-                // Note: If necessary in the future, hacky stuff can be done with
-                // the convienent removeAllEventListeners() and eventListeners()
-                // functions on each object provided by Mixer's framework.
-                // If other extensions want to defend themselves, they can simply
-                // name their keydown events.
                 inputBox.addEventListener('input', () => {
                     const query = getQuery();
                     if (query.length >= 3 || query[0] === ":") {
@@ -143,29 +137,25 @@ export default class Patcher {
                     }
                 });
 
-                // Handle message sending when enter is pressed since removing
-                // the vanilla emote menu also borks that.
-                // The keydown event needs a name so it doesn't get destroyed.
-                let _sendFixer;
-                inputBox.addEventListener('keydown', _sendFixer = e => {
-                    if (e.code === "Enter") {
-                        if (!autocompleter.showing) {
-                            const sendMessageBtn = chat.element.querySelector('[aria-label="Send message"]');
-                            if (sendMessageBtn) {
-                                sendMessageBtn.click();
-                            }
-                            e.preventDefault();
-                            return false;
-                        }
+                const vanillaKeydownListener = inputBox.eventListeners()[2];
+                inputBox.removeEventListener('keydown', vanillaKeydownListener);
+
+                inputBox.addEventListener('keydown', e => {
+                    if (autocompleter.showing) {
+                        return autocompleter.keydownEvent(e);
                     }
-                    else if (e.code === "Tab") {
-                        if (!autocompleter.showing) {
-                            autocompleter.query = getQuery();
+                    else {
+                        if (e.code === "Tab") {
+                            setTimeout(() => {
+                                autocompleter.query = getQuery();
+                            }, 0);
                             e.preventDefault();
                             return false;
                         }
                     }
                 });
+
+                inputBox.addEventListener('keydown', vanillaKeydownListener);
             }
         });
 
