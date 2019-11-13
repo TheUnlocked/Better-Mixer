@@ -118,6 +118,14 @@ export default class Patcher {
                 });
                 const inputBox = chat.element.querySelector('textarea');
 
+                const getQuery = () => {
+                    let backIndex = inputBox.value.lastIndexOf(' ', inputBox.selectionEnd - 1);
+                    let frontIndex = inputBox.value.indexOf(' ', inputBox.selectionEnd);
+                    if (backIndex === -1) backIndex = 0;
+                    if (frontIndex === -1) frontIndex = inputBox.value.length;
+                    return inputBox.value.slice(backIndex, frontIndex+1).trim().toLowerCase();
+                };
+
                 // We need to establish our keydown event listener HERE in order
                 // to beat Mixer to the race.
                 // Note: If necessary in the future, hacky stuff can be done with
@@ -126,11 +134,7 @@ export default class Patcher {
                 // If other extensions want to defend themselves, they can simply
                 // name their keydown events.
                 inputBox.addEventListener('input', () => {
-                    let backIndex = inputBox.value.lastIndexOf(' ', inputBox.selectionEnd - 1);
-                    let frontIndex = inputBox.value.indexOf(' ', inputBox.selectionEnd);
-                    if (backIndex === -1) backIndex = 0;
-                    if (frontIndex === -1) frontIndex = inputBox.value.length;
-                    const query = inputBox.value.slice(backIndex, frontIndex+1).trim().toLowerCase();
+                    const query = getQuery();
                     if (query.length >= 3 || query[0] === ":") {
                         autocompleter.query = query;
                     }
@@ -150,6 +154,13 @@ export default class Patcher {
                             if (sendMessageBtn) {
                                 sendMessageBtn.click();
                             }
+                            e.preventDefault();
+                            return false;
+                        }
+                    }
+                    else if (e.code === "Tab") {
+                        if (!autocompleter.showing) {
+                            autocompleter.query = getQuery();
                             e.preventDefault();
                             return false;
                         }
