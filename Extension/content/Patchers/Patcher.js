@@ -131,7 +131,7 @@ export default class Patcher {
                     if (backIndex === -1) backIndex = 0;
                     if (frontIndex === -1) frontIndex = inputBox.value.length;
                     const query = inputBox.value.slice(backIndex, frontIndex+1).trim().toLowerCase();
-                    if (query.length >= 2 || query[0] === ":") {
+                    if (query.length >= 3 || query[0] === ":") {
                         autocompleter.query = query;
                     }
                     else {
@@ -151,7 +151,6 @@ export default class Patcher {
                                 sendMessageBtn.click();
                             }
                             e.preventDefault();
-                            e.stopPropagation();
                             return false;
                         }
                     }
