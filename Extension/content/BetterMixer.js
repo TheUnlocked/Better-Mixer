@@ -183,10 +183,10 @@ export default class BetterMixer {
 
         page = page[0];
 
-        if (page === this._page) {
-            this.dispatchEvent(BetterMixer.Events.ON_PAGE_LOAD, page, this);
-            return;
-        }
+        // if (page === this._page) {
+        //     this.dispatchEvent(BetterMixer.Events.ON_PAGE_LOAD, page, this);
+        //     return;
+        // }
 
         this._page = page;
         this.dispatchEvent(BetterMixer.Events.ON_PAGE_LOAD, page, this);

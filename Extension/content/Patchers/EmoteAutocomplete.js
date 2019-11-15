@@ -3,6 +3,8 @@ import { fetchJson } from "../Utility/Util.js";
 import { VanillaEmote } from "../Emote.js";
 
 export default class EmoteAutocomplete {
+    // static vanillaEmoteCache = [];
+
     constructor(plugin, chat) {
         this.plugin = plugin;
         this.chat = chat;
@@ -12,9 +14,16 @@ export default class EmoteAutocomplete {
         this.element.classList.add('bettermixer-emote-autocomplete-container');
         
         this.loadVanillaEmoteCache();
+        this.plugin.addEventListener(BetterMixer.Events.ON_EMOTES_ADDED, () => this.reloadCache());   
     }
 
     async loadVanillaEmoteCache() {
+        if (EmoteAutocomplete.vanillaEmoteCache) {
+            this.vanillaEmotes = EmoteAutocomplete.vanillaEmoteCache;
+            this.reloadCache();
+            return;
+        }
+
         this.vanillaEmotes = [];
         await this.plugin.user.populateUser();
         const fetch1 = fetchJson(`https://mixer.com/api/v1/channels/${this.chat.channel.id}/emoticons?user=${this.plugin.user.userId}`)
@@ -50,10 +59,10 @@ export default class EmoteAutocomplete {
                 }
             })
             .catch(() => this.plugin.log("Failed to load vanilla global emotes", BetterMixer.LogType.WARN));
-        fetch1.finally(() => fetch2.finally(() => {            
+        fetch1.finally(() => fetch2.finally(() => {
+            EmoteAutocomplete.vanillaEmoteCache = this.vanillaEmotes;         
             this.reloadCache();
         }));
-        this.plugin.addEventListener(BetterMixer.Events.ON_EMOTES_ADDED, () => this.reloadCache());    
     }
 
     reloadCache() {
