@@ -61,7 +61,14 @@ export const observeNewElements = (selector, parent, callback) => {
             }
         }
         const uniqueMatches = matches.reduce((result, next) => result.includes(next) ? result : (result.push(next), result), []);
-        uniqueMatches.forEach(callback);
+        uniqueMatches.forEach(match => {
+            try {
+                callback(match);
+            }
+            catch (error) {
+                console.error(error);
+            }
+        });
     });
 
     observer.observe(parent, {

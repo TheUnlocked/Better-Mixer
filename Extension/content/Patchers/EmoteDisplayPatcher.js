@@ -10,7 +10,7 @@ export const parseMessageEmotes = (plugin, message, emoteSets = undefined) => {
         .reduce((acc, val) => !val ? acc : val instanceof EmoteSet ? acc.concat(val.emotes) : acc.concat(val), []);
     const emotes = emoteList.reduce((result, value) => { result[value.name] = value; return result; }, {});
 
-    const textPieces = [...message.element.querySelectorAll('span')];
+    const textPieces = [...message.element.querySelectorAll('span:not([class*="emote"])')];
     for (const textElement of textPieces) {
         // If the text piece is an actual html element, skip it.
         if (!(textElement.children.length === 0 && textElement.childNodes.length > 0)) {

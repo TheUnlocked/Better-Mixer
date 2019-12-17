@@ -1,6 +1,6 @@
 {
   "name": "better-mixer",
-  "version": "2.8.3",
+  "version": "2.8.4",
   "description": "Improvements to Mixer, similar to FFZ for Twitch.",
   "scripts": {
     "serve:firefox": "web-ext run --source-dir ./Extension/",
