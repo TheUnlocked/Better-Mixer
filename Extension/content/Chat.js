@@ -66,7 +66,7 @@ export default class Chat {
         this.plugin.addEventListener(BetterMixer.Events.GATHER_BADGES, this._gatherBadges);
 
         this._emoteDialogObserver = observeNewElements('[class*="modal"] h1', document.documentElement, element => {
-            if (element.innerHTML === "Emotes") {
+            if (['emotes', 'emoticons'].includes(element.innerHTML.toLowerCase())) {
                 this.plugin.dispatchEvent(BetterMixer.Events.ON_EMOTES_DIALOG_OPEN, { chat: this, dialog: element.parentElement }, this);
             }
         });

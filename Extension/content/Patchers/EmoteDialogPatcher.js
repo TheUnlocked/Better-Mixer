@@ -1,7 +1,7 @@
 import EmoteSet from "../EmoteSet.js";
 import BetterMixer from "../BetterMixer.js";
 
-export const patchEmoteDialog = (plugin, settingsDialogElement, chat) => {
+export const patchEmoteDialog = (plugin, emotesDialogElement, chat) => {
     const emoteGatherEventData = {
         channel: chat.channel,
         user: plugin.user,
@@ -9,7 +9,7 @@ export const patchEmoteDialog = (plugin, settingsDialogElement, chat) => {
     };
     const gatheredEmotes = plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, chat);
 
-    const emoteContainer = settingsDialogElement.querySelector('div[class*="container"]');
+    const emoteContainer = emotesDialogElement.querySelector('div[class*="container"]');
     emoteContainer.style.overflow = "hidden";
     
     // Priority 100
