@@ -235,15 +235,21 @@ export default class BetterMixer {
             }
         };
 
-        await waitFor(() => document.querySelector('b-channel-chat-section'));
+        if (!this._embedded) {
+            await waitFor(() => document.querySelector('b-channel-chat-section'));
 
-        this._chatObserver = observeNewElements('b-chat-client-host-component [class*="chatContainer"]',
-            document.querySelector('b-channel-chat-section').parentElement,
-            element => {
-            reloadChat(element);
-        });
-        if (!loaded && document.querySelector('b-chat-client-host-component')) {
-            reloadChat(document.querySelector('b-chat-client-host-component').children[0]);
+            this._chatObserver = observeNewElements('b-chat-client-host-component [class*="chatContainer"]',
+                document.querySelector('b-channel-chat-section').parentElement,
+                element => {
+                reloadChat(element);
+            });
+            if (!loaded && document.querySelector('b-chat-client-host-component')) {
+                reloadChat(document.querySelector('b-chat-client-host-component').children[0]);
+            }
+        }
+        else {
+            await waitFor(() => document.querySelector('b-chat-client-host-component [class*="chatContainer"]'));
+            reloadChat(document.querySelector('b-chat-client-host-component [class*="chatContainer"]'));
         }
     }
 

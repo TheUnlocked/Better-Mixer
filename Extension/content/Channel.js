@@ -19,6 +19,7 @@ export default class Channel {
             const data = await fetchJson(`https://mixer.com/api/v1/channels/${this.channelName}`);
             this.id = data.id;
             this.owner = new User(data.user);
+            this.channelName = data.token;
             this.name = data.name;
             this.audience = data.audience;
             this.description = data.description;
