@@ -71,7 +71,7 @@ h3.bettermixer-emote-set-header {
 } */
 
 [class*="chatContainer"] [class*="container"] {
-    overflow-y: overlay !important;
+    overflow-y: auto !important;
 }
 
 /* Emote Autocomplete Menu */
