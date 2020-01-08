@@ -158,6 +158,8 @@ b-language-selector bui-icon.icon-web[icon="InternetWithController"] {
     flex: 1 1 auto;
     text-overflow: ellipsis;
     white-space: nowrap;
+    display: block;
+    overflow: hidden;
 }
 
 .bettermixer-link-preview > div {
