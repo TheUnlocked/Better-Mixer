@@ -23,8 +23,9 @@ export const loadLinkPreview = async (plugin, msgElement, link) => {
         lowerContainer.appendChild(imageElt);
     }
 
+    
     const descElt = document.createElement('span');
-    descElt.innerText = urlInfo.description;
+    descElt.innerText = urlInfo.description || 'This site provides no description.';
     lowerContainer.appendChild(descElt);
 
     previewElt.appendChild(lowerContainer);
