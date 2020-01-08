@@ -18,15 +18,25 @@ export const loadLinkPreview = async (plugin, msgElement, link) => {
     const lowerContainer = document.createElement('div');
 
     if (urlInfo.image) {
+        const imageLink = document.createElement('a');
+        imageLink.href = link;
+        imageLink.target = "_blank";
+        imageLink.addEventListener('mouseup', e => {
+            e.stopImmediatePropagation();
+        });
         const imageElt = document.createElement('img');
         imageElt.src = urlInfo.image;
-        lowerContainer.appendChild(imageElt);
+        imageLink.appendChild(imageElt);
+        lowerContainer.appendChild(imageLink);
     }
-
     
     const descElt = document.createElement('span');
     descElt.innerText = urlInfo.description || 'This site provides no description.';
     lowerContainer.appendChild(descElt);
+
+    descElt.addEventListener('mouseup', e => {
+        e.stopImmediatePropagation();
+    });
 
     previewElt.appendChild(lowerContainer);
     msgElement.appendChild(previewElt);

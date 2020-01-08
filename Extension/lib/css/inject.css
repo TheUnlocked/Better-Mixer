@@ -169,14 +169,14 @@ b-language-selector bui-icon.icon-web[icon="InternetWithController"] {
     overflow: hidden;
 }
 
-.bettermixer-link-preview > div > img {
+.bettermixer-link-preview > div > a > img {
     margin-top: 4px;
     height: 38px;
     flex: 0 1 auto;
     margin-right: 6px;
 }
 
-.bettermixer-link-preview > div >  span {
+.bettermixer-link-preview > div > span {
     flex: 1 1 auto;
     overflow: auto;
 }
