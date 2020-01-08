@@ -103,6 +103,13 @@ const makeColorPicker = (config, setTempState) => {
         }
     }), colorHolder);
 
+    if (config.superText) {
+        const superText = document.createElement('span');
+        superText.classList.add('bettermixer-config-boxed-supertext');
+        superText.innerText = config.superText;
+        colorHolder.children[0].querySelector('label > span').appendChild(superText);
+    }
+
     return colorHolder.children[0];
 };
 
@@ -120,6 +127,13 @@ const makeDropdownMenu = (config, setTempState) => {
         }
     }), dropdownHolder);
 
+    if (config.superText) {
+        const superText = document.createElement('span');
+        superText.classList.add('bettermixer-config-boxed-supertext');
+        superText.innerText = config.superText;
+        dropdownHolder.children[0].querySelector('label > span').appendChild(superText);
+    }
+
     return dropdownHolder.children[0];
 };
 
@@ -135,6 +149,13 @@ const makeStringInput = (config, setTempState) => {
     input.addEventListener('change', e => {
         setTempState(input.value);
     });
+
+    if (config.superText) {
+        const superText = document.createElement('span');
+        superText.classList.add('bettermixer-config-boxed-supertext');
+        superText.innerText = config.superText;
+        stringInputHolder.children[0].querySelector('label > span').appendChild(superText);
+    }
 
     return stringInputHolder.children[0];
 };
