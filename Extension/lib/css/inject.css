@@ -165,7 +165,7 @@ b-language-selector bui-icon.icon-web[icon="InternetWithController"] {
 .bettermixer-link-preview > div {
     height: inherit;
     flex: 0 1 auto;
-    margin-top: -4px;
+    margin-top: -3px;
     display: flex;
     flex-flow: row;
     overflow: hidden;

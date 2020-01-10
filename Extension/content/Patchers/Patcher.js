@@ -17,6 +17,7 @@ export default class Patcher {
         this.plugin = plugin;
 
         this.plugin.addEventListener(BetterMixer.Events.ON_MESSAGE, event => {
+            /** @type {ChatMessage} */
             const message = event.sender;
 
             if (!this._emotesAddedListener) {
@@ -34,7 +35,7 @@ export default class Patcher {
             // Handle url previews
             {
                 const links = message.element.querySelectorAll('.linkComponent');
-                if (links) {
+                if (links.length > 0) {
                     const mode = BetterMixer.instance.configuration.getConfig('link_preview').state;
                     switch (mode) {
                         case 'off':
