@@ -45,6 +45,10 @@ export default class Config {
     get configType() {
         return Config.ConfigTypeEnum.NONE;
     }
+
+    get superText() {
+        return false;
+    }
 }
 
 Config.ConfigTypeEnum = Object.freeze({

@@ -13,6 +13,7 @@ import ColorConfig from "./Configs/ColorConfig.js";
 import BotDetectionConfig from "./Configs/BotDetectionConfig.js";
 import StringConfig from "./Configs/StringConfig.js";
 import { fetchJson, waitFor, observeNewElements } from "./Utility/Util.js";
+import DropdownConfig from "./Configs/DropdownConfig.js";
 
 const SRC = document.getElementById('BetterMixer-module').src;
 const BASE_URL = SRC.split('/').slice(0, -2).join('/') + '/';
@@ -72,6 +73,16 @@ export default class BetterMixer {
         this.configuration.registerConfig(botColorDetectionConfig);
         this.configuration.registerConfig(botColorRegexConfig);
         this.configuration.registerConfig(botColorConfig);
+
+        const linkPreviewConfig = new DropdownConfig(
+            'BETA_link_preview', 'Show Link Previews', '', {
+                'off': 'Disable',
+                'last': 'Show Last Only',
+                'all': 'Show All'
+            }, 'off'
+        );
+        Object.defineProperty(linkPreviewConfig, 'superText', { get: () => "BETA" });
+        this.configuration.registerConfig(linkPreviewConfig);
 
         this.configuration.registerConfig(new StylesheetToggleConfig(
             this.injectStylesheet("lib/css/hideanimatedemotes.css"),

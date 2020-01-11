@@ -43,6 +43,16 @@ export const waitFor = (pred, _options) => new Promise((resolve, reject) => {
 
 /**
  * 
+ * @param {((() => any)[]} functions 
+ */
+export const executeInOrder = async functions => {
+    for (const func of functions) {
+        await func();
+    }
+};
+
+/**
+ * 
  * @param {string} selector 
  * @param {Node} parent 
  * @param {(element: HTMLElement) => any} callback 
