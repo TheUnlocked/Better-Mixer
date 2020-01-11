@@ -75,13 +75,13 @@ export default class BetterMixer {
         this.configuration.registerConfig(botColorConfig);
 
         const linkPreviewConfig = new DropdownConfig(
-            'link_preview', 'Show Link Previews', '', {
+            'BETA_link_preview', 'Show Link Previews', '', {
                 'off': 'Disable',
                 'last': 'Show Last Only',
                 'all': 'Show All'
-            }, 'last'
+            }, 'off'
         );
-        Object.defineProperty(linkPreviewConfig, 'superText', { get: () => "New messages only" });
+        Object.defineProperty(linkPreviewConfig, 'superText', { get: () => "BETA" });
         this.configuration.registerConfig(linkPreviewConfig);
 
         this.configuration.registerConfig(new StylesheetToggleConfig(

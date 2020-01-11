@@ -1,7 +1,7 @@
 import BetterMixer from "../BetterMixer.js";
 import EmoteSet from "../EmoteSet.js";
 import ChatMessage from "../ChatMessage.js";
-import { waitFor, observeNewElements } from "../Utility/Util.js";
+import { waitFor, observeNewElements, executeInOrder } from "../Utility/Util.js";
 import { patchEmoteDialog } from "./EmoteDialogPatcher.js";
 import { parseMessageEmotes } from "./EmoteDisplayPatcher.js";
 import { patchSettingsDialog } from "./SettingsDialogPatcher.js";
@@ -36,7 +36,7 @@ export default class Patcher {
             {
                 const links = message.element.querySelectorAll('.linkComponent');
                 if (links.length > 0) {
-                    const mode = BetterMixer.instance.configuration.getConfig('link_preview').state;
+                    const mode = BetterMixer.instance.configuration.getConfig('BETA_link_preview').state;
                     switch (mode) {
                         case 'off':
                             break;
@@ -44,9 +44,7 @@ export default class Patcher {
                             loadLinkPreview(this.plugin, message.element, links[links.length - 1].href);
                             break;
                         case 'all':
-                            for (const link of links) {
-                                loadLinkPreview(this.plugin, message.element, link.href);
-                            }
+                            executeInOrder([...links].map(link => () => loadLinkPreview(this.plugin, message.element, link.href)));
                             break;
                     }
                 }

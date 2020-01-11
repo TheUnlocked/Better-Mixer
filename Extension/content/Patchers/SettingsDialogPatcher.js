@@ -69,6 +69,12 @@ export const patchSettingsDialog = async (plugin, settingsDialogElement) => {
     });
 };
 
+/**
+ * 
+ * @param {Config} config 
+ * @param {any => void} setTempState 
+ * @param {HTMLElement} example 
+ */
 const makeToggleSwitch = (config, setTempState, example) => {
     const element = example.cloneNode(true);
     element.children[2].textContent = config.displayText;
@@ -85,6 +91,11 @@ const makeToggleSwitch = (config, setTempState, example) => {
     return element;
 };
 
+/**
+ * 
+ * @param {Config} config 
+ * @param {any => void} setTempState 
+ */
 const makeColorPicker = (config, setTempState) => {
     const colorHolder = document.createElement('div');
     const colorLengths = [3, 4, 6, 8];
@@ -113,6 +124,11 @@ const makeColorPicker = (config, setTempState) => {
     return colorHolder.children[0];
 };
 
+/**
+ * 
+ * @param {Config} config 
+ * @param {any => void} setTempState 
+ */
 const makeDropdownMenu = (config, setTempState) => {
     const dropdownHolder = document.createElement('div');
                 
@@ -137,6 +153,11 @@ const makeDropdownMenu = (config, setTempState) => {
     return dropdownHolder.children[0];
 };
 
+/**
+ * 
+ * @param {Config} config 
+ * @param {any => void} setTempState 
+ */
 const makeStringInput = (config, setTempState) => {
     const stringInputHolder = document.createElement('div');
 
