@@ -117,6 +117,7 @@ export default class Patcher {
                         x.style.display = "none";
                     }
                 });
+                /** @type {HTMLTextAreaElement} */
                 const inputBox = chat.element.querySelector('textarea');
 
                 const getQuery = () => {
@@ -124,7 +125,7 @@ export default class Patcher {
                     let frontIndex = inputBox.value.indexOf(' ', inputBox.selectionEnd);
                     if (backIndex === -1) backIndex = 0;
                     if (frontIndex === -1) frontIndex = inputBox.value.length;
-                    return inputBox.value.slice(backIndex, frontIndex+1).trim().toLowerCase();
+                    return inputBox.value.slice(backIndex, frontIndex+1).trim();
                 };
 
                 inputBox.addEventListener('input', () => {

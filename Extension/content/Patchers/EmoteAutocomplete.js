@@ -97,7 +97,7 @@ export default class EmoteAutocomplete {
      * @param {string} value
      */
     set query(value) {
-        this._query = value;
+        this._query = value.trim().toLowerCase();
         if (this._query !== "") {
             this.updateContents();
         }
@@ -111,11 +111,12 @@ export default class EmoteAutocomplete {
             this.reloadCache();
         }
 
+        const getIndexOfQuery = str => { const index = str.toLowerCase().indexOf(this.query); return index === -1 ? 10000 : index; };
         this.autocompleteEmotes = this.emoteCache
-            .filter(x => x.name.toLowerCase().includes(this.query))
+            .filter(x => x.name.toLowerCase().includes(this.query.replace(/^:/, '')))
             // Sort decending based on when the query appears, so the
             // name with the earlier occurrance is the closest to the bottom
-            .sort((a, b) => b.name.toLowerCase().indexOf(this.query) - a.name.toLowerCase().indexOf(this.query));
+            .sort((a, b) => getIndexOfQuery(b.name) - getIndexOfQuery(a.name));
         
         if (this.autocompleteEmotes.length > 0) {
             if (this.element) {
