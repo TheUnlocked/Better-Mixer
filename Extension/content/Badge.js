@@ -6,14 +6,12 @@ export default class Badge {
      * 
      * @param {String} name 
      * @param {String} image 
-     * @param {String} description 
      * @param {String} vanillaSelector
      */
-    constructor(name, image, description, example = undefined) {
+    constructor(name, image, example = undefined) {
 
         this.name = name;
         this.image = image;
-        this.description = description;
         this.example = example;
 
     }

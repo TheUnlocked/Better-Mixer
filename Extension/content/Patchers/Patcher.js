@@ -1,10 +1,12 @@
 import BetterMixer from "../BetterMixer.js";
 import EmoteSet from "../EmoteSet.js";
 import ChatMessage from "../ChatMessage.js";
-import { waitFor } from "../Utility/Util.js";
+import { waitFor, observeNewElements, executeInOrder } from "../Utility/Util.js";
 import { patchEmoteDialog } from "./EmoteDialogPatcher.js";
 import { parseMessageEmotes } from "./EmoteDisplayPatcher.js";
 import { patchSettingsDialog } from "./SettingsDialogPatcher.js";
+import { loadLinkPreview } from "./LinkPreview.js";
+import EmoteAutocomplete from "./EmoteAutocomplete.js";
 
 export default class Patcher {
     /**
@@ -15,6 +17,7 @@ export default class Patcher {
         this.plugin = plugin;
 
         this.plugin.addEventListener(BetterMixer.Events.ON_MESSAGE, event => {
+            /** @type {ChatMessage} */
             const message = event.sender;
 
             if (!this._emotesAddedListener) {
@@ -27,8 +30,24 @@ export default class Patcher {
             }
 
             // Handle message emotes
+            parseMessageEmotes(this.plugin, message);
+
+            // Handle url previews
             {
-                parseMessageEmotes(this.plugin, message);
+                const links = message.element.querySelectorAll('.linkComponent');
+                if (links.length > 0) {
+                    const mode = BetterMixer.instance.configuration.getConfig('BETA_link_preview').state;
+                    switch (mode) {
+                        case 'off':
+                            break;
+                        case 'last':
+                            loadLinkPreview(this.plugin, message.element, links[links.length - 1].href);
+                            break;
+                        case 'all':
+                            executeInOrder([...links].map(link => () => loadLinkPreview(this.plugin, message.element, link.href)));
+                            break;
+                    }
+                }
             }
 
             // Handle bot color changes
@@ -54,8 +73,7 @@ export default class Patcher {
                     user: message.author,
                     message: message
                 };
-                const badges = plugin.dispatchGather(BetterMixer.Events.GATHER_BADGES, badgeGatherEventData, message)
-                    .reduce((acc, val) => acc.concat(val), []); // Upgrade to .flat(1) when that becomes mainstream tech
+                const badges = plugin.dispatchGather(BetterMixer.Events.GATHER_BADGES, badgeGatherEventData, message).flat(1);
 
                 const authorElement = message.element.querySelector('[class*="Username"]');
                 for (const badge of badges) {
@@ -82,14 +100,16 @@ export default class Patcher {
 
         // Handle chat load
         this.plugin.addEventListener(BetterMixer.Events.ON_CHAT_FINISH_LOAD, event => {
+            const chat = event.data;
+
             // Handle emote pre-loading
             {
                 const emoteGatherEventData = {
-                    channel: event.sender.channel,
-                    user: event.sender.plugin.user,
+                    channel: chat.channel,
+                    user: chat.plugin.user,
                     message: null
                 };
-                const gatheredEmotes = plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, event.sender);
+                const gatheredEmotes = plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, chat);
                 for (const emotes of gatheredEmotes) {
                     if (emotes instanceof EmoteSet) {
                         for (const emote of emotes.emotes) {
@@ -105,6 +125,57 @@ export default class Patcher {
                     }
                 }
             }
+
+            // Handle emote auto-complete
+            {
+                const autocompleter = new EmoteAutocomplete(this.plugin, chat);
+                // Purge built-in autocompleter
+                observeNewElements('#chat-listbox[class*="autocomplete"]', chat.element, x => {
+                    if (!x.querySelector('[class*="viewer"]')) {
+                        x.style.display = "none";
+                    }
+                });
+                /** @type {HTMLTextAreaElement} */
+                const inputBox = chat.element.querySelector('textarea');
+
+                const getQuery = () => {
+                    let backIndex = inputBox.value.lastIndexOf(' ', inputBox.selectionEnd - 1);
+                    let frontIndex = inputBox.value.indexOf(' ', inputBox.selectionEnd);
+                    if (backIndex === -1) backIndex = 0;
+                    if (frontIndex === -1) frontIndex = inputBox.value.length;
+                    return inputBox.value.slice(backIndex, frontIndex+1).trim();
+                };
+
+                inputBox.addEventListener('input', () => {
+                    const query = getQuery();
+                    if (query.length >= 3 || query[0] === ":") {
+                        autocompleter.query = query;
+                    }
+                    else {
+                        autocompleter.close();
+                    }
+                });
+
+                const vanillaKeydownListener = inputBox.eventListeners()[2];
+                inputBox.removeEventListener('keydown', vanillaKeydownListener);
+
+                inputBox.addEventListener('keydown', e => {
+                    if (autocompleter.showing) {
+                        return autocompleter.keydownEvent(e);
+                    }
+                    else {
+                        if (e.code === "Tab") {
+                            setTimeout(() => {
+                                autocompleter.query = getQuery();
+                            }, 0);
+                            e.preventDefault();
+                            return false;
+                        }
+                    }
+                });
+
+                inputBox.addEventListener('keydown', vanillaKeydownListener);
+            }
         });
 
         // Handle Browse > Filters > Save Filters
@@ -117,7 +188,7 @@ export default class Patcher {
                     }
 
                     let filtersWindow;
-                    await waitFor(
+                    await waitFor(() =>
                         (filtersWindow = document.querySelector('b-browse-filters')) &&
                         !filtersWindow.querySelector('button.bettermixer-save-filters'));
 

@@ -27,12 +27,18 @@ export const waitFor = (pred: () => boolean, _options: { delay?: number; maxAtte
     loop();
 });
 
+export const executeInOrder = async (functions: (() => any)[]) => {
+    for (const func of functions) {
+        await func();
+    }
+};
+
 export const observeNewElements = (selector: string, parent: Node, callback: (element: Element) => void) => {
     const observer = new MutationObserver(muts => {
         const matches = [] as Element[];
         for (const mut of muts) {
             for (const node of mut.addedNodes) {
-                if (node instanceof Element) {
+                if (node instanceof HTMLElement) {
                     if (node.matches(selector)) {
                         matches.push(node);
                     }
@@ -40,8 +46,15 @@ export const observeNewElements = (selector: string, parent: Node, callback: (el
                 }
             }
         }
-        const uniqueMatches = matches.reduce((result, next) => result.includes(next) ? result : (result.push(next), result), [] as Element[]);
-        uniqueMatches.forEach(callback);
+        const uniqueMatches: Element[] = matches.reduce((result, next) => result.includes(next) ? result : (result.push(next), result), []);
+        uniqueMatches.forEach(match => {
+            try {
+                callback(match);
+            }
+            catch (error) {
+                console.error(error);
+            }
+        });
     });
 
     observer.observe(parent, {

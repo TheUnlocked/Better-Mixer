@@ -7,7 +7,7 @@ if (DEBUG_MODE) {
     console.log("%cBetterMixer.instance.postToContent({message: 'clearAllConfigs'})", hintFormatting);
 }
 
-document.body.onload = () => {
+const onLoad = () => {
     const injection = document.createElement('script');
     injection.src = chrome.runtime.getURL('content/BetterMixer.js');
     injection.id = "BetterMixer-module";
@@ -17,24 +17,34 @@ document.body.onload = () => {
     const SRC = injection.src;
     const MIXER = "https://mixer.com";
 
+    let storage;
+    if (typeof browser === "undefined") {
+        // we're on chrome
+        storage = chrome.storage.sync;
+    }
+    else {
+        // we're on firefox
+        storage = chrome.storage.local;
+    }
+
     window.addEventListener('message', (event) => {
         if (event.origin === MIXER) {
             if (event.data[0] === SRC) {
                 const data = event.data[1];
                 switch (data.message) {
                     case 'getAllConfigs':
-                        chrome.storage.sync.get(null, (result) =>
+                        storage.get(null, (result) =>
                             window.postMessage([SRC, {message: 'sendAllConfigs', data: result}], MIXER)
                         );
                         break;
                     case 'setConfigs':
-                        chrome.storage.sync.set(data.data);
+                        storage.set(data.data);
                         break;
                 }
 
                 if (DEBUG_MODE) {
                     if (data.message === 'clearAllConfigs')
-                        chrome.storage.sync.clear();
+                        storage.clear();
                     if (data.message === 'ping')
                         console.log('pong');
                 }
@@ -42,3 +52,8 @@ document.body.onload = () => {
         }
     }, false);
 };
+
+if (document.readyState === "complete") {
+    onLoad();
+}
+document.body.onload = onLoad;

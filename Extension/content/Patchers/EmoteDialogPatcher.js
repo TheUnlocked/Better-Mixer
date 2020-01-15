@@ -1,7 +1,14 @@
 import EmoteSet from "../EmoteSet.js";
 import BetterMixer from "../BetterMixer.js";
+import Chat from "../Chat.js";
 
-export const patchEmoteDialog = (plugin, settingsDialogElement, chat) => {
+/**
+ * 
+ * @param {BetterMixer} plugin 
+ * @param {HTMLElement} emotesDialogElement 
+ * @param {Chat} chat 
+ */
+export const patchEmoteDialog = (plugin, emotesDialogElement, chat) => {
     const emoteGatherEventData = {
         channel: chat.channel,
         user: plugin.user,
@@ -9,18 +16,18 @@ export const patchEmoteDialog = (plugin, settingsDialogElement, chat) => {
     };
     const gatheredEmotes = plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, chat);
 
-    const emoteContainer = settingsDialogElement.querySelector('div[class*="container"]');
+    const emoteContainer = emotesDialogElement.querySelector('div[class*="container"]');
     emoteContainer.style.overflow = "hidden";
     
+    const emoteHeaders = [...emoteContainer.querySelectorAll('h3[class*="emoteGroupHeader"]')];
+
     // Priority 100
-    const thisChannelSubscriberEmotesHeader = [...emoteContainer.querySelectorAll('h3[class*="emoteGroupHeader"]')]
-        .filter(x => x.innerHTML.toLowerCase() === chat.channel.name.toLowerCase())[0];
+    const thisChannelSubscriberEmotesHeader = emoteHeaders.find(x => x.innerHTML.toLowerCase() === chat.channel.name.toLowerCase());
     // Priority -200
-    const globalEmotesHeader = [...emoteContainer.querySelectorAll('h3[class*="emoteGroupHeader"]')]
-        .filter(x => x.innerHTML.toLowerCase() === "global")[0];
+    const globalEmotesHeader = emoteHeaders.find(x => x.innerHTML.toLowerCase() === "global");
     // Priority 50
-    const otherSubscriberEmoteHeader = [...emoteContainer.querySelectorAll('h3[class*="emoteGroupHeader"]')]
-        .filter(x => x !== thisChannelSubscriberEmotesHeader && x !== globalEmotesHeader)[0];
+    const otherSubscriberEmoteHeader = emoteHeaders.find(x => x !== thisChannelSubscriberEmotesHeader && x !== globalEmotesHeader);
+    
     const start = document.createElement('div');
     emoteContainer.insertBefore(start, emoteContainer.children[0]);
     const end = document.createElement('div');
@@ -35,7 +42,7 @@ export const patchEmoteDialog = (plugin, settingsDialogElement, chat) => {
         if (emotes instanceof EmoteSet) {
             emoteSets.push(emotes);
         }
-        else {
+        else if (emotes) {
             uncategorizedEmotes.addEmotes(emotes);
         }
     }
@@ -55,6 +62,11 @@ export const patchEmoteDialog = (plugin, settingsDialogElement, chat) => {
         return mixerEmoteHeader;
     };
 
+    const autofillEmote = emoteName => {
+        const inputBox = chat.element.querySelector('textarea');
+        inputBox.value += `${inputBox.value.length === 0 || inputBox.value.endsWith(' ') ? '' : ' '}${emoteName} `;
+    };
+
     for (const emoteSet of emoteSets) {
         let emoteSetEmotes = emoteSet.emotes;
         if (!plugin.configuration.getConfig('show_emotes_animated').state) {
@@ -70,10 +82,7 @@ export const patchEmoteDialog = (plugin, settingsDialogElement, chat) => {
                 emoteButton.appendChild(emote.element);
                 emoteButton.style.paddingLeft = '4px';
                 emoteButton.style.paddingRight = '4px';
-                emoteButton.addEventListener('click', () => {
-                    const inputBox = chat.element.querySelector('textarea');
-                    inputBox.value += `${inputBox.value.length === 0 || inputBox.value.endsWith(' ') ? '' : ' '}${emote.name} `;
-                });
+                emoteButton.addEventListener('click', () => autofillEmote(emote.name));
                 emoteSetContainer.appendChild(emoteButton);
             }
 

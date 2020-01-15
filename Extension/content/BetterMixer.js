@@ -13,6 +13,7 @@ import ColorConfig from "./Configs/ColorConfig.js";
 import BotDetectionConfig from "./Configs/BotDetectionConfig.js";
 import StringConfig from "./Configs/StringConfig.js";
 import { fetchJson, waitFor, observeNewElements } from "./Utility/Util.js";
+import DropdownConfig from "./Configs/DropdownConfig.js";
 
 const SRC = document.getElementById('BetterMixer-module').src;
 const BASE_URL = SRC.split('/').slice(0, -2).join('/') + '/';
@@ -73,6 +74,16 @@ export default class BetterMixer {
         this.configuration.registerConfig(botColorRegexConfig);
         this.configuration.registerConfig(botColorConfig);
 
+        const linkPreviewConfig = new DropdownConfig(
+            'BETA_link_preview', 'Show Link Previews', '', {
+                'off': 'Disable',
+                'last': 'Show Last Only',
+                'all': 'Show All'
+            }, 'off'
+        );
+        Object.defineProperty(linkPreviewConfig, 'superText', { get: () => "BETA" });
+        this.configuration.registerConfig(linkPreviewConfig);
+
         this.configuration.registerConfig(new StylesheetToggleConfig(
             this.injectStylesheet("lib/css/hideanimatedemotes.css"),
             'show_emotes_animated', 'Show Animated Emotes', '', true, false));
@@ -103,9 +114,23 @@ export default class BetterMixer {
             }
         };
 
-        const creatorBadge = new Badge("Better Mixer Creator", "https://i.imgur.com/HfmDsUC.png", "Creator of the Better Mixer Chrome extension.");
+        fetchJson('https://raw.githubusercontent.com/TheUnlocked/Better-Mixer/master/Info/badges/badges.json').then(data => {
+            const badges = {};
+            for (const badge of data.badges) {
+                badges[badge.id] = new Badge(badge.name, badge.src);
+            }
+            this.addEventListener(BetterMixer.Events.GATHER_BADGES, event => {
+                const userBadges = [];
 
-        this.addEventListener(BetterMixer.Events.GATHER_BADGES, event => event.data.user.username === "Unlocked" ? creatorBadge : undefined);
+                for (const group of data.groups) {
+                    if (group.members.includes(event.data.user.username.toLowerCase())) {
+                        userBadges.push(...(group.badges.map(id => badges[id])));
+                    }
+                }
+
+                return userBadges;
+            });
+        });
 
         this.patcher = new Patcher(this);
 
@@ -169,10 +194,10 @@ export default class BetterMixer {
 
         page = page[0];
 
-        if (page === this._page) {
-            this.dispatchEvent(BetterMixer.Events.ON_PAGE_LOAD, page, this);
-            return;
-        }
+        // if (page === this._page) {
+        //     this.dispatchEvent(BetterMixer.Events.ON_PAGE_LOAD, page, this);
+        //     return;
+        // }
 
         this._page = page;
         this.dispatchEvent(BetterMixer.Events.ON_PAGE_LOAD, page, this);
@@ -221,15 +246,21 @@ export default class BetterMixer {
             }
         };
 
-        await waitFor(() => document.querySelector('b-channel-chat-section'));
+        if (!this._embedded) {
+            await waitFor(() => document.querySelector('b-channel-chat-section'));
 
-        this._chatObserver = observeNewElements('b-chat-client-host-component [class*="chatContainer"]',
-            document.querySelector('b-channel-chat-section').parentElement,
-            element => {
-            reloadChat(element);
-        });
-        if (!loaded && document.querySelector('b-chat-client-host-component')) {
-            reloadChat(document.querySelector('b-chat-client-host-component').children[0]);
+            this._chatObserver = observeNewElements('b-chat-client-host-component [class*="chatContainer"]',
+                document.querySelector('b-channel-chat-section').parentElement,
+                element => {
+                reloadChat(element);
+            });
+            if (!loaded && document.querySelector('b-chat-client-host-component')) {
+                reloadChat(document.querySelector('b-chat-client-host-component').children[0]);
+            }
+        }
+        else {
+            await waitFor(() => document.querySelector('b-chat-client-host-component [class*="chatContainer"]'));
+            reloadChat(document.querySelector('b-chat-client-host-component [class*="chatContainer"]'));
         }
     }
 

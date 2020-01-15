@@ -6,17 +6,12 @@ export const parseMessageEmotes = (plugin, message, emoteSets = undefined) => {
         user: message.author,
         message: message
     };
-    let emoteList;
-    if (!emoteSets) {
-        emoteList = (emoteSets || plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, message));
-    }
-    else {
-        emoteList = emoteSets;
-    }
-    emoteList = emoteList.reduce((acc, val) => val instanceof EmoteSet ? acc.concat(val.emotes) : acc.concat(val), []);
+    const emoteList = (emoteSets || plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, message))
+        .reduce((acc, val) => !val ? acc : val instanceof EmoteSet ? acc.concat(val.emotes) : acc.concat(val), []);
     const emotes = emoteList.reduce((result, value) => { result[value.name] = value; return result; }, {});
 
-    const textPieces = [...message.element.querySelectorAll('span')];
+    const textPieces = [...message.element.querySelectorAll('span:not([class*="emote"])')];
+    let textBuilder = "";
     for (const textElement of textPieces) {
         // If the text piece is an actual html element, skip it.
         if (!(textElement.children.length === 0 && textElement.childNodes.length > 0)) {
@@ -28,22 +23,14 @@ export const parseMessageEmotes = (plugin, message, emoteSets = undefined) => {
         const messageBuilder = [];
 
         // Buffer used to retain non-emote text
-        let textBuilder = "";
         for (const word of words) {
             const emote = emotes[word];
             if (emote) {
                 // End the text element if you find an emote
-                if (textBuilder) {
-                    const newText = textElement.cloneNode();
-                    newText.textContent = textBuilder.trimStart();
-                    messageBuilder.push(newText);
-                    textBuilder = " ";
-                }
-                else {
-                    const newText = document.createElement('span');
-                    newText.textContent = " ";
-                    messageBuilder.push(newText);
-                }
+                const newText = textElement.cloneNode();
+                newText.textContent = textBuilder;
+                messageBuilder.push(newText);
+                textBuilder = " ";
                 // Push the emote
                 messageBuilder.push(emote.element);
             } else {
@@ -58,6 +45,7 @@ export const parseMessageEmotes = (plugin, message, emoteSets = undefined) => {
             const newText = textElement.cloneNode();
             newText.textContent = textBuilder;
             messageBuilder.push(newText);
+            textBuilder = " ";
         }
 
         // Final padding

@@ -49,14 +49,14 @@ export default class Chat {
             for (const badgeElement of event.data.message.element.querySelectorAll('[class*="badge"]')) {
                 if (badgeElement.alt === 'Subscriber') {
                     if (!this.subBadge) {
-                        this.subBadge = new Badge('Subscriber', badgeElement.src, 'Subscriber', badgeElement);
+                        this.subBadge = new Badge('Subscriber', badgeElement.src, badgeElement);
                     }
                     badges.push(this.subBadge);
                 }
                 else if (badgeElement.alt === 'Staff') {
                     if (!this.staffBadge) {
                         badgeElement.style.margin = "0";
-                        this.staffBadge = new Badge('Staff', badgeElement.src, 'A member of the Mixer staff', badgeElement);
+                        this.staffBadge = new Badge('Staff', badgeElement.src, badgeElement);
                     }
                     badges.push(this.staffBadge);
                 }
@@ -66,7 +66,7 @@ export default class Chat {
         this.plugin.addEventListener(BetterMixer.Events.GATHER_BADGES, this._gatherBadges);
 
         this._emoteDialogObserver = observeNewElements('[class*="modal"] h1', document.documentElement, element => {
-            if (element.innerHTML === "Emotes") {
+            if (['emotes', 'emoticons'].includes(element.innerHTML.toLowerCase())) {
                 this.plugin.dispatchEvent(BetterMixer.Events.ON_EMOTES_DIALOG_OPEN, { chat: this, dialog: element.parentElement }, this);
             }
         });

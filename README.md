@@ -1,8 +1,10 @@
 # Better-Mixer
-Improvements to Mixer, similar to FFZ for Twitch.
+Improvements to Mixer, similar to FFZ for Twitch. Available for both [Google Chrome](https://bit.ly/bettermixer) and [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/bettermixer/).
 
+Join the [Better Mixer Discord server](https://discord.gg/mrr5Vtf) to report bugs, get help, request features, and chat with the developers!
 
-Works on both Google Chrome and Mozilla Firefox.
+## For Streamers
+Go to the [Better Mixer self-service](https://theunlocked.github.io/bettermixer/selfservice) to add FFZ/BTTV emotes to your channel.
 
 # How to contribute
 ## How to file bug reports/feature requests
@@ -12,9 +14,11 @@ In the case of a bug report, if you know how to do so, provide the console logs 
 
 ## How to develop
 1. Clone this repo.
-2. If developing on Chrome (recommended), go to chrome://extensions and enable developer mode in the upper left if you have not already done so (Firefox development follows a similar process, but I won't go over that explicitly).
+2. If developing on Chrome, go to chrome://extensions and enable developer mode in the upper left.
 3. Click the "Load Unpacked" button and select the "Extension" folder.
 4. You're good to go. Make sure to disable the Chrome Webstore version so you don't have two instances of Better Mixer running at once. Visual Studio Code is the recommended editor (and it's the one I use), but any JavaScript editor should suffice.
+
+For Firefox, set up the development environment below and run the `serve:firefox` npm script.
 
 _Note: Do NOT add additional dependencies without first asking to see if it's okay. This includes JavaScript libraries, build tools, and external stylesheets._
 
@@ -46,12 +50,12 @@ npm run package
 ```
 
 # Development Environment
-I use ESLint to guarantee code style compliance. While PRs are not required to be fully compliant (in fact many of mine will not be), compliance should be followed according to your own judgement. To set up ESLint, install node, and then run
+Better Mixer uses various tools to make development run as smoothly as possible. To set these up, install node, and then run
 ```sh
 npm install
 ```
 
-If you're using Visual Studio Code, install the ESLint extension and add these lines to your workspace settings:
+If you're using Visual Studio Code, install the [ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and add these lines to your workspace settings:
 ```json
 {
     "eslint.enable": true,
@@ -72,7 +76,6 @@ If you're using Visual Studio Code, install the ESLint extension and add these l
 Optionally, you can also add these lines which provide the schema for `manifest.json`, though it's unlikely that they will be necessary.
 ```json
 {
-    "eslint.enable": true,
     "json.schemas": [
         {
             "fileMatch": [

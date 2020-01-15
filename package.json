@@ -1,14 +1,14 @@
 {
   "name": "better-mixer",
-  "version": "2.7.2",
+  "version": "2.9.0",
   "description": "Improvements to Mixer, similar to FFZ for Twitch.",
   "scripts": {
     "lint": "eslint -c .eslintrc ./Extension/**/*.{ts,js}",
     "lint:fix": "eslint -c .eslintrc ./Extension/**/*.{ts,js} --fix",
-    "serve": "web-ext run --source-dir ./build/",
+    "serve:firefox": "web-ext run --source-dir ./build/",
     "package": "npm run build && web-ext build --source-dir ./build/",
     "build": "gulp",
-    "build:watch": "gulp watch"
+    "watch": "gulp watch"
   },
   "devDependencies": {
     "@types/chrome": "0.0.91",
