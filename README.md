@@ -27,6 +27,28 @@ _Note: Do NOT add additional dependencies without first asking to see if it's ok
 2. Write your fix/feature (see above).
 3. Make a pull request. Feel free to PR into master (I'll redirect the PR into a new branch if necessary).
 
+# Building the extension
+*Gulp is used for building Typescript and copying assets*
+```sh
+# Run ESLint manually
+npm run lint
+
+# Fix linting errors where possible
+npm run lint:fix
+
+# Build the extension
+npm run build
+
+# Build the extension and start watching for changes
+npm run build:watch
+
+# Start Firefox with the extension installed
+npm run serve
+
+# Package extension for Mozilla Addon deployment
+npm run package
+```
+
 # Development Environment
 Better Mixer uses various tools to make development run as smoothly as possible. To set these up, install node, and then run
 ```sh
@@ -38,16 +60,17 @@ If you're using Visual Studio Code, install the [ESLint extension](https://marke
 {
     "eslint.enable": true,
     "eslint.options": {
-		"configFile": ".eslintrc",
-		"extensions": [".js"]
-	},
-	"eslint.lintTask.enable": true,
-	"eslint.validate": [
+        "configFile": ".eslintrc",
+        "extensions": [".js", ".ts"]
+    },
+    "eslint.lintTask.enable": true,
+    "eslint.validate": [
+        "javascript",
         {
-            "language": "javascript",
+            "language": "typescript",
             "autoFix": true
-        }
-	]
+        },
+    ]
 }
 ```
 Optionally, you can also add these lines which provide the schema for `manifest.json`, though it's unlikely that they will be necessary.

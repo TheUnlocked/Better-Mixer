@@ -1,7 +1,7 @@
 import Patcher from "./Patchers/Patcher.js";
 
 export default class Emote {
-    constructor(name, image, width, height, animated=false) {
+    constructor(name, image, width, height, animated = false) {
 
         this.name = name;
         this.image = image;
