@@ -50,7 +50,7 @@ export default class Channel {
             // this.gameWispChannel = plugin.gameWisp.getSync(this);
 
             this.chat = new Chat(this);
-            this.plugin.dispatchEvent(BetterMixer.Events.ON_CHAT_START_LOAD, this.chat, this);
+            this.plugin.dispatchEvent('chatStartLoad', this.chat, this);
             this.plugin.log(`Loaded channel '${this.channelName}'`, BetterMixer.LogType.INFO);
         } catch (err) {
             this.plugin.log(`${err.message}: Failed to get channel ${this.channelName}`, BetterMixer.LogType.ERROR);
@@ -62,10 +62,10 @@ export default class Channel {
             this.chat.load(element);
         }
         else {
-            const loader = this.plugin.addEventListener(BetterMixer.Events.ON_CHAT_START_LOAD, e => {
+            const loader = this.plugin.addEventListener('chatStartLoad', e => {
                 if (e.data === this.chat) {
                     e.data.load(element);
-                    this.plugin.removeEventListener(BetterMixer.Events.ON_CHAT_START_LOAD, loader);    
+                    this.plugin.removeEventListener('chatStartLoad', loader);    
                 }
             });
         }

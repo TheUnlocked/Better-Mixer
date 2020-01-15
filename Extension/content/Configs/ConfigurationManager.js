@@ -33,7 +33,7 @@ export default class ConfigurationManager {
 
         this._configDialogObserver = observeNewElements('[class*="modal"] h1', document.documentElement, element => {
             if (element.innerHTML === "Chat Settings") {
-                this.plugin.dispatchEvent(BetterMixer.Events.ON_SETTINGS_DIALOG_OPEN, { dialog: element.parentElement }, this);
+                this.plugin.dispatchEvent('settingsDialogOpen', { dialog: element.parentElement }, this);
             }
         });
     }

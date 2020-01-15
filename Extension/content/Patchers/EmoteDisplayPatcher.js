@@ -1,12 +1,20 @@
 import EmoteSet from "../EmoteSet.js";
+import BetterMixer from "../BetterMixer.js";
+import ChatMessage from "../ChatMessage.js";
 
+/**
+ * 
+ * @param {BetterMixer} plugin 
+ * @param {ChatMessage} message 
+ * @param {EmoteSet[]} emoteSets 
+ */
 export const parseMessageEmotes = (plugin, message, emoteSets = undefined) => {
     const emoteGatherEventData = {
         channel: message.chat.channel,
         user: message.author,
         message: message
     };
-    const emoteList = (emoteSets || plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, message))
+    const emoteList = (emoteSets || plugin.dispatchGather('gatherEmotes', emoteGatherEventData, message))
         .reduce((acc, val) => !val ? acc : val instanceof EmoteSet ? acc.concat(val.emotes) : acc.concat(val), []);
     const emotes = emoteList.reduce((result, value) => { result[value.name] = value; return result; }, {});
 

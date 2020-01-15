@@ -11,7 +11,7 @@
         "eqeqeq": ["warn", "always", { "null": "ignore" }],
         "comma-dangle": "off",
         "no-delete-var": "error",
-        "no-unused-vars": "off", /* ["warn", { "vars": "local" }] */
+        "@typescript-eslint/no-unused-vars": "off",
         "babel/new-cap": "warn",
         "camelcase": ["warn", { "allow": ["__bettermixer_poly"] }],
         "babel/camelcase": "off",
@@ -32,11 +32,16 @@
         "keyword-spacing": "warn",
         "space-unary-ops": ["warn", { "words": true }],
         "no-void": "error",
-        "prefer-arrow/prefer-arrow-functions": "error",
+        "prefer-arrow/prefer-arrow-functions": "warn",
         "space-infix-ops": "warn",
         "@typescript-eslint/explicit-function-return-type": "off",
+        "@typescript-eslint/no-explicit-any": "off",
         "no-empty": "off",
-        "no-fallthrough": "warn"
+        "@typescript-eslint/no-empty-function": "off",
+        "no-fallthrough": "warn",
+        "@typescript-eslint/no-use-before-define": "off",
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "no-dupe-class-members": "off"
     },
     "env": {
         "webextensions": true,

@@ -16,9 +16,8 @@ export default class Patcher {
     constructor(plugin) {
         this.plugin = plugin;
 
-        this.plugin.addEventListener(BetterMixer.Events.ON_MESSAGE, event => {
-            /** @type {ChatMessage} */
-            const message = event.sender;
+        this.plugin.addEventListener('chatMessage', event => {
+            const message = event.data;
 
             if (!this._emotesAddedListener) {
                 this._emotesAddedListener = event => {
@@ -26,7 +25,7 @@ export default class Patcher {
                         parseMessageEmotes(this.plugin, new ChatMessage(this.plugin.focusedChannel.chat, msgElement), event.data);
                     }
                 };
-                this.plugin.addEventListener(BetterMixer.Events.ON_EMOTES_ADDED, this._emotesAddedListener);
+                this.plugin.addEventListener('emotesAdded', this._emotesAddedListener);
             }
 
             // Handle message emotes
@@ -73,7 +72,7 @@ export default class Patcher {
                     user: message.author,
                     message: message
                 };
-                const badges = plugin.dispatchGather(BetterMixer.Events.GATHER_BADGES, badgeGatherEventData, message).flat(1);
+                const badges = plugin.dispatchGather('gatherBadges', badgeGatherEventData, message).flat(1);
 
                 const authorElement = message.element.querySelector('[class*="Username"]');
                 for (const badge of badges) {
@@ -89,17 +88,17 @@ export default class Patcher {
         });
 
         // Handle emote menu
-        this.plugin.addEventListener(BetterMixer.Events.ON_EMOTES_DIALOG_OPEN, event => {
+        this.plugin.addEventListener('emotesDialogOpen', event => {
             patchEmoteDialog(this.plugin, event.data.dialog, event.data.chat);
         });
 
         // Handle config menu
-        this.plugin.addEventListener(BetterMixer.Events.ON_SETTINGS_DIALOG_OPEN, event => {
+        this.plugin.addEventListener('settingsDialogOpen', event => {
             patchSettingsDialog(this.plugin, event.data.dialog);
         });
 
         // Handle chat load
-        this.plugin.addEventListener(BetterMixer.Events.ON_CHAT_FINISH_LOAD, event => {
+        this.plugin.addEventListener('chatFinishLoad', event => {
             const chat = event.data;
 
             // Handle emote pre-loading
@@ -109,7 +108,7 @@ export default class Patcher {
                     user: chat.plugin.user,
                     message: null
                 };
-                const gatheredEmotes = plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, chat);
+                const gatheredEmotes = plugin.dispatchGather('gatherEmotes', emoteGatherEventData, chat);
                 for (const emotes of gatheredEmotes) {
                     if (emotes instanceof EmoteSet) {
                         for (const emote of emotes.emotes) {
@@ -143,7 +142,7 @@ export default class Patcher {
                     let frontIndex = inputBox.value.indexOf(' ', inputBox.selectionEnd);
                     if (backIndex === -1) backIndex = 0;
                     if (frontIndex === -1) frontIndex = inputBox.value.length;
-                    return inputBox.value.slice(backIndex, frontIndex+1).trim();
+                    return inputBox.value.slice(backIndex, frontIndex + 1).trim();
                 };
 
                 inputBox.addEventListener('input', () => {
@@ -179,7 +178,7 @@ export default class Patcher {
         });
 
         // Handle Browse > Filters > Save Filters
-        this.plugin.addEventListener(BetterMixer.Events.ON_PAGE_LOAD, () => {
+        this.plugin.addEventListener('pageLoad', () => {
             if (document.location.pathname.startsWith("/browse")) {
                 this.plugin.configuration.getConfigAsync('browse_filters', async (filterConfig) => {    
                     const browseBaseUrl = "https://mixer.com" + document.location.pathname;

@@ -1,17 +1,18 @@
 {
   "compilerOptions": {
-    "target": "es2017",
-    "module": "es6",
+    "target": "ES2020",
+    "module": "ES6",
     "strict": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "allowJs": true,
+    "incremental": true,
+    "tsBuildInfoFile": ".tsbuildinfo",
     "baseUrl": ".",
     "lib": [
       "dom",
       "dom.iterable",
-      "scripthost"
     ],
     "outDir": "build/"
   },

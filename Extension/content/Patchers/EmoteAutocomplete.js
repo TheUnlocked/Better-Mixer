@@ -1,10 +1,17 @@
 import EmoteSet from "../EmoteSet.js";
 import { fetchJson } from "../Utility/Util.js";
 import { VanillaEmote } from "../Emote.js";
+import Chat from "../Chat.js";
+import BetterMixer from "../BetterMixer.js";
 
 export default class EmoteAutocomplete {
     // static vanillaEmoteCache = [];
 
+    /**
+     * 
+     * @param {BetterMixer} plugin 
+     * @param {Chat} chat 
+     */
     constructor(plugin, chat) {
         this.plugin = plugin;
         this.chat = chat;
@@ -14,7 +21,7 @@ export default class EmoteAutocomplete {
         this.element.classList.add('bettermixer-emote-autocomplete-container');
         
         this.loadVanillaEmoteCache();
-        this.plugin.addEventListener(BetterMixer.Events.ON_EMOTES_ADDED, () => this.reloadCache());   
+        this.plugin.addEventListener('emotesAdded', () => this.reloadCache());   
     }
 
     async loadVanillaEmoteCache() {
@@ -72,7 +79,7 @@ export default class EmoteAutocomplete {
             message: null
         };
         this.emoteCache = this.vanillaEmotes
-            .concat(this.plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, this)
+            .concat(this.plugin.dispatchGather('gatherEmotes', emoteGatherEventData, this)
                 .reduce((acc, val) => !val ? acc : val instanceof EmoteSet ? acc.concat(val.emotes) : acc.concat(val), []));
         this._animatedEmotesWereOn = this.plugin.configuration.getConfig('show_emotes_animated').state;
         if (!this._animatedEmotesWereOn) {

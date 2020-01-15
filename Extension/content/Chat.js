@@ -36,7 +36,7 @@ export default class Chat {
             // if (!this.users[authorName]){
             //     this.users[authorName] = msg.author;
             // }
-            this.plugin.dispatchEvent(BetterMixer.Events.ON_MESSAGE, null, msg);
+            this.plugin.dispatchEvent('chatMessage', msg, this);
             element.__bettermixerSent = true;
         });
 
@@ -63,21 +63,21 @@ export default class Chat {
             }
             return badges;
         };
-        this.plugin.addEventListener(BetterMixer.Events.GATHER_BADGES, this._gatherBadges);
+        this.plugin.addEventListener('gatherBadges', this._gatherBadges);
 
         this._emoteDialogObserver = observeNewElements('[class*="modal"] h1', document.documentElement, element => {
             if (['emotes', 'emoticons'].includes(element.innerHTML.toLowerCase())) {
-                this.plugin.dispatchEvent(BetterMixer.Events.ON_EMOTES_DIALOG_OPEN, { chat: this, dialog: element.parentElement }, this);
+                this.plugin.dispatchEvent('emotesDialogOpen', { chat: this, dialog: element.parentElement }, this);
             }
         });
 
-        this.plugin.dispatchEvent(BetterMixer.Events.ON_CHAT_FINISH_LOAD, this, this);
+        this.plugin.dispatchEvent('chatFinishLoad', this, this);
     }
 
     unload() {
         this._msgObserver && this._msgObserver.disconnect();
         this._emoteDialogObserver && this._emoteDialogObserver.disconnect();
-        this._gatherBadges && this.plugin.removeEventListener(BetterMixer.Events.GATHER_BADGES, this._gatherBadges);
+        this._gatherBadges && this.plugin.removeEventListener('gatherBadges', this._gatherBadges);
         this._loaded = false;
     }
 }

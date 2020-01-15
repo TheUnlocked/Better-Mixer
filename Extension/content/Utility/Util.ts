@@ -1,4 +1,4 @@
-export const fetchJson = async (url: RequestInfo, init: RequestInit) => {
+export const fetchJson = async (url: RequestInfo, init?: RequestInit) => {
     return fetch(url, init)
         .then(resp => {
             if (resp.status < 200 || resp.status > 299) {
@@ -8,11 +8,11 @@ export const fetchJson = async (url: RequestInfo, init: RequestInit) => {
         });
 };
 
-export const waitFor = (pred: () => boolean, _options: { delay?: number; maxAttempts?: number }) => new Promise((resolve, reject) => {
+export const waitFor = (pred: () => any, _options?: { delay?: number; maxAttempts?: number }) => new Promise((resolve, reject) => {
     const options = {
         delay: 100,
         maxAttempts: -1,
-        ..._options
+        ...(_options || {})
     };
     let attempts = options.maxAttempts;
     const loop = () => {
@@ -33,9 +33,9 @@ export const executeInOrder = async (functions: (() => any)[]) => {
     }
 };
 
-export const observeNewElements = (selector: string, parent: Node, callback: (element: Element) => void) => {
+export const observeNewElements = (selector: string, parent: Node, callback: (element: HTMLElement) => void) => {
     const observer = new MutationObserver(muts => {
-        const matches = [] as Element[];
+        const matches = [];
         for (const mut of muts) {
             for (const node of mut.addedNodes) {
                 if (node instanceof HTMLElement) {
@@ -46,10 +46,10 @@ export const observeNewElements = (selector: string, parent: Node, callback: (el
                 }
             }
         }
-        const uniqueMatches: Element[] = matches.reduce((result, next) => result.includes(next) ? result : (result.push(next), result), []);
+        const uniqueMatches = matches.reduce((result, next) => result.includes(next) ? result : (result.push(next), result), [] as Element[]);
         uniqueMatches.forEach(match => {
             try {
-                callback(match);
+                callback(match as HTMLElement);
             }
             catch (error) {
                 console.error(error);

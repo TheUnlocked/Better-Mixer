@@ -14,7 +14,7 @@ export const patchEmoteDialog = (plugin, emotesDialogElement, chat) => {
         user: plugin.user,
         message: null
     };
-    const gatheredEmotes = plugin.dispatchGather(BetterMixer.Events.GATHER_EMOTES, emoteGatherEventData, chat);
+    const gatheredEmotes = plugin.dispatchGather('gatherEmotes', emoteGatherEventData, chat);
 
     const emoteContainer = emotesDialogElement.querySelector('div[class*="container"]');
     emoteContainer.style.overflow = "hidden";

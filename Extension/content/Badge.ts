@@ -2,13 +2,11 @@ import Patcher from "./Patchers/Patcher.js";
 import BetterMixer from "./BetterMixer.js";
 
 export default class Badge {
-    /**
-     * 
-     * @param {String} name 
-     * @param {String} image 
-     * @param {String} vanillaSelector
-     */
-    constructor(name, image, example = undefined) {
+    name: string;
+    image: any;
+    example?: Element;
+
+    constructor(name: string, image: any, example?: Element) {
 
         this.name = name;
         this.image = image;
@@ -19,7 +17,7 @@ export default class Badge {
     get element() {
         let badge;
         if (this.example) {
-            badge = this.example.cloneNode(true);
+            badge = this.example.cloneNode(true) as Element;
         }
         else {
             badge = document.createElement('img');

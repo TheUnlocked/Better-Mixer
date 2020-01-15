@@ -38,8 +38,8 @@ export default class FFZAddon {
                 }
             };
 
-            this.plugin.addEventListener(BetterMixer.Events.GATHER_EMOTES, this._gatherEmotes);
-            this.plugin.dispatchEvent(BetterMixer.Events.ON_EMOTES_ADDED, [this.emotes], this);
+            this.plugin.addEventListener('gatherEmotes', this._gatherEmotes);
+            this.plugin.dispatchEvent('emotesAdded', [this.emotes], this);
 
             this.plugin.log(`Fetched global FFZ emotes.`, BetterMixer.LogType.INFO);
         } catch (err) {

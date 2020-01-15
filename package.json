@@ -7,8 +7,8 @@
     "lint:fix": "eslint -c .eslintrc ./Extension/**/*.{ts,js} --fix",
     "serve:firefox": "web-ext run --source-dir ./build/",
     "package": "npm run build && web-ext build --source-dir ./build/",
-    "build": "gulp",
-    "watch": "gulp watch"
+    "build": "tsc && gulp",
+    "watch": "concurrently --raw \"gulp watch\" \"tsc --watch\""
   },
   "devDependencies": {
     "@types/chrome": "0.0.91",
@@ -19,10 +19,9 @@
     "eslint-plugin-babel": "^5.3.0",
     "eslint-plugin-prefer-arrow": "^1.1.6",
     "gulp": "^4.0.2",
-    "gulp-sourcemaps": "^2.6.5",
-    "gulp-typescript": "^5.0.1",
     "typescript": "^3.7.2",
-    "web-ext": "^3.2.1"
+    "web-ext": "^3.2.1",
+    "concurrently": "^5.0.2"
   },
   "repository": {
     "type": "git",

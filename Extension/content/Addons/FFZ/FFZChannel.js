@@ -67,14 +67,14 @@ export default class FFZChannel {
             }
         };
 
-        this.plugin.addEventListener(BetterMixer.Events.GATHER_EMOTES, this._gatherEmotes);
-        this.plugin.dispatchEvent(BetterMixer.Events.ON_EMOTES_ADDED, [this.emotes], this);
+        this.plugin.addEventListener('gatherEmotes', this._gatherEmotes);
+        this.plugin.dispatchEvent('emotesAdded', [this.emotes], this);
 
         this.plugin.log(`Synced ${this.channel.owner.username} with FFZ emotes from ${this.twitch.login}.`, BetterMixer.LogType.INFO);
     } 
 
     unload() {
         this.cancelLoad = true;
-        this._gatherEmotes && this.plugin.removeEventListener(BetterMixer.Events.GATHER_EMOTES, this._gatherEmotes);
+        this._gatherEmotes && this.plugin.removeEventListener('gatherEmotes', this._gatherEmotes);
     }
 }

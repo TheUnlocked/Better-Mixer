@@ -14,18 +14,50 @@ import BotDetectionConfig from "./Configs/BotDetectionConfig.js";
 import StringConfig from "./Configs/StringConfig.js";
 import { fetchJson, waitFor, observeNewElements } from "./Utility/Util.js";
 import DropdownConfig from "./Configs/DropdownConfig.js";
+import { GatherBadgesEvent, GatherBadgesResult, BetterMixerEvent, ChatStartLoadEvent, ChatFinishLoadEvent, GatherBadgesEventData, ChatStartLoadEventData, ChatFinishLoadEventData, LoadEvent, ChannelLoadEvent, UserLoadEvent, ChatMessageEvent, EmotesDialogOpenEvent, SettingsDialogOpenEvent, PageLoadEvent, EmotesAddedEvent, GatherEmotesEvent, GatherEmotesResult, LoadEventData, ChannelLoadEventData, UserLoadEventData, ChatMessageEventData, EmotesDialogOpenEventData, SettingsDialogOpenEventData, PageLoadEventData, EmotesAddedEventData, GatherEmotesEventData } from "./BetterMixerEvent.js";
 
-const SRC = document.getElementById('BetterMixer-module').src;
+const SRC: string = (document.getElementById('BetterMixer-module') as HTMLImageElement).src;
 const BASE_URL = SRC.split('/').slice(0, -2).join('/') + '/';
 
 export default class BetterMixer {
+    _events: {[eventName: string]: Function[]};
+    configuration: ConfigurationManager;
+    twitch: TwitchAddon;
+    bttv: BTTVAddon;
+    ffz: FFZAddon;
+    activeChannels: Channel[];
+    patcher: Patcher;
+    user?: User;
+    focusedChannel?: Channel;
+
+    private _embedded?: any;
+    private _userPage?: any;
+    private _page?: string;
+    private _chatObserver?: MutationObserver;
+    private _state: any;
+
     constructor() {
 
         this.log("Base loaded.");
 
-        this._events = [];
-        for (const _ in BetterMixer.Events) {
-            this._events.push([]);
+        this._events = {};
+        
+        for (const eventName of [
+            'load',
+            'channelLoad',
+            'chatFinishLoad',
+            'chatStartLoad',
+            'userLoad',
+            'chatMessage',
+            'emotesDialogOpen',
+            'settingsDialogOpen',
+            'pageLoad',
+            'emotesAdded',
+            
+            'gatherEmotes',
+            'gatherBadges',
+        ]) {
+            this._events[eventName] = [];
         }
 
         this.configuration = new ConfigurationManager(this);
@@ -41,19 +73,19 @@ export default class BetterMixer {
         /* eslint-disable prefer-arrow/prefer-arrow-functions */
         (function(history) {
             const pushState = history.pushState;
-            history.pushState = function(state) {
-                if (typeof history.onpushstate === "function") {
-                    history.onpushstate({state: state});
+            history.pushState = function(state, data: any, title: string, url?: string | null) {
+                if (typeof history.__bettermixer_onpushstate === "function") {
+                    history.__bettermixer_onpushstate({state: state});
                 }
         
                 // eslint-disable-next-line prefer-rest-params
-                const ret = pushState.apply(history, arguments);
+                const ret = pushState.apply(history, [data, title, url]);
 
                 BetterMixer.instance.reload();
 
                 return ret;
             };
-            window.onpopstate = e => BetterMixer.instance.reload();
+            window.onpopstate = (e: PopStateEvent) => BetterMixer.instance.reload();
         })(window.history);
         /* eslint-enable prefer-arrow/prefer-arrow-functions */
 
@@ -67,7 +99,7 @@ export default class BetterMixer {
         Object.defineProperty(botColorConfig, 'hidden', { get: () => botColorDetectionConfig.state === "off" });
         botColorConfig.update = () => {
             document.querySelectorAll('.bettermixer-role-bot').forEach(element => {
-                element.style.color = this._state;
+                (element as HTMLElement).style.color = this._state;
             });
         };
         this.configuration.registerConfig(botColorDetectionConfig);
@@ -114,12 +146,23 @@ export default class BetterMixer {
             }
         };
 
-        fetchJson('https://raw.githubusercontent.com/TheUnlocked/Better-Mixer/master/Info/badges/badges.json').then(data => {
-            const badges = {};
+        fetchJson('https://raw.githubusercontent.com/TheUnlocked/Better-Mixer/master/Info/badges/badges.json').then((data: {
+            badges: {
+                id: string;
+                name: string;
+                src: string;
+                description: string;
+            }[];
+            groups: {
+                badges: string[];
+                members: string[];
+            }[];
+        }) => {
+            const badges: {[badgeId: string]: Badge} = {};
             for (const badge of data.badges) {
                 badges[badge.id] = new Badge(badge.name, badge.src);
             }
-            this.addEventListener(BetterMixer.Events.GATHER_BADGES, event => {
+            this.addEventListener('gatherBadges', event => {
                 const userBadges = [];
 
                 for (const group of data.groups) {
@@ -135,17 +178,20 @@ export default class BetterMixer {
         this.patcher = new Patcher(this);
 
         // BetterMixer.ClassNames
-        this.addEventListener(BetterMixer.Events.ON_CHAT_FINISH_LOAD, async () => {
-            let badgeElement;
+        this.addEventListener('chatFinishLoad', async () => {
+            let badgeElement: HTMLElement = undefined!;
             await waitFor(() => badgeElement = [...document.querySelectorAll('style')].filter(element => element.innerHTML.includes('.badge__'))[0]);
 
             BetterMixer.ClassNames.BADGE = "badge__" +  badgeElement.innerHTML.split('.badge__')[1].split('{')[0].trim();
 
             if (!BetterMixer.ClassNames.TEXTITEM) {
-                const scriptText = await (await fetch(document.querySelector('script[src*="main."]').src)).text();
-                const index = scriptText.indexOf('textItem_');
-                // eslint-disable-next-line require-atomic-updates
-                BetterMixer.ClassNames.TEXTITEM = scriptText.slice(index, index + 14);
+                const script = document.querySelector('script[src*="main."]') as HTMLScriptElement;
+                if (script) {
+                    const scriptText = await (await fetch(script.src)).text();
+                    const index = scriptText.indexOf('textItem_');
+                    // eslint-disable-next-line require-atomic-updates
+                    BetterMixer.ClassNames.TEXTITEM = scriptText.slice(index, index + 14);
+                }
             }
         });
     }
@@ -167,14 +213,14 @@ export default class BetterMixer {
     }
 
     async reload() {
-        let page;
+        let page: string = undefined!;
 
         await waitFor(() => (page = window.location.pathname.substring(1).toLowerCase()) !== 'me/bounceback');
 
         this._userPage = !(page === 'browse/all' || page.startsWith('dashboard') || page === "pro");
         if (!this._userPage) {
             this.log(`This is not a user page.`);
-            this.dispatchEvent(BetterMixer.Events.ON_PAGE_LOAD, page, this);
+            this.dispatchEvent('pageLoad', page, this);
             return;
         }
 
@@ -184,15 +230,15 @@ export default class BetterMixer {
             this.log(`Chat is either in a popout or embedded window.`);
         }
 
-        page = page.match(/^[a-z0-9_-]+/i);
+        const pageRegexMatches = page.match(/^[a-z0-9_-]+/i);
 
-        if (!page) {
+        if (!pageRegexMatches) {
             this._page = "";
-            this.dispatchEvent(BetterMixer.Events.ON_PAGE_LOAD, page, this);
+            this.dispatchEvent('pageLoad', page, this);
             return;
         }
 
-        page = page[0];
+        page = pageRegexMatches[0];
 
         // if (page === this._page) {
         //     this.dispatchEvent(BetterMixer.Events.ON_PAGE_LOAD, page, this);
@@ -200,7 +246,7 @@ export default class BetterMixer {
         // }
 
         this._page = page;
-        this.dispatchEvent(BetterMixer.Events.ON_PAGE_LOAD, page, this);
+        this.dispatchEvent('pageLoad', page, this);
 
         this.log(`Switched to page '${this._page}'`);
 
@@ -218,7 +264,7 @@ export default class BetterMixer {
         this.focusedChannel = mainChannel;
 
         let loaded = false;
-        const reloadChat = element => {
+        const reloadChat = (element: HTMLElement) => {
             loaded = true;
             const chatTabBar = document.querySelector('b-channel-chat-tabs>bui-tab-bar');
 
@@ -228,12 +274,12 @@ export default class BetterMixer {
                 const selectedButton = thisChannelButton.querySelector('.bui-tab-underline') ? thisChannelButton : otherChannelButton;
                 if (selectedButton === thisChannelButton || window.location.search.startsWith('?vod=')) {
                     this.focusedChannel = mainChannel;
-                    this.dispatchEvent(BetterMixer.Events.ON_CHAT_START_LOAD, {channel: mainChannel, element: element}, this);
+                    // this.dispatchEvent('chatStartLoad', {channel: mainChannel, element: element}, this);
                 }
                 else {
-                    const secondChannel = new Channel(this, otherChannelButton.innerText.toLowerCase());
+                    const secondChannel = new Channel(this, (otherChannelButton as HTMLElement).innerText.toLowerCase());
                     if (this.activeChannels.length > 1) {
-                        this.activeChannels.pop().unload();
+                        this.activeChannels.pop()!.unload();
                     }
                     this.activeChannels.push(secondChannel);
                     this.focusedChannel = secondChannel;
@@ -250,21 +296,20 @@ export default class BetterMixer {
             await waitFor(() => document.querySelector('b-channel-chat-section'));
 
             this._chatObserver = observeNewElements('b-chat-client-host-component [class*="chatContainer"]',
-                document.querySelector('b-channel-chat-section').parentElement,
-                element => {
-                reloadChat(element);
-            });
+                document.querySelector('b-channel-chat-section')!.parentElement!,
+                element => reloadChat(element)
+            );
             if (!loaded && document.querySelector('b-chat-client-host-component')) {
-                reloadChat(document.querySelector('b-chat-client-host-component').children[0]);
+                reloadChat(document.querySelector('b-chat-client-host-component')!.children[0] as HTMLElement);
             }
         }
         else {
             await waitFor(() => document.querySelector('b-chat-client-host-component [class*="chatContainer"]'));
-            reloadChat(document.querySelector('b-chat-client-host-component [class*="chatContainer"]'));
+            reloadChat(document.querySelector('b-chat-client-host-component [class*="chatContainer"]') as HTMLElement);
         }
     }
 
-    injectStylesheet(file) {
+    injectStylesheet(file: string) {
         const injection = document.createElement('link');
         injection.rel = 'stylesheet';
         injection.href = BASE_URL + file;
@@ -273,7 +318,7 @@ export default class BetterMixer {
         return injection;
     }
 
-    log(msg, logType = BetterMixer.LogType.INFO) {
+    log(msg: string, logType = BetterMixer.LogType.INFO) {
         switch (logType) {
             case BetterMixer.LogType.INFO:
                 console.log(`[Better Mixer] ${msg}`);
@@ -286,7 +331,7 @@ export default class BetterMixer {
         }
     }
 
-    postToContent(message) {
+    postToContent(message: {message: string; data: any}) {
         window.postMessage([SRC, message], '*');
     }
 
@@ -294,23 +339,45 @@ export default class BetterMixer {
         return this.activeChannels[index];
     }
 
-    registerEventType(eventName) {
-        if (!(eventName in BetterMixer.Events)) {
-            BetterMixer.Events[eventName] = BetterMixer.Events.length;
-            this._events.push([]);
-            return BetterMixer.Events[eventName];
+    registerEventType(eventName: string) {
+        if (Object.keys(this._events).includes(eventName)) {
+            this._events[eventName] = [];
         }
         else {
             this.log(`${eventName} is already an event!`, BetterMixer.LogType.WARN);
         }
     }
 
-    addEventListener(eventType, callback) {
+    addEventListener(eventType: 'load', callback: (event: LoadEvent) => void): void;
+    addEventListener(eventType: 'channelLoad', callback: (event: ChannelLoadEvent) => void): void;
+    addEventListener(eventType: 'chatStartLoad', callback: (event: ChatStartLoadEvent) => void): void;
+    addEventListener(eventType: 'chatFinishLoad', callback: (event: ChatFinishLoadEvent) => void): void;
+    addEventListener(eventType: 'userLoad', callback: (event: UserLoadEvent) => void): void;
+    addEventListener(eventType: 'chatMessage', callback: (event: ChatMessageEvent) => void): void;
+    addEventListener(eventType: 'emotesDialogOpen', callback: (event: EmotesDialogOpenEvent) => void): void;
+    addEventListener(eventType: 'settingsDialogOpen', callback: (event: SettingsDialogOpenEvent) => void): void;
+    addEventListener(eventType: 'pageLoad', callback: (event: PageLoadEvent) => void): void;
+    addEventListener(eventType: 'emotesAdded', callback: (event: EmotesAddedEvent) => void): void;
+    addEventListener(eventType: 'gatherEmotes', callback: (event: GatherEmotesEvent) => GatherEmotesResult): void;
+    addEventListener(eventType: 'gatherBadges', callback: (event: GatherBadgesEvent) => GatherBadgesResult): void;
+    addEventListener(eventType: EventType, callback: (event: BetterMixerEvent<any>) => any) {
         this._events[eventType].push(callback);
     }
 
-    removeEventListener(eventType, callback) {
-        if (eventType >= Object.keys(BetterMixer.Events).length) {
+    removeEventListener(eventType: 'load', callback: (event: LoadEvent) => void): void;
+    removeEventListener(eventType: 'channelLoad', callback: (event: ChannelLoadEvent) => void): void;
+    removeEventListener(eventType: 'chatStartLoad', callback: (event: ChatStartLoadEvent) => void): void;
+    removeEventListener(eventType: 'chatFinishLoad', callback: (event: ChatFinishLoadEvent) => void): void;
+    removeEventListener(eventType: 'userLoad', callback: (event: UserLoadEvent) => void): void;
+    removeEventListener(eventType: 'chatMessage', callback: (event: ChatMessageEvent) => void): void;
+    removeEventListener(eventType: 'emotesDialogOpen', callback: (event: EmotesDialogOpenEvent) => void): void;
+    removeEventListener(eventType: 'settingsDialogOpen', callback: (event: SettingsDialogOpenEvent) => void): void;
+    removeEventListener(eventType: 'pageLoad', callback: (event: PageLoadEvent) => void): void;
+    removeEventListener(eventType: 'emotesAdded', callback: (event: EmotesAddedEvent) => void): void;
+    removeEventListener(eventType: 'gatherEmotes', callback: (event: GatherEmotesEvent) => GatherEmotesResult): void;
+    removeEventListener(eventType: 'gatherBadges', callback: (event: GatherBadgesEvent) => GatherBadgesResult): void;
+    removeEventListener(eventType: EventType, callback: (event: BetterMixerEvent<any>) => any) {
+        if (!Object.keys(this._events).includes(eventType)) {
             this.log(`Event ${eventType} does not exist.`, BetterMixer.LogType.ERROR);
             return;
         }
@@ -324,14 +391,24 @@ export default class BetterMixer {
         this._events[eventType].splice(index, 1);
     }
 
-    dispatchEvent(eventType, data, sender) {
+    dispatchEvent(eventType: 'load', data: LoadEventData, sender: any): void;
+    dispatchEvent(eventType: 'channelLoad', data: ChannelLoadEventData, sender: any): void;
+    dispatchEvent(eventType: 'chatStartLoad', data: ChatStartLoadEventData, sender: any): void;
+    dispatchEvent(eventType: 'chatFinishLoad', data: ChatFinishLoadEventData, sender: any): void;
+    dispatchEvent(eventType: 'userLoad', data: UserLoadEventData, sender: any): void;
+    dispatchEvent(eventType: 'chatMessage', data: ChatMessageEventData, sender: any): void;
+    dispatchEvent(eventType: 'emotesDialogOpen', data: EmotesDialogOpenEventData, sender: any): void;
+    dispatchEvent(eventType: 'settingsDialogOpen', data: SettingsDialogOpenEventData, sender: any): void;
+    dispatchEvent(eventType: 'pageLoad', data: PageLoadEventData, sender: any): void;
+    dispatchEvent(eventType: 'emotesAdded', data: EmotesAddedEventData, sender: any): void;
+    dispatchEvent(eventType: EventType, data: any, sender: any) {
         const event = {
             event: eventType,
             sender: sender,
             data: data
         };
 
-        if (eventType >= Object.keys(BetterMixer.Events).length) {
+        if (!Object.keys(this._events).includes(eventType)) {
             this.log(`Event ${eventType} does not exist.`, BetterMixer.LogType.ERROR);
             return;
         }
@@ -346,15 +423,17 @@ export default class BetterMixer {
         });
     }
 
-    dispatchGather(eventType, data, sender) {
+    dispatchGather(eventType: 'gatherEmotes', data: GatherEmotesEventData, sender: any): GatherEmotesResult;
+    dispatchGather(eventType: 'gatherBadges', data: GatherBadgesEventData, sender: any): GatherBadgesResult;
+    dispatchGather(eventType: EventType, data: any, sender: any): any {
         const event = {
             event: eventType,
             sender: sender,
             data: data
         };
 
-        const collected = [];
-        if (eventType >= Object.keys(BetterMixer.Events).length) {
+        const collected: any[] = [];
+        if (!Object.keys(this._events).includes(eventType)) {
             this.log(`Event ${eventType} does not exist.`, BetterMixer.LogType.ERROR);
             return;
         }
@@ -372,40 +451,20 @@ export default class BetterMixer {
         });
         return collected;
     }
+
+    static LogType = Object.freeze({
+        INFO: 0,
+        WARN: 1,
+        /** @deprecated use `BetterMixer.LogType.WARN` instead */
+        WARNING: 1,
+        ERROR: 2
+    });
+
+    static ClassNames: {[className: string]: string} = {};
+
+    static instance = new BetterMixer();
 }
 
-/**
- * @enum {number}
- */
-BetterMixer.LogType = Object.freeze({
-    INFO: 0,
-    WARN: 1,
-    /* Deprecated - DO NOT USE */ WARNING: 1,
-    ERROR: 2
-});
+type EventType = string;
 
-/**
- * @enum {number}
- */
-BetterMixer.Events = {
-    ON_LOAD: 0,
-    ON_CHANNEL_LOAD: 1,
-    ON_CHAT_FINISH_LOAD: 2,
-    ON_CHAT_START_LOAD: 10,
-    ON_USER_LOAD: 3,
-    ON_MESSAGE: 4,
-    ON_EMOTES_DIALOG_OPEN: 5,
-    ON_SETTINGS_DIALOG_OPEN: 6,
-    ON_PAGE_LOAD: 7,
-    ON_EMOTES_ADDED: 11,
-
-    GATHER_EMOTES: 8,
-    GATHER_BADGES: 9,
-};
-
-BetterMixer.ClassNames = {
-    
-};
-
-BetterMixer.instance = new BetterMixer();
 window.BetterMixer = BetterMixer;
