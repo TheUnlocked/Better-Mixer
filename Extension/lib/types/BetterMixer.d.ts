@@ -1,7 +1,7 @@
-import BetterMixer from "Extension/content/BetterMixer";
+import BetterMixer from "Extension/content/BetterMixer.js";
 
 declare global {
     interface Window { BetterMixer: new() => BetterMixer }
-    // eslint-disable-next-line camelcase
-    interface History { __bettermixer_onpushstate: any }
+    interface History { __bettermixerOnpushstate: any }
+    interface HTMLElement { __bettermixerSent: boolean }
 }

@@ -63,4 +63,4 @@ export type GatherBadgesEventData = {
     message: ChatMessage;
     channel: Channel;
 };
-export type GatherBadgesResult = Badge | Badge[];
+export type GatherBadgesResult = Badge | Badge[] | undefined;

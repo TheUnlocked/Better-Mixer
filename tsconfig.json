@@ -7,8 +7,6 @@
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "allowJs": true,
-    "incremental": true,
-    "tsBuildInfoFile": ".tsbuildinfo",
     "baseUrl": ".",
     "lib": [
       "dom",

@@ -1,8 +1,13 @@
 import Patcher from "./Patchers/Patcher.js";
 
 export default class Emote {
-    constructor(name, image, width, height, animated = false) {
+    name: string;
+    image: string;
+    height: number;
+    width: number;
+    animated: boolean;
 
+    constructor(name: string, image: string, width: number, height: number, animated = false) {
         this.name = name;
         this.image = image;
         if (height < 28) {
@@ -41,7 +46,7 @@ export default class Emote {
         return emote;
     }
 
-    get imageElement() {
+    get imageElement(): HTMLElement {
         const image = document.createElement('img');
         image.src = this.image;
         image.alt = this.name + " ";
@@ -52,12 +57,13 @@ export default class Emote {
 }
 
 export class VanillaEmote extends Emote {
-    constructor(name, spritesheet, position) {
+    position: any;
+    constructor(name: string, spritesheet: string, position: {width: number; height: number}) {
         super(name, spritesheet, position.width, position.height, false);
         this.position = position;
     }
 
-    get element() {
+    get element(): never {
         throw new Error("VanillaEmote elements cannot be instantiated.");
     }
 

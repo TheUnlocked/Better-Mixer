@@ -2,13 +2,36 @@ import BetterMixer from "./BetterMixer.js";
 import Chat from "./Chat.js";
 import User from "./User.js";
 import { fetchJson } from "./Utility/Util.js";
+import FFZChannel from "./Addons/FFZ/FFZChannel.js";
+import BTTVChannel from "./Addons/BTTV/BTTVChannel.js";
+import TwitchChannel from "./Addons/Twitch/TwitchChannel.js";
 
 export default class Channel {
-    /**
-     * @param {BetterMixer} plugin 
-     * @param {string} channelName 
-     */
-    constructor(plugin, channelName) {
+    plugin: BetterMixer;
+    channelName: string;
+    id?: number;
+    owner?: User;
+    name?: string;
+    audience?: string;
+    description?: string;
+    partnered?: boolean;
+    twitchChannel?: TwitchChannel;
+    bttvChannel?: BTTVChannel;
+    ffzChannel?: FFZChannel;
+    chat?: Chat;
+    channelSettings?: {
+        twitch?: {
+            bttv?: {
+                globals?: boolean;
+
+            };
+            ffz?: {
+
+            };
+        };
+    };
+
+    constructor(plugin: BetterMixer, channelName: string) {
         this.plugin = plugin;
         this.channelName = channelName;
         this.init();
@@ -25,7 +48,7 @@ export default class Channel {
             this.description = data.description;
             this.partnered = data.partnered;
 
-            const channelSettingsElement = new DOMParser().parseFromString(this.description, "text/html").querySelector('img[alt^="!!better-mixer-desc-flags!!"]');
+            const channelSettingsElement: HTMLImageElement | null = new DOMParser().parseFromString(this.description!, "text/html").querySelector('img[alt^="!!better-mixer-desc-flags!!"]');
             if (channelSettingsElement) {
                 try {
                     const parsed = JSON.parse(channelSettingsElement.alt.slice(27));
@@ -47,7 +70,6 @@ export default class Channel {
                 this.bttvChannel = this.plugin.bttv.getSync(this.twitchChannel);
                 this.ffzChannel = this.plugin.ffz.getSync(this.twitchChannel);
             }
-            // this.gameWispChannel = plugin.gameWisp.getSync(this);
 
             this.chat = new Chat(this);
             this.plugin.dispatchEvent('chatStartLoad', this.chat, this);
@@ -57,7 +79,7 @@ export default class Channel {
         }
     }
 
-    loadChat(element) {
+    loadChat(element: HTMLElement) {
         if (this.chat) {
             this.chat.load(element);
         }
@@ -72,7 +94,7 @@ export default class Channel {
     }
 
     unload() {
-        this.chat.unload();
+        this.chat && this.chat.unload();
         this.ffzChannel && this.ffzChannel.unload();
         this.bttvChannel && this.bttvChannel.unload();
         this.twitchChannel && this.twitchChannel.unload();

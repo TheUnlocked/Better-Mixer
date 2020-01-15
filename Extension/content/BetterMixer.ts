@@ -74,8 +74,8 @@ export default class BetterMixer {
         (function(history) {
             const pushState = history.pushState;
             history.pushState = function(state, data: any, title: string, url?: string | null) {
-                if (typeof history.__bettermixer_onpushstate === "function") {
-                    history.__bettermixer_onpushstate({state: state});
+                if (typeof history.__bettermixerOnpushstate === "function") {
+                    history.__bettermixerOnpushstate({state: state});
                 }
         
                 // eslint-disable-next-line prefer-rest-params
@@ -348,20 +348,25 @@ export default class BetterMixer {
         }
     }
 
-    addEventListener(eventType: 'load', callback: (event: LoadEvent) => void): void;
-    addEventListener(eventType: 'channelLoad', callback: (event: ChannelLoadEvent) => void): void;
-    addEventListener(eventType: 'chatStartLoad', callback: (event: ChatStartLoadEvent) => void): void;
-    addEventListener(eventType: 'chatFinishLoad', callback: (event: ChatFinishLoadEvent) => void): void;
-    addEventListener(eventType: 'userLoad', callback: (event: UserLoadEvent) => void): void;
-    addEventListener(eventType: 'chatMessage', callback: (event: ChatMessageEvent) => void): void;
-    addEventListener(eventType: 'emotesDialogOpen', callback: (event: EmotesDialogOpenEvent) => void): void;
-    addEventListener(eventType: 'settingsDialogOpen', callback: (event: SettingsDialogOpenEvent) => void): void;
-    addEventListener(eventType: 'pageLoad', callback: (event: PageLoadEvent) => void): void;
-    addEventListener(eventType: 'emotesAdded', callback: (event: EmotesAddedEvent) => void): void;
-    addEventListener(eventType: 'gatherEmotes', callback: (event: GatherEmotesEvent) => GatherEmotesResult): void;
-    addEventListener(eventType: 'gatherBadges', callback: (event: GatherBadgesEvent) => GatherBadgesResult): void;
-    addEventListener(eventType: EventType, callback: (event: BetterMixerEvent<any>) => any) {
+    addEventListener(eventType: 'load', callback: (event: LoadEvent) => void): (event: LoadEvent) => void;
+    addEventListener(eventType: 'channelLoad', callback: (event: ChannelLoadEvent) => void): (event: ChannelLoadEvent) => void;
+    addEventListener(eventType: 'chatStartLoad', callback: (event: ChatStartLoadEvent) => void): (event: ChatStartLoadEvent) => void;
+    addEventListener(eventType: 'chatFinishLoad', callback: (event: ChatFinishLoadEvent) => void): (event: ChatFinishLoadEvent) => void;
+    addEventListener(eventType: 'userLoad', callback: (event: UserLoadEvent) => void): (event: UserLoadEvent) => void;
+    addEventListener(eventType: 'chatMessage', callback: (event: ChatMessageEvent) => void): (event: ChatMessageEvent) => void;
+    addEventListener(eventType: 'emotesDialogOpen', callback: (event: EmotesDialogOpenEvent) => void): (event: EmotesDialogOpenEvent) => void;
+    addEventListener(eventType: 'settingsDialogOpen', callback: (event: SettingsDialogOpenEvent) => void): (event: SettingsDialogOpenEvent) => void;
+    addEventListener(eventType: 'pageLoad', callback: (event: PageLoadEvent) => void): (event: PageLoadEvent) => void;
+    addEventListener(eventType: 'emotesAdded', callback: (event: EmotesAddedEvent) => void): (event: EmotesAddedEvent) => void;
+    addEventListener(eventType: 'gatherEmotes', callback: (event: GatherEmotesEvent) => GatherEmotesResult): (event: GatherEmotesEvent) => GatherEmotesResult;
+    addEventListener(eventType: 'gatherBadges', callback: (event: GatherBadgesEvent) => GatherBadgesResult): (event: GatherBadgesEvent) => GatherBadgesResult;
+    /**
+     * 
+     * @returns The function put in `callback`
+     */
+    addEventListener(eventType: EventType, callback: (event: BetterMixerEvent<any>) => any): (event: BetterMixerEvent<any>) => any {
         this._events[eventType].push(callback);
+        return callback;
     }
 
     removeEventListener(eventType: 'load', callback: (event: LoadEvent) => void): void;

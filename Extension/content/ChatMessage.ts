@@ -3,13 +3,11 @@ import User from "./User.js";
 import BetterMixer from "./BetterMixer.js";
 
 export default class ChatMessage {
-    /**
-     * @param {Chat} chat 
-     * @param {Element} element 
-     * @param {User} author
-     */
-    constructor(chat, element, author = undefined) {
-
+    chat: Chat;
+    plugin: BetterMixer;
+    element: Element;
+    author: User;
+    constructor(chat: Chat, element: Element, author: User | undefined = undefined) {
         this.chat = chat;
         this.plugin = chat.plugin;
         this.element = element;
@@ -17,7 +15,7 @@ export default class ChatMessage {
             this.author = author;
         }
         else {
-            this.author = new User({ username: this.element.querySelector('[class*="Username"]').innerText.split(' ')[0]});
+            this.author = new User({ username: (this.element.querySelector('[class*="Username"]') as HTMLElement).innerText.split(' ')[0]});
         }
     }
 }
