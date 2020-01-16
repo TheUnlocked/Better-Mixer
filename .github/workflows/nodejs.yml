@@ -14,3 +14,6 @@ jobs:
         node-version: 12.x
     - name: ESlint Runner Action
       uses: tinovyatkin/action-eslint@v1
+      with:
+        repo-token: ${{secrets.GITHUB_TOKEN}}
+        check-name: eslint
