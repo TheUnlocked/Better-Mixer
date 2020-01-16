@@ -3,14 +3,28 @@
   "version": "2.9.0",
   "description": "Improvements to Mixer, similar to FFZ for Twitch.",
   "scripts": {
-    "serve:firefox": "web-ext run --source-dir ./Extension/",
-    "package": "web-ext build --source-dir ./Extension/"
+    "lint": "eslint -c .eslintrc ./Extension/**/*.{ts,js}",
+    "lint:fix": "eslint -c .eslintrc ./Extension/**/*.{ts,js} --fix",
+    "serve:firefox": "web-ext run --source-dir ./build/",
+    "package": "npm run build && web-ext build --source-dir ./build/",
+    "build": "gulp clean && tsc && gulp",
+    "watch": "concurrently --raw \"gulp watch\" \"tsc --watch\""
   },
   "devDependencies": {
+    "@types/chrome": "0.0.91",
+    "@typescript-eslint/eslint-plugin": "^2.7.0",
+    "@typescript-eslint/parser": "^2.7.0",
+    "@types/react": "^16.9.17",
+    "@types/react-dom": "^16.9.4",
     "babel-eslint": "^10.0.3",
+    "concurrently": "^5.0.2",
+    "del": "^5.1.0",
     "eslint": "^6.6.0",
     "eslint-plugin-babel": "^5.3.0",
     "eslint-plugin-prefer-arrow": "^1.1.6",
+    "gulp": "^4.0.2",
+    "gulp-cli": "^2.2.0",
+    "typescript": "^3.7.2",
     "web-ext": "^3.2.1"
   },
   "repository": {

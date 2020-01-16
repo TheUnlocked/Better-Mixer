@@ -27,10 +27,40 @@ _Note: Do NOT add additional dependencies without first asking to see if it's ok
 2. Write your fix/feature (see above).
 3. Make a pull request. Feel free to PR into master (I'll redirect the PR into a new branch if necessary).
 
+# NPM Scripts
+```sh
+# Run ESLint manually
+npm run lint
+
+# Fix linting errors where possible
+npm run lint:fix
+
+# Build the extension
+# You should usually not need to run this yourself,
+# though it can fix Typescript issues
+npm run build
+
+# Build the extension and start watching for changes
+npm run watch
+
+# Start Firefox with the extension installed
+# Note that this does not start a watch,
+# so you should have a watch running alongside this
+# for the smoothest experience
+npm run serve:firefox
+
+# Build and package extension
+npm run package
+```
+
 # Development Environment
 Better Mixer uses various tools to make development run as smoothly as possible. To set these up, install node, and then run
 ```sh
-npm install
+npm install --save-dev
+```
+To avoid requiring any global package installs, `gulp-cli` is listed as a devDependency rather than a global install. If you wish to use gulp CLI tools on your command line, you'll need to install `gulp-cli` globally:
+```sh
+npm install -g gulp-cli
 ```
 
 If you're using Visual Studio Code, install the [ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and add these lines to your workspace settings:
@@ -38,16 +68,17 @@ If you're using Visual Studio Code, install the [ESLint extension](https://marke
 {
     "eslint.enable": true,
     "eslint.options": {
-		"configFile": ".eslintrc",
-		"extensions": [".js"]
-	},
-	"eslint.lintTask.enable": true,
-	"eslint.validate": [
+        "configFile": ".eslintrc",
+        "extensions": [".js", ".ts"]
+    },
+    "eslint.lintTask.enable": true,
+    "eslint.validate": [
+        "javascript",
         {
-            "language": "javascript",
+            "language": "typescript",
             "autoFix": true
-        }
-	]
+        },
+    ]
 }
 ```
 Optionally, you can also add these lines which provide the schema for `manifest.json`, though it's unlikely that they will be necessary.
