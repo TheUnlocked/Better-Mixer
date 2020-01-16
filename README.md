@@ -56,7 +56,7 @@ npm run package
 # Development Environment
 Better Mixer uses various tools to make development run as smoothly as possible. To set these up, install node, and then run
 ```sh
-npm install
+npm install --save-dev
 ```
 To avoid requiring any global package installs, `gulp-cli` is listed as a devDependency rather than a global install. If you wish to use gulp CLI tools on your command line, you'll need to install `gulp-cli` globally:
 ```sh

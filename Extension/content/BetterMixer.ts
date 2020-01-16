@@ -64,7 +64,6 @@ export default class BetterMixer {
         this.twitch = new TwitchAddon(this);
         this.bttv = new BTTVAddon(this);
         this.ffz = new FFZAddon(this);
-        //this.gameWisp = new GameWispAddon(this);
         this.activeChannels = [];
 
         this.loadUser();
@@ -73,9 +72,6 @@ export default class BetterMixer {
         (history => {
             const pushState = history.pushState;
             history.pushState = (state: any, title: string, url?: string | null) => {
-                if (typeof history.__bettermixerOnpushstate === "function") {
-                    history.__bettermixerOnpushstate({state: state});
-                }
                 const ret = pushState.apply(history, [state, title, url]);
 
                 BetterMixer.instance.reload();
