@@ -1,0 +1,1 @@
+interface Node { eventListeners(): ((event: Event) => void)[] }

@@ -17,7 +17,7 @@ export default class Badge {
     get element() {
         let badge;
         if (this.example) {
-            badge = this.example.cloneNode(true) as Element;
+            badge = this.example.cloneNode(true) as HTMLElement;
         }
         else {
             badge = document.createElement('img');

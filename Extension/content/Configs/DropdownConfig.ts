@@ -1,15 +1,21 @@
 import Config from "./Config.js";
 
-export default class StylesheetToggleConfig extends Config {
-    constructor(element, configName, displayText, descriptionText = "", defaultState = false, enabledState = true) {
+export default class DropdownConfig extends Config<string> {
+    private _configName: string;
+    private _displayText: string;
+    private _descriptionText: string;
+    private _options: {[option: string]: string};
+    private _defaultState: string;
+    private _state: string;
+
+    constructor(configName: string, displayText: string, descriptionText = "", options = {}, defaultState = "") {
         super();
 
-        this._element = element;
         this._configName = configName;
         this._displayText = displayText;
         this._descriptionText = descriptionText;
+        this._options = options;
         this._defaultState = defaultState;
-        this._enabledState = enabledState;
         this._state = defaultState;
     }
 
@@ -43,13 +49,21 @@ export default class StylesheetToggleConfig extends Config {
         return this._defaultState;
     }
 
+    get options() {
+        return Object.keys(this._options);
+    }
+
+    getDisplayFromOption(option: string) {
+        return this._options[option] || "";
+    }
+
     // Updates the configuration effect
     update() {
-        this._element.disabled = this._state !== this._enabledState;
+        
     }
 
     // The type of config, currently unused as configs can only be booleans
     get configType() {
-        return Config.ConfigTypeEnum.BOOLEAN;
+        return Config.ConfigTypeEnum.DROPDOWN;
     }
 }

@@ -5,9 +5,10 @@ import BetterMixer from "./BetterMixer.js";
 export default class ChatMessage {
     chat: Chat;
     plugin: BetterMixer;
-    element: Element;
+    element: HTMLElement;
     author: User;
-    constructor(chat: Chat, element: Element, author: User | undefined = undefined) {
+    
+    constructor(chat: Chat, element: HTMLElement, author: User | undefined = undefined) {
         this.chat = chat;
         this.plugin = chat.plugin;
         this.element = element;

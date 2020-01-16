@@ -7,25 +7,25 @@ import { parseMessageEmotes } from "./EmoteDisplayPatcher.js";
 import { patchSettingsDialog } from "./SettingsDialogPatcher.js";
 import { loadLinkPreview } from "./LinkPreview.js";
 import EmoteAutocomplete from "./EmoteAutocomplete.js";
+import { EmotesAddedEvent } from "../BetterMixerEvent.js";
 
 export default class Patcher {
-    /**
-     * 
-     * @param {BetterMixer} plugin 
-     */
-    constructor(plugin) {
+    plugin: BetterMixer;
+
+    private _emotesAddedListener?: (event: EmotesAddedEvent) => void;
+
+    constructor(plugin: BetterMixer) {
         this.plugin = plugin;
 
         this.plugin.addEventListener('chatMessage', event => {
             const message = event.data;
 
             if (!this._emotesAddedListener) {
-                this._emotesAddedListener = event => {
-                    for (const msgElement of this.plugin.focusedChannel.chat.element.querySelectorAll('div[class*="message__"]')) {
-                        parseMessageEmotes(this.plugin, new ChatMessage(this.plugin.focusedChannel.chat, msgElement), event.data);
+                this._emotesAddedListener = this.plugin.addEventListener('emotesAdded', event => {
+                    for (const msgElement of this.plugin.focusedChannel!.chat!.element!.querySelectorAll('div[class*="message__"]') as NodeListOf<HTMLDivElement>) {
+                        parseMessageEmotes(this.plugin, new ChatMessage(this.plugin.focusedChannel!.chat!, msgElement), event.data);
                     }
-                };
-                this.plugin.addEventListener('emotesAdded', this._emotesAddedListener);
+                });
             }
 
             // Handle message emotes
@@ -33,7 +33,7 @@ export default class Patcher {
 
             // Handle url previews
             {
-                const links = message.element.querySelectorAll('.linkComponent');
+                const links = message.element.querySelectorAll('.linkComponent') as NodeListOf<HTMLAnchorElement>;
                 if (links.length > 0) {
                     const mode = BetterMixer.instance.configuration.getConfig('BETA_link_preview').state;
                     switch (mode) {
@@ -57,8 +57,8 @@ export default class Patcher {
                     const regex = mode === "auto" ? regexConfig.defaultState : regexConfig.state;
 
                     if (new RegExp(regex).test(message.author.username)) {
-                        const usernameElement = message.element.querySelector('[class*="Username"]');
-                        usernameElement.mixerColor = usernameElement.style.color;
+                        const usernameElement = message.element.querySelector('[class*="Username"]') as HTMLElement;
+                        usernameElement.__bettermixerMixerColor = usernameElement.style.color;
                         usernameElement.style.color = BetterMixer.instance.configuration.getConfig("botcolor").state;
                         usernameElement.classList.add('bettermixer-role-bot');
                     }
@@ -74,12 +74,12 @@ export default class Patcher {
                 };
                 const badges = plugin.dispatchGather('gatherBadges', badgeGatherEventData, message).flat(1);
 
-                const authorElement = message.element.querySelector('[class*="Username"]');
+                const authorElement = message.element.querySelector('[class*="Username"]')!;
                 for (const badge of badges) {
                     if (!badge.example) {
                         authorElement.appendChild(badge.element);
                     }
-                    const preceedingBadge = badge.element;
+                    const preceedingBadge = badge.element as HTMLElement;
                     preceedingBadge.classList.add('bettermixer-badge-relocated');
                     preceedingBadge.style.display = 'none';
                     authorElement.insertBefore(preceedingBadge, authorElement.firstChild);
@@ -105,7 +105,7 @@ export default class Patcher {
             {
                 const emoteGatherEventData = {
                     channel: chat.channel,
-                    user: chat.plugin.user,
+                    user: chat.plugin.user!,
                     message: null
                 };
                 const gatheredEmotes = plugin.dispatchGather('gatherEmotes', emoteGatherEventData, chat);
@@ -129,13 +129,12 @@ export default class Patcher {
             {
                 const autocompleter = new EmoteAutocomplete(this.plugin, chat);
                 // Purge built-in autocompleter
-                observeNewElements('#chat-listbox[class*="autocomplete"]', chat.element, x => {
+                observeNewElements('#chat-listbox[class*="autocomplete"]', chat.element!, x => {
                     if (!x.querySelector('[class*="viewer"]')) {
                         x.style.display = "none";
                     }
                 });
-                /** @type {HTMLTextAreaElement} */
-                const inputBox = chat.element.querySelector('textarea');
+                const inputBox = chat.element!.querySelector('textarea') as HTMLTextAreaElement;
 
                 const getQuery = () => {
                     let backIndex = inputBox.value.lastIndexOf(' ', inputBox.selectionEnd - 1);
@@ -154,7 +153,7 @@ export default class Patcher {
                         autocompleter.close();
                     }
                 });
-
+                
                 const vanillaKeydownListener = inputBox.eventListeners()[2];
                 inputBox.removeEventListener('keydown', vanillaKeydownListener);
 
@@ -186,16 +185,16 @@ export default class Patcher {
                         document.location.href = browseBaseUrl + "?" + filterConfig.state;
                     }
 
-                    let filtersWindow;
+                    let filtersWindow!: HTMLElement;
                     await waitFor(() =>
-                        (filtersWindow = document.querySelector('b-browse-filters')) &&
+                        (filtersWindow = document.querySelector('b-browse-filters') as HTMLElement) &&
                         !filtersWindow.querySelector('button.bettermixer-save-filters'));
 
-                    const resetFiltersButton = filtersWindow.querySelector('button.reset-filters');
-                    const saveFiltersButton = resetFiltersButton.cloneNode(true);
+                    const resetFiltersButton = filtersWindow.querySelector('button.reset-filters')!;
+                    const saveFiltersButton = resetFiltersButton.cloneNode(true) as HTMLElement;
                     saveFiltersButton.classList.remove('reset-filters');
                     saveFiltersButton.classList.add('bettermixer-save-filters');
-                    saveFiltersButton.querySelector('div > span > span').textContent = "Save Filters";
+                    saveFiltersButton.querySelector('div > span > span')!.textContent = "Save Filters";
                     filtersWindow.insertBefore(saveFiltersButton, resetFiltersButton);
 
                     //Patcher.addTooltip(saveFiltersButton, 'The "Games" and "Share Controller" filters are currently not supported.');
@@ -214,12 +213,7 @@ export default class Patcher {
         this.plugin.log("Patcher Loaded");
     }
 
-    /**
-     * 
-     * @param {Element} element 
-     * @param {String} text 
-     */
-    static addTooltip(element, text) {
+    static addTooltip(element: HTMLElement, text: string) {
         element.addEventListener('mouseover', () => {
             const tooltip = document.createElement('div');
             document.body.appendChild(tooltip); // This needs to happen first to make sure tooltip.clientWidth works correctly.
@@ -231,7 +225,8 @@ export default class Patcher {
             tooltip.style.top = document.documentElement.scrollTop + rect.top - 24 + "px";
             tooltip.style.pointerEvents = "none";
 
-            let scrollEvent, mouseoutEvent;
+            let scrollEvent: (event: Event) => void;
+            let mouseoutEvent: (event: MouseEvent) => void;
 
             window.addEventListener('scroll',
                 scrollEvent = () => tooltip.style.top = document.documentElement.scrollTop + rect.top - 24 + "px");

@@ -14,7 +14,7 @@ import BotDetectionConfig from "./Configs/BotDetectionConfig.js";
 import StringConfig from "./Configs/StringConfig.js";
 import { fetchJson, waitFor, observeNewElements } from "./Utility/Util.js";
 import DropdownConfig from "./Configs/DropdownConfig.js";
-import { GatherBadgesEvent, GatherBadgesResult, BetterMixerEvent, ChatStartLoadEvent, ChatFinishLoadEvent, GatherBadgesEventData, ChatStartLoadEventData, ChatFinishLoadEventData, LoadEvent, ChannelLoadEvent, UserLoadEvent, ChatMessageEvent, EmotesDialogOpenEvent, SettingsDialogOpenEvent, PageLoadEvent, EmotesAddedEvent, GatherEmotesEvent, GatherEmotesResult, LoadEventData, ChannelLoadEventData, UserLoadEventData, ChatMessageEventData, EmotesDialogOpenEventData, SettingsDialogOpenEventData, PageLoadEventData, EmotesAddedEventData, GatherEmotesEventData } from "./BetterMixerEvent.js";
+import { BetterMixerEvent, EventMap, GatherMap } from "./BetterMixerEvent.js";
 
 const SRC: string = (document.getElementById('BetterMixer-module') as HTMLImageElement).src;
 const BASE_URL = SRC.split('/').slice(0, -2).join('/') + '/';
@@ -331,7 +331,7 @@ export default class BetterMixer {
         }
     }
 
-    postToContent(message: {message: string; data: any}) {
+    postToContent(message: {message: string; data?: any}) {
         window.postMessage([SRC, message], '*');
     }
 
@@ -348,18 +348,14 @@ export default class BetterMixer {
         }
     }
 
-    addEventListener(eventType: 'load', callback: (event: LoadEvent) => void): (event: LoadEvent) => void;
-    addEventListener(eventType: 'channelLoad', callback: (event: ChannelLoadEvent) => void): (event: ChannelLoadEvent) => void;
-    addEventListener(eventType: 'chatStartLoad', callback: (event: ChatStartLoadEvent) => void): (event: ChatStartLoadEvent) => void;
-    addEventListener(eventType: 'chatFinishLoad', callback: (event: ChatFinishLoadEvent) => void): (event: ChatFinishLoadEvent) => void;
-    addEventListener(eventType: 'userLoad', callback: (event: UserLoadEvent) => void): (event: UserLoadEvent) => void;
-    addEventListener(eventType: 'chatMessage', callback: (event: ChatMessageEvent) => void): (event: ChatMessageEvent) => void;
-    addEventListener(eventType: 'emotesDialogOpen', callback: (event: EmotesDialogOpenEvent) => void): (event: EmotesDialogOpenEvent) => void;
-    addEventListener(eventType: 'settingsDialogOpen', callback: (event: SettingsDialogOpenEvent) => void): (event: SettingsDialogOpenEvent) => void;
-    addEventListener(eventType: 'pageLoad', callback: (event: PageLoadEvent) => void): (event: PageLoadEvent) => void;
-    addEventListener(eventType: 'emotesAdded', callback: (event: EmotesAddedEvent) => void): (event: EmotesAddedEvent) => void;
-    addEventListener(eventType: 'gatherEmotes', callback: (event: GatherEmotesEvent) => GatherEmotesResult): (event: GatherEmotesEvent) => GatherEmotesResult;
-    addEventListener(eventType: 'gatherBadges', callback: (event: GatherBadgesEvent) => GatherBadgesResult): (event: GatherBadgesEvent) => GatherBadgesResult;
+    addEventListener<Event extends keyof EventMap>(
+        eventType: Event,
+        callback: (event: BetterMixerEvent<EventMap[Event]>) => void
+    ): (event: BetterMixerEvent<EventMap[Event]>) => void;
+    addEventListener<Event extends keyof GatherMap>(
+        eventType: Event,
+        callback: (event: BetterMixerEvent<GatherMap[Event][0]>) => GatherMap[Event][1] | undefined
+    ): (event: BetterMixerEvent<GatherMap[Event][0]>) => GatherMap[Event][1];
     /**
      * 
      * @returns The function put in `callback`
@@ -369,18 +365,14 @@ export default class BetterMixer {
         return callback;
     }
 
-    removeEventListener(eventType: 'load', callback: (event: LoadEvent) => void): void;
-    removeEventListener(eventType: 'channelLoad', callback: (event: ChannelLoadEvent) => void): void;
-    removeEventListener(eventType: 'chatStartLoad', callback: (event: ChatStartLoadEvent) => void): void;
-    removeEventListener(eventType: 'chatFinishLoad', callback: (event: ChatFinishLoadEvent) => void): void;
-    removeEventListener(eventType: 'userLoad', callback: (event: UserLoadEvent) => void): void;
-    removeEventListener(eventType: 'chatMessage', callback: (event: ChatMessageEvent) => void): void;
-    removeEventListener(eventType: 'emotesDialogOpen', callback: (event: EmotesDialogOpenEvent) => void): void;
-    removeEventListener(eventType: 'settingsDialogOpen', callback: (event: SettingsDialogOpenEvent) => void): void;
-    removeEventListener(eventType: 'pageLoad', callback: (event: PageLoadEvent) => void): void;
-    removeEventListener(eventType: 'emotesAdded', callback: (event: EmotesAddedEvent) => void): void;
-    removeEventListener(eventType: 'gatherEmotes', callback: (event: GatherEmotesEvent) => GatherEmotesResult): void;
-    removeEventListener(eventType: 'gatherBadges', callback: (event: GatherBadgesEvent) => GatherBadgesResult): void;
+    removeEventListener<Event extends keyof EventMap>(
+        eventType: Event,
+        callback: (event: BetterMixerEvent<EventMap[Event]>) => void
+    ): void;
+    removeEventListener<Event extends keyof GatherMap>(
+        eventType: Event,
+        callback: (event: BetterMixerEvent<GatherMap[Event][0]>) => GatherMap[Event][1] | undefined
+    ): void;
     removeEventListener(eventType: EventType, callback: (event: BetterMixerEvent<any>) => any) {
         if (!Object.keys(this._events).includes(eventType)) {
             this.log(`Event ${eventType} does not exist.`, BetterMixer.LogType.ERROR);
@@ -396,16 +388,11 @@ export default class BetterMixer {
         this._events[eventType].splice(index, 1);
     }
 
-    dispatchEvent(eventType: 'load', data: LoadEventData, sender: any): void;
-    dispatchEvent(eventType: 'channelLoad', data: ChannelLoadEventData, sender: any): void;
-    dispatchEvent(eventType: 'chatStartLoad', data: ChatStartLoadEventData, sender: any): void;
-    dispatchEvent(eventType: 'chatFinishLoad', data: ChatFinishLoadEventData, sender: any): void;
-    dispatchEvent(eventType: 'userLoad', data: UserLoadEventData, sender: any): void;
-    dispatchEvent(eventType: 'chatMessage', data: ChatMessageEventData, sender: any): void;
-    dispatchEvent(eventType: 'emotesDialogOpen', data: EmotesDialogOpenEventData, sender: any): void;
-    dispatchEvent(eventType: 'settingsDialogOpen', data: SettingsDialogOpenEventData, sender: any): void;
-    dispatchEvent(eventType: 'pageLoad', data: PageLoadEventData, sender: any): void;
-    dispatchEvent(eventType: 'emotesAdded', data: EmotesAddedEventData, sender: any): void;
+    dispatchEvent<Event extends keyof EventMap>(
+        eventType: Event,
+        data:  EventMap[Event],
+        sender: any
+    ): void;
     dispatchEvent(eventType: EventType, data: any, sender: any) {
         const event = {
             event: eventType,
@@ -428,8 +415,11 @@ export default class BetterMixer {
         });
     }
 
-    dispatchGather(eventType: 'gatherEmotes', data: GatherEmotesEventData, sender: any): GatherEmotesResult;
-    dispatchGather(eventType: 'gatherBadges', data: GatherBadgesEventData, sender: any): GatherBadgesResult;
+    dispatchGather<Event extends keyof GatherMap>(
+        eventType: Event,
+        data:  GatherMap[Event][0],
+        sender: any
+    ): GatherMap[Event][1][];
     dispatchGather(eventType: EventType, data: any, sender: any): any {
         const event = {
             event: eventType,

@@ -12,55 +12,64 @@ export interface BetterMixerEvent<EventData> {
     data: EventData;
 }
 
-// `unknown` is used for currently unimplemented events.
-
 export type LoadEvent = BetterMixerEvent<LoadEventData>;
-export type LoadEventData = unknown;
-
 export type ChannelLoadEvent = BetterMixerEvent<ChannelLoadEventData>;
-export type ChannelLoadEventData = unknown;
-
 export type ChatStartLoadEvent = BetterMixerEvent<ChatStartLoadEventData>;
-export type ChatStartLoadEventData = Chat;
-
 export type ChatFinishLoadEvent = BetterMixerEvent<ChatFinishLoadEventData>;
-export type ChatFinishLoadEventData = Chat;
-
 export type UserLoadEvent = BetterMixerEvent<UserLoadEventData>;
-export type UserLoadEventData = unknown;
-
 export type ChatMessageEvent = BetterMixerEvent<ChatMessageEventData>;
-export type ChatMessageEventData = ChatMessage;
-
 export type EmotesDialogOpenEvent = BetterMixerEvent<EmotesDialogOpenEventData>;
+export type SettingsDialogOpenEvent = BetterMixerEvent<SettingsDialogOpenEventData>;
+export type PageLoadEvent = BetterMixerEvent<PageLoadEventData>;
+export type EmotesAddedEvent = BetterMixerEvent<EmotesAddedEventData>;
+export type GatherEmotesEvent = BetterMixerEvent<GatherEmotesEventData>;
+export type GatherBadgesEvent = BetterMixerEvent<GatherBadgesEventData>;
+
+// `unknown` is used for currently unimplemented events.
+export type LoadEventData = unknown;
+export type ChannelLoadEventData = unknown;
+export type ChatStartLoadEventData = Chat;
+export type ChatFinishLoadEventData = Chat;
+export type UserLoadEventData = unknown;
+export type ChatMessageEventData = ChatMessage;
 export type EmotesDialogOpenEventData = {
     chat: Chat;
     dialog: HTMLElement;
 };
-
-export type SettingsDialogOpenEvent = BetterMixerEvent<SettingsDialogOpenEventData>;
 export type SettingsDialogOpenEventData = {
     dialog: HTMLElement;
 };
-
-export type PageLoadEvent = BetterMixerEvent<PageLoadEventData>;
 export type PageLoadEventData = unknown;
-
-export type EmotesAddedEvent = BetterMixerEvent<EmotesAddedEventData>;
 export type EmotesAddedEventData = EmoteSet[];
 
-export type GatherEmotesEvent = BetterMixerEvent<GatherEmotesEventData>;
 export type GatherEmotesEventData = {
-    user: User;
-    message: ChatMessage;
     channel: Channel;
+    user: User;
+    message: ChatMessage | null;
 };
-export type GatherEmotesResult = Emote | Emote[] | EmoteSet;
+export type GatherEmotesResult = Emote[] | EmoteSet;
 
-export type GatherBadgesEvent = BetterMixerEvent<GatherBadgesEventData>;
 export type GatherBadgesEventData = {
-    user: User;
-    message: ChatMessage;
     channel: Channel;
+    user: User;
+    message: ChatMessage | null;
 };
-export type GatherBadgesResult = Badge | Badge[] | undefined;
+export type GatherBadgesResult = Badge[];
+
+export interface EventMap {
+    'load': LoadEventData;
+    'channelLoad': ChannelLoadEventData;
+    'chatStartLoad': ChatStartLoadEventData;
+    'chatFinishLoad': ChatFinishLoadEventData;
+    'userLoad': UserLoadEventData;
+    'chatMessage': ChatMessageEventData;
+    'emotesDialogOpen': EmotesDialogOpenEventData;
+    'settingsDialogOpen': SettingsDialogOpenEventData;
+    'pageLoad': PageLoadEventData;
+    'emotesAdded': EmotesAddedEventData;
+}
+
+export interface GatherMap {
+    'gatherEmotes': [GatherEmotesEventData, GatherEmotesResult];
+    'gatherBadges': [GatherBadgesEventData, GatherBadgesResult];
+}

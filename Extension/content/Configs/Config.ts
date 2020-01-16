@@ -5,10 +5,10 @@ export default abstract class Config<TState> {
     abstract get configName(): string;
 
     // The name seen in the settings menu
-    abstract get displayText(): string;
+    get displayText(): string { return ""; }
 
     // A currently unused property explaining the config
-    abstract get descriptionText(): string;
+    get descriptionText(): string { return ""; }
 
     // Set the config state
     abstract set state(state: TState);
@@ -20,18 +20,18 @@ export default abstract class Config<TState> {
     abstract get defaultState(): TState;
 
     // Updates the configuration effect
-    abstract update(): void;
+    update(): void {}
 
     // Updates immediately on being changed
-    abstract updateImmediate(newState: TState): void;
+    updateImmediate(newState: TState): void {}
 
     // Determines whether or not to hide this config in the menu
     // Unnecessary if the config type is NONE.
-    abstract get hidden(): boolean;
+    get hidden(): boolean { return false; }
 
     abstract get configType(): ConfigType;
 
-    abstract get superText(): string | undefined;
+    get superText(): string | undefined { return undefined; }
 
     static ConfigTypeEnum: {[configTypeName: string]: ConfigType} = {
         NONE: 0,

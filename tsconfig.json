@@ -9,8 +9,10 @@
     "allowJs": true,
     "baseUrl": ".",
     "lib": [
-      "dom",
-      "dom.iterable",
+      "DOM",
+      "DOM.Iterable",
+      "ES2019",
+      "ES2019.Array"
     ],
     "outDir": "build/"
   },

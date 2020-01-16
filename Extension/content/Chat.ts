@@ -59,7 +59,7 @@ export default class Chat {
             }
 
             const badges = [];
-            for (const badgeElement of event.data.message.element.querySelectorAll('[class*="badge"]')) {
+            for (const badgeElement of event.data.message!.element.querySelectorAll('[class*="badge"]')) {
                 if (badgeElement instanceof HTMLImageElement) {
                     if (badgeElement.alt === 'Subscriber') {
                         if (!this.subBadge) {
