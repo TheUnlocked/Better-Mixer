@@ -19,4 +19,9 @@ declare const mixerUi: {
         value: string;
         onChange(v: string): void;
     }>;
+    Toggle: React.ComponentClass<{
+        children: string;
+        checked: boolean;
+        onChange: React.ChangeEventHandler<HTMLInputElement>;
+    }>;
 };

@@ -23,7 +23,7 @@ export const patchSettingsDialog = async (plugin: BetterMixer, settingsDialogEle
     for (const config of plugin.configuration.getAllConfigs()) {
         // Allow a config to fail to load without destroying everything.
         try {
-            let state;
+            let state: any;
             let configElement: HTMLElement | undefined;
             const setTempState = (newState: any) => state = newState;
 
@@ -54,7 +54,7 @@ export const patchSettingsDialog = async (plugin: BetterMixer, settingsDialogEle
                 configsData.push({
                     element: configElement,
                     config: config,
-                    newState: state
+                    get newState() { return state; }
                 });
             }
         }
@@ -77,19 +77,26 @@ export const patchSettingsDialog = async (plugin: BetterMixer, settingsDialogEle
 };
 
 const makeToggleSwitch = (config: Config<any>, setTempState: (newState: any) => void, example: HTMLElement) => {
-    const element = example.cloneNode(true) as HTMLElement;
-    element.children[2].textContent = config.displayText;
+    const toggleHolder = document.createElement('div');
+                
+    ReactDOM.render(React.createElement(mixerUi.Toggle, {
+        children: config.displayText,
+        checked: config.state,
+        onChange: function(e) {
+            this.checked = !this.checked;
+            setTempState(this.checked);
+            config.updateImmediate(this.checked);
+        }
+    }), toggleHolder);
 
-    if (config.state !== element.classList.contains('checked_37Lzx')) {
-        element.classList.toggle('checked_37Lzx');
+    if (config.superText) {
+        const superText = document.createElement('span');
+        superText.classList.add('bettermixer-config-boxed-supertext');
+        superText.innerText = config.superText;
+        toggleHolder.children[0].querySelector('label > span')!.appendChild(superText);
     }
-    element.getElementsByTagName("input")[0].addEventListener('click', e => {
-        element.classList.toggle('checked_37Lzx');
-        setTempState(element.classList.contains('checked_37Lzx'));
-        config.updateImmediate(element.classList.contains('checked_37Lzx'));
-    });
 
-    return element;
+    return toggleHolder.children[0] as HTMLElement;
 };
 
 const makeColorPicker = (config: Config<string>, setTempState: (newState: string | undefined) => void) => {

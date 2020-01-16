@@ -70,16 +70,13 @@ export default class BetterMixer {
         this.loadUser();
 
         // Reload on page change
-        /* eslint-disable prefer-arrow/prefer-arrow-functions */
-        (function(history) {
+        (history => {
             const pushState = history.pushState;
-            history.pushState = function(state, data: any, title: string, url?: string | null) {
+            history.pushState = (state: any, title: string, url?: string | null) => {
                 if (typeof history.__bettermixerOnpushstate === "function") {
                     history.__bettermixerOnpushstate({state: state});
                 }
-        
-                // eslint-disable-next-line prefer-rest-params
-                const ret = pushState.apply(history, [data, title, url]);
+                const ret = pushState.apply(history, [state, title, url]);
 
                 BetterMixer.instance.reload();
 
@@ -87,7 +84,6 @@ export default class BetterMixer {
             };
             window.onpopstate = (e: PopStateEvent) => BetterMixer.instance.reload();
         })(window.history);
-        /* eslint-enable prefer-arrow/prefer-arrow-functions */
 
         this.injectStylesheet("lib/css/inject.css").disabled = false;
 
