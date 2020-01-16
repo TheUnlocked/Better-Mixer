@@ -35,12 +35,13 @@ npm run lint
 # Fix linting errors where possible
 npm run lint:fix
 
-# Build the extension
-# You should usually not need to run this yourself,
-# though it can fix Typescript issues
+# Build the extension with sourcemaps
+npm run build:dev
+
+# Build the extension without sourcemaps
 npm run build
 
-# Build the extension and start watching for changes
+# Build the extension with sourcemaps and start watching for changes
 npm run watch
 
 # Start Firefox with the extension installed

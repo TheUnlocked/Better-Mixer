@@ -7,9 +7,6 @@
     "strict": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "inlineSourceMap": true,
-    "inlineSources": true,
-    "sourceRoot": "/",
     "allowJs": true,
     "baseUrl": ".",
     "lib": [

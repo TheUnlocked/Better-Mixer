@@ -7,8 +7,9 @@
     "lint:fix": "eslint -c .eslintrc ./Extension/**/*.{ts,js} --fix",
     "serve:firefox": "web-ext run --source-dir ./build/",
     "package": "npm run build && web-ext build --source-dir ./build/",
+    "build:dev": "tsc --inlineSourceMap true --inlineSources true --sourceRoot \"/\" && gulp",
     "build": "gulp clean && tsc && gulp",
-    "watch": "concurrently --raw \"gulp watch\" \"tsc --watch\""
+    "watch": "concurrently --raw \"gulp watch\" \"tsc --inlineSourceMap true --inlineSources true --sourceRoot \"/\" --watch\""
   },
   "devDependencies": {
     "@types/chrome": "0.0.91",
