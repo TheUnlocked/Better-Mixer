@@ -1,18 +1,24 @@
 import EmoteSet from "../EmoteSet.js";
 import { fetchJson } from "../Utility/Util.js";
-import { VanillaEmote } from "../Emote.js";
+import Emote, { VanillaEmote } from "../Emote.js";
 import Chat from "../Chat.js";
 import BetterMixer from "../BetterMixer.js";
 
 export default class EmoteAutocomplete {
-    // static vanillaEmoteCache = [];
+    static vanillaEmoteCache: Emote[] = [];
+    plugin: BetterMixer;
+    chat: Chat;
+    showing: boolean;
+    element: HTMLDivElement;
+    vanillaEmotes: Emote[] = [];
+    emoteCache: Emote[] = [];
+    autocompleteEmotes: Emote[] = [];
+     
+    private _animatedEmotesWereOn: any;
+    private _query: any;
+    private _selectionIndex: any;
 
-    /**
-     * 
-     * @param {BetterMixer} plugin 
-     * @param {Chat} chat 
-     */
-    constructor(plugin, chat) {
+    constructor(plugin: BetterMixer, chat: Chat) {
         this.plugin = plugin;
         this.chat = chat;
         this.showing = false;
@@ -32,35 +38,44 @@ export default class EmoteAutocomplete {
         }
 
         this.vanillaEmotes = [];
-        await this.plugin.user.populateUser();
-        const fetch1 = fetchJson(`https://mixer.com/api/v1/channels/${this.chat.channel.id}/emoticons?user=${this.plugin.user.userId}`)
-            .then(data => {
+        await this.plugin.user!.populateUser();
+        const fetch1 = fetchJson(`https://mixer.com/api/v1/channels/${this.chat.channel.id}/emoticons?user=${this.plugin.user!.id}`)
+            .then((data: {
+                url: string;
+                channelId: number;
+                emoticons: {[emoteName: string]: {
+                    x: number;
+                    y: number;
+                    width: number;
+                    height: number;
+                };};
+            }[]) => {
                 for (const emoteGroup of data) {
                     const src = emoteGroup.url;
                     const emotes = Object.entries(emoteGroup.emoticons)
-                        .map(emote => new VanillaEmote(emote[0], src, { 
-                            x: emote[1].x,
-                            y: emote[1].y,
-                            width: emote[1].width,
-                            height: emote[1].height
-                        }));
+                        .map(emote => new VanillaEmote(emote[0], src, emote[1]));
                     this.vanillaEmotes.push(...emotes);
                     this.plugin.log(`Loaded ${emotes.length} vanilla user emotes`);
                 }
             })
             .catch(() => this.plugin.log("Failed to load vanilla user emotes", BetterMixer.LogType.WARN));
         const fetch2 = fetchJson("https://mixer.com/_latest/assets/emoticons/manifest.json")
-            .then(data => {
+            .then((data: {[packName: string]: {
+                name: string;
+                default: boolean;
+                authors: string[];
+                emoticons: {[emoteName: string]: {
+                    x: number;
+                    y: number;
+                    width: number;
+                    height: number;
+                };};
+            };}) => {
                 for (const emoteGroupName in data) {
                     const src = `https://mixer.com/_latest/assets/emoticons/${emoteGroupName}.png`;
                     const emoteGroup = data[emoteGroupName];
                     const emotes = Object.entries(emoteGroup.emoticons)
-                        .map(emote => new VanillaEmote(emote[0], src, { 
-                            x: emote[1].x,
-                            y: emote[1].y,
-                            width: emote[1].width,
-                            height: emote[1].height
-                        }));
+                        .map(emote => new VanillaEmote(emote[0], src, emote[1]));
                     this.vanillaEmotes.push(...emotes);
                     this.plugin.log(`Loaded ${emotes.length} vanilla global emotes`);
                 }
@@ -75,12 +90,12 @@ export default class EmoteAutocomplete {
     reloadCache() {
         const emoteGatherEventData = {
             channel: this.chat.channel,
-            user: this.plugin.user,
+            user: this.plugin.user!,
             message: null
         };
         this.emoteCache = this.vanillaEmotes
             .concat(this.plugin.dispatchGather('gatherEmotes', emoteGatherEventData, this)
-                .reduce((acc, val) => !val ? acc : val instanceof EmoteSet ? acc.concat(val.emotes) : acc.concat(val), []));
+                .reduce((acc: Emote[], val) => val instanceof EmoteSet ? acc.concat(val.emotes) : acc.concat(val), []));
         this._animatedEmotesWereOn = this.plugin.configuration.getConfig('show_emotes_animated').state;
         if (!this._animatedEmotesWereOn) {
             this.emoteCache = this.emoteCache.filter(emote => !emote.animated);
@@ -91,7 +106,7 @@ export default class EmoteAutocomplete {
     open() {
         this.close();
         this.showing = true;
-        this.chat.element.querySelector('[class*="webComposerBlock"]').prepend(this.element);
+        this.chat.element!.querySelector('[class*="webComposerBlock"]')!.prepend(this.element);
         this.selectionIndex = this.autocompleteEmotes.length - 1;
     }
 
@@ -118,7 +133,7 @@ export default class EmoteAutocomplete {
             this.reloadCache();
         }
 
-        const getIndexOfQuery = str => { const index = str.toLowerCase().indexOf(this.query); return index === -1 ? 10000 : index; };
+        const getIndexOfQuery = (str: string) => { const index = str.toLowerCase().indexOf(this.query); return index === -1 ? 10000 : index; };
         this.autocompleteEmotes = this.emoteCache
             .filter(x => x.name.toLowerCase().includes(this.query.replace(/^:/, '')))
             // Sort decending based on when the query appears, so the
@@ -143,10 +158,10 @@ export default class EmoteAutocomplete {
                 emoteNameElement.classList.add('bettermixer-emote-autocomplete-option-name');
                 optionBtn.appendChild(emoteNameElement);
                 element.appendChild(optionBtn);
-                element.setAttribute("bettermixer-autocomplete-index", index);
+                element.setAttribute("bettermixer-autocomplete-index", `${index}`);
                 optionBtn.addEventListener('click', () => {
                     this.fillSelectedEmote();
-                    setTimeout(() => this.chat.element.querySelector('textarea').dispatchEvent(new Event('input')), 0);
+                    setTimeout(() => this.chat.element!.querySelector('textarea')!.dispatchEvent(new Event('input')), 0);
                 });
                 return element;
             });
@@ -159,8 +174,8 @@ export default class EmoteAutocomplete {
         }
     }
 
-    keydownEvent(e) {
-        const ta = this.chat.element.querySelector('textarea');
+    keydownEvent(e: KeyboardEvent) {
+        const ta = this.chat.element!.querySelector('textarea') as HTMLTextAreaElement;
 
         const updateCursorAfter = () => setTimeout(() => ta.dispatchEvent(new Event('input')), 0);
 
@@ -191,7 +206,7 @@ export default class EmoteAutocomplete {
     }
 
     fillSelectedEmote() {
-        const ta = this.chat.element.querySelector('textarea');
+        const ta = this.chat.element!.querySelector('textarea') as HTMLTextAreaElement;
         const queryStart = ta.value.lastIndexOf(' ', ta.selectionEnd - 1);
         const selectedEmote = this.autocompleteEmotes[this.selectionIndex].name;
         ta.value = ta.value.slice(0, queryStart + 1) + selectedEmote + ta.value.slice(queryStart + this.query.length + 1);
@@ -221,7 +236,7 @@ export default class EmoteAutocomplete {
         else {
             this._selectionIndex = v;
         }
-        const newSelection = this.element.querySelector(`[bettermixer-autocomplete-index="${this._selectionIndex}"]`);
+        const newSelection = this.element.querySelector(`[bettermixer-autocomplete-index="${this._selectionIndex}"]`) as HTMLElement;
         newSelection.classList.add('selected');
         newSelection.scrollIntoView({ block: "nearest" });
     }

@@ -4,14 +4,20 @@ import BTTVAddon from "./BTTVAddon.js";
 import TwitchChannel from "../Twitch/TwitchChannel.js";
 import EmoteSet from "../../EmoteSet.js";
 import { fetchJson, waitFor } from "../../Utility/Util.js";
+import { GatherEmotesEvent, GatherEmotesResult } from "Extension/content/BetterMixerEvent.js";
+import Channel from "Extension/content/Channel.js";
 
 export default class BTTVChannel {
-    /**
-     * @param {BTTVAddon} parent 
-     * @param {TwitchChannel} channel
-     * @param {string} username 
-     */
-    constructor(parent, channel) {
+    bttv: BTTVAddon;
+    plugin: BetterMixer;
+    channel: Channel;
+    twitch: TwitchChannel;
+    emotes: EmoteSet;
+    cancelLoad?: boolean;
+
+    private _gatherEmotes?: (event: GatherEmotesEvent) => GatherEmotesResult | undefined;
+
+    constructor(parent: BTTVAddon, channel: TwitchChannel) {
         this.bttv = parent;
         this.plugin = parent.plugin;
         this.channel = channel.channel;
@@ -43,7 +49,7 @@ export default class BTTVChannel {
                 this.plugin.addEventListener('gatherEmotes', this._gatherEmotes);
                 this.plugin.dispatchEvent('emotesAdded', [this.emotes], this);
 
-                this.plugin.log(`Synced ${this.channel.owner.username} with BTTV emotes from ${this.twitch.login}.`, BetterMixer.LogType.INFO);
+                this.plugin.log(`Synced ${this.channel.owner!.username} with BTTV emotes from ${this.twitch.login}.`, BetterMixer.LogType.INFO);
             } catch (err) {
                 if (this.cancelLoad) return;
                 this.plugin.log(`${err.message}: Failed to load emotes from BTTV.`, BetterMixer.LogType.INFO);

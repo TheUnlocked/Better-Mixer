@@ -1,25 +1,31 @@
 import Config from "../Configs/Config.js";
 import { waitFor } from "../Utility/Util.js";
 import BetterMixer from "../BetterMixer.js";
+import DropdownConfig from "../Configs/DropdownConfig.js";
 
-export const patchSettingsDialog = async (plugin, settingsDialogElement) => {
+export const patchSettingsDialog = async (plugin: BetterMixer, settingsDialogElement: HTMLElement) => {
     await waitFor(() => settingsDialogElement.querySelector('h2[class*="title"]'));
 
-    const configSection = settingsDialogElement.querySelector('section');
+    const configSection = settingsDialogElement.querySelector('section') as HTMLElement;
 
-    const label = configSection.firstChild.cloneNode();
+    const label = configSection.firstChild!.cloneNode();
     label.textContent = "Better Mixer Preferences";
     configSection.appendChild(label);
 
-    const exampleToggle = configSection.querySelector('[class*="control"][class*="toggle"]');
+    const exampleToggle = configSection.querySelector('[class*="control"][class*="toggle"]') as HTMLElement;
 
-    const configsData = [];
+    const configsData: {
+        element: HTMLElement;
+        config: Config<any>;
+        newState: any;
+    }[] = [];
 
     for (const config of plugin.configuration.getAllConfigs()) {
         // Allow a config to fail to load without destroying everything.
         try {
-            let configElement;
-            const setTempState = newState => configElement.tempState = newState;
+            let state;
+            let configElement: HTMLElement | undefined;
+            const setTempState = (newState: any) => state = newState;
 
             switch (config.configType) {
                 case Config.ConfigTypeEnum.BOOLEAN:
@@ -31,7 +37,7 @@ export const patchSettingsDialog = async (plugin, settingsDialogElement) => {
                     break;
 
                 case Config.ConfigTypeEnum.DROPDOWN:
-                    configElement = makeDropdownMenu(config, setTempState);
+                    configElement = makeDropdownMenu(config as DropdownConfig, setTempState);
                     break;
 
                 case Config.ConfigTypeEnum.STRING:
@@ -47,7 +53,8 @@ export const patchSettingsDialog = async (plugin, settingsDialogElement) => {
                 configSection.appendChild(configElement);
                 configsData.push({
                     element: configElement,
-                    config: config
+                    config: config,
+                    newState: state
                 });
             }
         }
@@ -57,10 +64,10 @@ export const patchSettingsDialog = async (plugin, settingsDialogElement) => {
     }
 
     // Save
-    settingsDialogElement.querySelector('button[data-variant="primary"]').addEventListener('click', e => {
+    settingsDialogElement.querySelector('button[data-variant="primary"]')!.addEventListener('click', e => {
         for (const configData of configsData) {
-            if (configData.element.tempState !== undefined) {
-                configData.config.state = configData.element.tempState;
+            if (configData.newState !== undefined) {
+                configData.config.state = configData.newState;
             }
         }
         plugin.configuration.saveConfig();
@@ -69,14 +76,8 @@ export const patchSettingsDialog = async (plugin, settingsDialogElement) => {
     });
 };
 
-/**
- * 
- * @param {Config} config 
- * @param {any => void} setTempState 
- * @param {HTMLElement} example 
- */
-const makeToggleSwitch = (config, setTempState, example) => {
-    const element = example.cloneNode(true);
+const makeToggleSwitch = (config: Config<any>, setTempState: (newState: any) => void, example: HTMLElement) => {
+    const element = example.cloneNode(true) as HTMLElement;
     element.children[2].textContent = config.displayText;
 
     if (config.state !== element.classList.contains('checked_37Lzx')) {
@@ -85,23 +86,19 @@ const makeToggleSwitch = (config, setTempState, example) => {
     element.getElementsByTagName("input")[0].addEventListener('click', e => {
         element.classList.toggle('checked_37Lzx');
         setTempState(element.classList.contains('checked_37Lzx'));
-        config.updateImmediate(element.tempState);
+        config.updateImmediate(element.classList.contains('checked_37Lzx'));
     });
 
     return element;
 };
 
-/**
- * 
- * @param {Config} config 
- * @param {any => void} setTempState 
- */
-const makeColorPicker = (config, setTempState) => {
+const makeColorPicker = (config: Config<string>, setTempState: (newState: string | undefined) => void) => {
     const colorHolder = document.createElement('div');
     const colorLengths = [3, 4, 6, 8];
 
     ReactDOM.render(React.createElement(mixerUi.SimpleColorPicker, {
         label: config.displayText,
+        fallback: '#d37110',
         value: config.state,
         onChange: v => {
             if (v.match(/^#[a-fA-F0-9]*$/) && colorLengths.includes(v.length - 1)) {
@@ -118,18 +115,13 @@ const makeColorPicker = (config, setTempState) => {
         const superText = document.createElement('span');
         superText.classList.add('bettermixer-config-boxed-supertext');
         superText.innerText = config.superText;
-        colorHolder.children[0].querySelector('label > span').appendChild(superText);
+        colorHolder.children[0].querySelector('label > span')!.appendChild(superText);
     }
 
-    return colorHolder.children[0];
+    return colorHolder.children[0] as HTMLElement;
 };
 
-/**
- * 
- * @param {Config} config 
- * @param {any => void} setTempState 
- */
-const makeDropdownMenu = (config, setTempState) => {
+const makeDropdownMenu = (config: DropdownConfig, setTempState: (newState: string | undefined) => void) => {
     const dropdownHolder = document.createElement('div');
                 
     ReactDOM.render(React.createElement(mixerUi.Select, {
@@ -147,36 +139,29 @@ const makeDropdownMenu = (config, setTempState) => {
         const superText = document.createElement('span');
         superText.classList.add('bettermixer-config-boxed-supertext');
         superText.innerText = config.superText;
-        dropdownHolder.children[0].querySelector('label > span').appendChild(superText);
+        dropdownHolder.children[0].querySelector('label > span')!.appendChild(superText);
     }
 
-    return dropdownHolder.children[0];
+    return dropdownHolder.children[0] as HTMLElement;
 };
 
-/**
- * 
- * @param {Config} config 
- * @param {any => void} setTempState 
- */
-const makeStringInput = (config, setTempState) => {
+const makeStringInput = (config: Config<string>, setTempState: (newState: string | undefined) => void) => {
     const stringInputHolder = document.createElement('div');
 
     ReactDOM.render(React.createElement(mixerUi.BuiTextInput, {
-        label: config.displayText
+        label: config.displayText,
+        value: config.state,
+        onChange: (v: string) => {
+            setTempState(v);
+        }
     }), stringInputHolder);
-
-    const input = stringInputHolder.querySelector('input');
-    input.value = config.state;
-    input.addEventListener('change', e => {
-        setTempState(input.value);
-    });
 
     if (config.superText) {
         const superText = document.createElement('span');
         superText.classList.add('bettermixer-config-boxed-supertext');
         superText.innerText = config.superText;
-        stringInputHolder.children[0].querySelector('label > span').appendChild(superText);
+        stringInputHolder.children[0].querySelector('label > span')!.appendChild(superText);
     }
 
-    return stringInputHolder.children[0];
+    return stringInputHolder.children[0] as HTMLElement;
 };

@@ -55,9 +55,9 @@ export default class User {
         }
 
         try {
-            const data = await fetchJson(`https://mixer.com/api/v1/channels/${this.username}`);
+            const data = await fetchJson(`https://mixer.com/api/v1/channels/${this.username}`) as MixerExpandedChannel;
             this._populated = true;
-            this._loadUser(data);
+            this._loadUser(data.user);
         }
         catch (err) {
             BetterMixer.instance.log(`${err.message}: Failed to get channel ${this.username}`, BetterMixer.LogType.ERROR);

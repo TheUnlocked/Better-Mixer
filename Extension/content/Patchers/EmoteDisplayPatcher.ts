@@ -1,22 +1,17 @@
 import EmoteSet from "../EmoteSet.js";
 import BetterMixer from "../BetterMixer.js";
 import ChatMessage from "../ChatMessage.js";
+import Emote from "../Emote.js";
 
-/**
- * 
- * @param {BetterMixer} plugin 
- * @param {ChatMessage} message 
- * @param {EmoteSet[]} emoteSets 
- */
-export const parseMessageEmotes = (plugin, message, emoteSets = undefined) => {
+export const parseMessageEmotes = (plugin: BetterMixer, message: ChatMessage, emoteSets?: EmoteSet[]) => {
     const emoteGatherEventData = {
         channel: message.chat.channel,
         user: message.author,
         message: message
     };
     const emoteList = (emoteSets || plugin.dispatchGather('gatherEmotes', emoteGatherEventData, message))
-        .reduce((acc, val) => !val ? acc : val instanceof EmoteSet ? acc.concat(val.emotes) : acc.concat(val), []);
-    const emotes = emoteList.reduce((result, value) => { result[value.name] = value; return result; }, {});
+        .reduce((acc: Emote[], val) => !val ? acc : val instanceof EmoteSet ? acc.concat(val.emotes) : acc.concat(val), []);
+    const emotes = emoteList.reduce((result, value) => { result[value.name] = value; return result; }, {} as {[emoteName: string]: Emote});
 
     const textPieces = [...message.element.querySelectorAll('span:not([class*="emote"])')];
     let textBuilder = "";
@@ -63,9 +58,9 @@ export const parseMessageEmotes = (plugin, message, emoteSets = undefined) => {
 
         // Replace the text element with the new text/emote elements
         for (const word of messageBuilder) {
-            textElement.parentElement.insertBefore(word, textElement);
+            textElement.parentElement!.insertBefore(word, textElement);
             //textElement.parentElement.insertBefore(document.createTextNode(' '), textElement);
         }
-        textElement.parentElement.removeChild(textElement);
+        textElement.parentElement!.removeChild(textElement);
     }
 };

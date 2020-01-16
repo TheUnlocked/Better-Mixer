@@ -4,13 +4,16 @@ import TwitchChannel from "../Twitch/TwitchChannel.js";
 import EmoteSet from "../../EmoteSet.js";
 import Emote from "../../Emote.js";
 import { fetchJson } from "../../Utility/Util.js";
+import { GatherEmotesEvent, GatherEmotesResult } from "Extension/content/BetterMixerEvent.js";
 
 export default class FFZAddon {
-    /**
-     * 
-     * @param {BetterMixer} plugin 
-     */
-    constructor(plugin) {
+    plugin: BetterMixer;
+    globalEmotes: EmoteSet;
+    emotes: any;
+
+    private _gatherEmotes?: (event: GatherEmotesEvent) => GatherEmotesResult | undefined;
+
+    constructor(plugin: BetterMixer) {
         this.plugin = plugin;
         this.globalEmotes = new EmoteSet("FFZ Global Emotes", -50);
         this.init();
@@ -38,7 +41,7 @@ export default class FFZAddon {
                 }
             };
 
-            this.plugin.addEventListener('gatherEmotes', this._gatherEmotes);
+            this.plugin.addEventListener('gatherEmotes', this._gatherEmotes!);
             this.plugin.dispatchEvent('emotesAdded', [this.emotes], this);
 
             this.plugin.log(`Fetched global FFZ emotes.`, BetterMixer.LogType.INFO);
@@ -47,10 +50,7 @@ export default class FFZAddon {
         }
     }
 
-    /**
-     * @param {TwitchChannel} channel 
-     */
-    getSync(channel) {
+    getSync(channel: TwitchChannel) {
         return new FFZChannel(this, channel);
     }
 }

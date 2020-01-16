@@ -4,11 +4,11 @@ import TwitchChannel from "./TwitchChannel.js";
 import { fetchJson } from "../../Utility/Util.js";
 
 export default class TwitchAddon {
-    /**
-     * 
-     * @param {BetterMixer} plugin 
-     */
-    constructor(plugin) {
+    plugin: BetterMixer;
+
+    private _syncList: {[username: string]: string} = {};
+
+    constructor(plugin: BetterMixer) {
         this.plugin = plugin;
         this.init();
     }
@@ -23,27 +23,25 @@ export default class TwitchAddon {
         }
     }
 
-    /**
-     * @param {Channel} channel 
-     */
-    getSync(channel) {
+    getSync(channel: Channel) {
         if (channel.channelSettings.twitch) {
             if (channel.channelSettings.twitch.id) {
-                return new TwitchChannel(this, channel, undefined, channel.channelSettings.twitch.id);
+                return new TwitchChannel(this, channel, channel.channelSettings.twitch.id);
             }
             else if (channel.channelSettings.twitch.name) {
-                return new TwitchChannel(this, channel, channel.channelSettings.twitch.name, undefined);
+                return new TwitchChannel(this, channel, channel.channelSettings.twitch.name);
             }
         }
 
         if (!this._syncList) {
+            this.plugin.log(`${channel.owner!.username} is either not Twitch synced, or the sync list isn't loading.`, BetterMixer.LogType.INFO);
             return;
         }
 
-        const twitchName = this._syncList[channel.owner.username.toLowerCase()];
+        const twitchName = this._syncList[channel.owner!.username.toLowerCase()];
         if (twitchName) {
-            return new TwitchChannel(this, channel, twitchName, undefined);
+            return new TwitchChannel(this, channel, twitchName);
         }
-        this.plugin.log(`${channel.owner.username} is not Twitch synced.`, BetterMixer.LogType.INFO);
+        this.plugin.log(`${channel.owner!.username} is not Twitch synced.`, BetterMixer.LogType.INFO);
     }
 }

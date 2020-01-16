@@ -1,12 +1,6 @@
 import BetterMixer from "../BetterMixer.js";
 
-/**
- * 
- * @param {BetterMixer} plugin 
- * @param {HTMLElement} msgElement 
- * @param {string} link 
- */
-export const loadLinkPreview = async (plugin, msgElement, link) => {
+export const loadLinkPreview = async (plugin: BetterMixer, msgElement: HTMLElement, link: string) => {
     const requestAddress = `https://bettermixer.web.app/api/v1/url-preview?urlb64=${btoa(link)}`;
     const urlPreviewResponse = await fetch(requestAddress);
     if (!urlPreviewResponse.ok) {
@@ -20,7 +14,7 @@ export const loadLinkPreview = async (plugin, msgElement, link) => {
     if (matchingPerfEntries.length === 0) {
         plugin.log("URL preview retrieved, but cannot determine whether or not it was cached (likely server)", BetterMixer.LogType.INFO);
     }
-    else if (matchingPerfEntries[matchingPerfEntries.length - 1].transferSize === 0) {
+    else if ((matchingPerfEntries[matchingPerfEntries.length - 1] as PerformanceResourceTiming).transferSize === 0) {
         plugin.log("URL preview retrieved from cache", BetterMixer.LogType.INFO);
     }
     else {

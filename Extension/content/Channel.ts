@@ -19,17 +19,20 @@ export default class Channel {
     bttvChannel?: BTTVChannel;
     ffzChannel?: FFZChannel;
     chat?: Chat;
-    channelSettings?: {
+    channelSettings: {
         twitch?: {
-            bttv?: {
-                globals?: boolean;
-
-            };
-            ffz?: {
-
-            };
+            id?: number;
+            name?: string;
         };
-    };
+        bttv?: {
+            globals?: boolean;
+            sync?: boolean;
+        };
+        ffz?: {
+            globals?: boolean;
+            sync?: boolean;
+        };
+    } = {};
 
     constructor(plugin: BetterMixer, channelName: string) {
         this.plugin = plugin;

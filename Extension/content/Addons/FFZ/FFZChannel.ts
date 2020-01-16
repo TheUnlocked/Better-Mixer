@@ -4,14 +4,20 @@ import FFZAddon from "./FFZAddon.js";
 import TwitchChannel from "../Twitch/TwitchChannel.js";
 import EmoteSet from "../../EmoteSet.js";
 import { fetchJson, waitFor } from "../../Utility/Util.js";
+import Channel from "Extension/content/Channel.js";
+import { GatherEmotesEvent, GatherEmotesResult } from "Extension/content/BetterMixerEvent.js";
 
 export default class FFZChannel {
-    /**
-     * @param {FFZAddon} parent 
-     * @param {TwitchChannel} channel
-     * @param {string} username 
-     */
-    constructor(parent, channel) {
+    ffz: FFZAddon;
+    plugin: any;
+    channel: Channel;
+    twitch: TwitchChannel;
+    emotes: EmoteSet;
+    cancelLoad = false;
+    
+    private _gatherEmotes?: (event: GatherEmotesEvent) => GatherEmotesResult | undefined;
+
+    constructor(parent: FFZAddon, channel: TwitchChannel) {
         this.ffz = parent;
         this.plugin = parent.plugin;
         this.channel = channel.channel;
@@ -35,7 +41,7 @@ export default class FFZChannel {
         }
     }
 
-    async _loadAlternate() {
+    private async _loadAlternate() {
         await waitFor(() => this.twitch.id);
 
         try {
@@ -46,7 +52,41 @@ export default class FFZChannel {
         }
     }
 
-    _successHandler(data) {
+    private _successHandler(data: {
+        /* eslint-disable camelcase */
+        room: unknown;
+        sets: {[setName: string]: {
+            id: number;
+            _type: number;
+            icon: string | null;
+            title: string;
+            css: string | null;
+            emoticons: {
+                id: number;
+                name: string;
+                height: number;
+                width: number;
+                public: boolean;
+                hidden: boolean;
+                modifier: boolean;
+                offset: unknown;
+                margins: unknown;
+                css: unknown;
+                owner: {
+                    _id: number;
+                    name: string;
+                    display_name: string;
+                };
+                urls: {
+                    1: string;
+                    2: string | null;
+                    4: string | null;
+                };
+                animated: boolean;
+            }[];
+        };};
+        /* eslint-enable camelcase */
+    }) {
         if (this.cancelLoad) {
             return;
         }
@@ -70,7 +110,7 @@ export default class FFZChannel {
         this.plugin.addEventListener('gatherEmotes', this._gatherEmotes);
         this.plugin.dispatchEvent('emotesAdded', [this.emotes], this);
 
-        this.plugin.log(`Synced ${this.channel.owner.username} with FFZ emotes from ${this.twitch.login}.`, BetterMixer.LogType.INFO);
+        this.plugin.log(`Synced ${this.channel.owner!.username} with FFZ emotes from ${this.twitch.login}.`, BetterMixer.LogType.INFO);
     } 
 
     unload() {
