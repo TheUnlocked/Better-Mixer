@@ -6,7 +6,6 @@ const del = require('del');
 
 const assets = ["Extension/lib/css/*.css", "Extension/Icons/*.png", "Extension/manifest.json"];
 
-
 task('clean', function() {
     return del('build/**', {force: true});
 });
@@ -24,7 +23,5 @@ function assetsWatch() {
     return watch(assets, copyAssets);
 }
 
-exports.assets = copyAssets;
 exports.watch = series(createBuildTask(), parallel(assetsWatch));
-
 exports.default = createBuildTask();

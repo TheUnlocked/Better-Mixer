@@ -25,7 +25,11 @@
 
   "web_accessible_resources": [
     "lib/**/*.*",
+    "content/*.js",
+    "content/*.js.map",
+    "content/*.ts",
     "content/**/*.js",
-    "content/*.js"
+    "content/**/*.js.map",
+    "content/**/*.ts"
   ]
 }
