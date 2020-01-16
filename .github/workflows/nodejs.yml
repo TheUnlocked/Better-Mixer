@@ -12,6 +12,5 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 12.x
-    - name: lint
-      run: |
-        npm run lint
+    - name: ESlint Runner Action
+      uses: tinovyatkin/action-eslint@v1
