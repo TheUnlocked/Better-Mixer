@@ -130,7 +130,7 @@ export default class Patcher {
                 const autocompleter = new EmoteAutocomplete(this.plugin, chat);
                 // Purge built-in autocompleter
                 observeNewElements('#chat-listbox[class*="autocomplete"]', chat.element!, x => {
-                    if (!x.querySelector('[class*="viewer"]')) {
+                    if (x.querySelector('[class*="emote"]')) {
                         x.style.display = "none";
                     }
                 });

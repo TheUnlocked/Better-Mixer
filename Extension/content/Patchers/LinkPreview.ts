@@ -1,6 +1,9 @@
 import BetterMixer from "../BetterMixer.js";
 
 export const loadLinkPreview = async (plugin: BetterMixer, msgElement: HTMLElement, link: string) => {
+    const chatScrollElement = plugin.focusedChannel!.chat!.element!.querySelector('[class*="scrollWrapper"]') as HTMLElement;
+    const scrollToBottom = Math.ceil(chatScrollElement.scrollTop + chatScrollElement.getBoundingClientRect().height) >= chatScrollElement.scrollHeight;
+
     const requestAddress = `https://bettermixer.web.app/api/v1/url-preview?urlb64=${btoa(link)}`;
     const urlPreviewResponse = await fetch(requestAddress);
     if (!urlPreviewResponse.ok) {
@@ -59,5 +62,10 @@ export const loadLinkPreview = async (plugin: BetterMixer, msgElement: HTMLEleme
     });
 
     previewElt.appendChild(lowerContainer);
+
     msgElement.appendChild(previewElt);
+
+    if (scrollToBottom) {
+        chatScrollElement.scrollTop = chatScrollElement.scrollHeight;
+    }
 };
