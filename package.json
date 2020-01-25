@@ -7,16 +7,17 @@
     "lint:fix": "eslint -c .eslintrc ./Extension/**/*.{ts,js} --fix",
     "serve:firefox": "web-ext run --source-dir ./build/",
     "package": "npm run build && web-ext build --source-dir ./build/",
-    "build:dev": "tsc --inlineSourceMap true --inlineSources true --sourceRoot \"/\" && gulp",
-    "build": "gulp clean && tsc && gulp",
-    "watch": "concurrently --raw \"gulp watch\" \"tsc --inlineSourceMap true --inlineSources true --sourceRoot \"/\" --watch\""
+    "clean": "gulp clean",
+    "build:dev": "tsc --inlineSourceMap --inlineSources --sourceRoot \"/\" && gulp",
+    "build": "npm run clean && tsc && gulp",
+    "watch": "concurrently --raw \"gulp watch\" \"tsc --inlineSourceMap --inlineSources --sourceRoot \"/\" --watch\""
   },
   "devDependencies": {
     "@types/chrome": "0.0.91",
-    "@typescript-eslint/eslint-plugin": "^2.7.0",
-    "@typescript-eslint/parser": "^2.7.0",
     "@types/react": "^16.9.17",
     "@types/react-dom": "^16.9.4",
+    "@typescript-eslint/eslint-plugin": "^2.7.0",
+    "@typescript-eslint/parser": "^2.7.0",
     "babel-eslint": "^10.0.3",
     "concurrently": "^5.0.2",
     "del": "^5.1.0",

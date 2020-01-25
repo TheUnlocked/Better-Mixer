@@ -136,10 +136,16 @@ b-language-selector bui-icon.icon-web[icon="InternetWithController"] {
 }
 
 /* Configs */
-.bettermixer-config-boxed-supertext {
+.bettermixer-config-supertext-boxed {
     font-size: 12px;
     margin-left: 4px;
     margin-top: -4px;
+}
+
+.bettermixer-config-supertext {
+    font-size: 12px;
+    margin-left: 3px;
+    vertical-align: super;
 }
 
 /* Link Preview */

@@ -6,6 +6,14 @@ Join the [Better Mixer Discord server](https://discord.gg/mrr5Vtf) to report bug
 ## For Streamers
 Go to the [Better Mixer self-service](https://theunlocked.github.io/bettermixer/selfservice) to add FFZ/BTTV emotes to your channel.
 
+## For Firefox Reviewers
+This extension is packaged for release with these commands:
+```sh
+# Node 12+
+npm install --save-dev
+npm run package
+```
+
 # How to contribute
 ## How to file bug reports/feature requests
 Visit the Issues tab and check if your bug report/feature request has already been submitted. If it has not (or if the issue has been erronously closed), you may open a new issue. Please describe what occurred or what you want in as much detail as possible.

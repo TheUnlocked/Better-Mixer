@@ -80,18 +80,17 @@ const makeToggleSwitch = (config: Config<any>, setTempState: (newState: any) => 
     const toggleHolder = document.createElement('div');
                 
     ReactDOM.render(React.createElement(mixerUi.Toggle, {
-        children: config.displayText,
         checked: config.state,
         onChange: function(e) {
             this.checked = !this.checked;
             setTempState(this.checked);
             config.updateImmediate(this.checked);
         }
-    }), toggleHolder);
+    }, config.displayText), toggleHolder);
 
     if (config.superText) {
         const superText = document.createElement('span');
-        superText.classList.add('bettermixer-config-boxed-supertext');
+        superText.classList.add('bettermixer-config-supertext');
         superText.innerText = config.superText;
         toggleHolder.children[0].querySelector('label > span')!.appendChild(superText);
     }
@@ -120,7 +119,7 @@ const makeColorPicker = (config: Config<string>, setTempState: (newState: string
 
     if (config.superText) {
         const superText = document.createElement('span');
-        superText.classList.add('bettermixer-config-boxed-supertext');
+        superText.classList.add('bettermixer-config-supertext-boxed');
         superText.innerText = config.superText;
         colorHolder.children[0].querySelector('label > span')!.appendChild(superText);
     }
@@ -144,7 +143,7 @@ const makeDropdownMenu = (config: DropdownConfig, setTempState: (newState: strin
 
     if (config.superText) {
         const superText = document.createElement('span');
-        superText.classList.add('bettermixer-config-boxed-supertext');
+        superText.classList.add('bettermixer-config-supertext-boxed');
         superText.innerText = config.superText;
         dropdownHolder.children[0].querySelector('label > span')!.appendChild(superText);
     }
@@ -160,12 +159,13 @@ const makeStringInput = (config: Config<string>, setTempState: (newState: string
         value: config.state,
         onChange: (v: string) => {
             setTempState(v);
+            config.updateImmediate(v);
         }
     }), stringInputHolder);
 
     if (config.superText) {
         const superText = document.createElement('span');
-        superText.classList.add('bettermixer-config-boxed-supertext');
+        superText.classList.add('bettermixer-config-supertext-boxed');
         superText.innerText = config.superText;
         stringInputHolder.children[0].querySelector('label > span')!.appendChild(superText);
     }
