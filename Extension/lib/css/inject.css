@@ -183,3 +183,8 @@ b-language-selector bui-icon.icon-web[icon="InternetWithController"] {
     overflow: auto;
     font-size: 10pt;
 }
+
+/* Markdown */
+.bettermixer-markdown {
+    display: none;
+}

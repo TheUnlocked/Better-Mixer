@@ -109,12 +109,18 @@ export default class BetterMixer {
         this.configuration.registerConfig(linkPreviewConfig);
 
         this.configuration.registerConfig(new StylesheetToggleConfig(
-            this.injectStylesheet("lib/css/hideanimatedemotes.css"),
-            'show_emotes_animated', 'Show Animated Emotes', '', true, false));
-
-        this.configuration.registerConfig(new StylesheetToggleConfig(
             this.injectStylesheet("lib/css/movebadges.css"),
             'move_badges', 'Show Badges Before Username', '', true, true));
+
+        const markdownConfig = new StylesheetToggleConfig(
+            this.injectStylesheet("lib/css/showmarkdown.css"),
+            'BETA_show_markdown', 'Render Markdown Effects', '', false, true);
+        Object.defineProperty(markdownConfig, 'superText', { get: () => "BETA" });
+        this.configuration.registerConfig(markdownConfig);
+
+        this.configuration.registerConfig(new StylesheetToggleConfig(
+            this.injectStylesheet("lib/css/hideanimatedemotes.css"),
+            'show_emotes_animated', 'Show Animated Emotes', '', true, false));
 
         this.configuration.registerConfig(new StylesheetToggleConfig(
             this.injectStylesheet("lib/css/hideavatars.css"),
@@ -353,6 +359,11 @@ export default class BetterMixer {
      * @returns The function put in `callback`
      */
     addEventListener(eventType: EventType, callback: (event: BetterMixerEvent<any>) => any): (event: BetterMixerEvent<any>) => any {
+        if (!Object.keys(this._events).includes(eventType)) {
+            this.log(`Event ${eventType} does not exist.`, BetterMixer.LogType.ERROR);
+            return callback;
+        }
+
         this._events[eventType].push(callback);
         return callback;
     }

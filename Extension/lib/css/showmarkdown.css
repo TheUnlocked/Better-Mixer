@@ -1,0 +1,14 @@
+.bettermixer-markdown {
+    display: unset;
+}
+
+code.bettermixer-markdown {
+    font-family: monospace;
+    background-color: rgba(0, 0, 0, 0.4);
+    padding: 1px 3px;
+    border-radius: 4px;
+}
+
+.bettermixer-markdown-original {
+    display: none;
+}
