@@ -1,7 +1,7 @@
 import ChatMessage from "../ChatMessage.js";
 import { findMin } from "../Utility/Functional.js";
 import { sliceMany } from "../Utility/String.js";
-import { RAW_TEXT_STRING_QUERY_SELECTOR } from "../Utility/Constants.js";
+import { RAW_MESSAGE_TEXT_QUERY_SELECTOR } from "../Utility/Constants.js";
 
 // Firefox doesn't like lookbehind, so we need to provide a fallback
 const regexWithFallback = (attept: [string, string], fallback: [string, string]) => {
@@ -94,7 +94,10 @@ const passes: Pass[] = [
 ];
 
 export const patchMessageMarkdown = (message: ChatMessage) =>
-    message.element.querySelectorAll(`[class*="messageContent"] > ${RAW_TEXT_STRING_QUERY_SELECTOR}`).forEach(originalContents => {
+    message.element.querySelectorAll(RAW_MESSAGE_TEXT_QUERY_SELECTOR).forEach(originalContents => {
+        if (originalContents.children.length > 0) {
+            return;
+        }
         const newContents = originalContents.cloneNode(true) as HTMLElement;
         patchElementMarkdown(newContents, passes);
         newContents.setAttribute('bettermixer-markdown', "");

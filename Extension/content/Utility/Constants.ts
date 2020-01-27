@@ -1,1 +1,1 @@
-export const RAW_TEXT_STRING_QUERY_SELECTOR = 'span:not([class*="username"]):not([class*="emote"])';
+export const RAW_MESSAGE_TEXT_QUERY_SELECTOR = 'span:not([class])';
