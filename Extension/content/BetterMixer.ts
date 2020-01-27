@@ -12,7 +12,7 @@ import BrowseFiltersConfig from "./Configs/BrowseFiltersConfig.js";
 import ColorConfig from "./Configs/ColorConfig.js";
 import BotDetectionConfig from "./Configs/BotDetectionConfig.js";
 import StringConfig from "./Configs/StringConfig.js";
-import { fetchJson, waitFor, observeNewElements } from "./Utility/Util.js";
+import { fetchJson, waitFor, observeNewElements } from "./Utility/Promise.js";
 import DropdownConfig from "./Configs/DropdownConfig.js";
 import { BetterMixerEvent, EventMap, GatherMap } from "./BetterMixerEvent.js";
 
@@ -109,12 +109,17 @@ export default class BetterMixer {
         this.configuration.registerConfig(linkPreviewConfig);
 
         this.configuration.registerConfig(new StylesheetToggleConfig(
-            this.injectStylesheet("lib/css/hideanimatedemotes.css"),
-            'show_emotes_animated', 'Show Animated Emotes', '', true, false));
-
-        this.configuration.registerConfig(new StylesheetToggleConfig(
             this.injectStylesheet("lib/css/movebadges.css"),
             'move_badges', 'Show Badges Before Username', '', true, true));
+
+        const markdownConfig = new StylesheetToggleConfig(
+            this.injectStylesheet("lib/css/showmarkdown.css"),
+            'show_markdown', 'Render Markdown Effects', '', true, true);
+        this.configuration.registerConfig(markdownConfig);
+
+        this.configuration.registerConfig(new StylesheetToggleConfig(
+            this.injectStylesheet("lib/css/hideanimatedemotes.css"),
+            'show_emotes_animated', 'Show Animated Emotes', '', true, false));
 
         this.configuration.registerConfig(new StylesheetToggleConfig(
             this.injectStylesheet("lib/css/hideavatars.css"),
@@ -353,6 +358,11 @@ export default class BetterMixer {
      * @returns The function put in `callback`
      */
     addEventListener(eventType: EventType, callback: (event: BetterMixerEvent<any>) => any): (event: BetterMixerEvent<any>) => any {
+        if (!Object.keys(this._events).includes(eventType)) {
+            this.log(`Event ${eventType} does not exist.`, BetterMixer.LogType.ERROR);
+            return callback;
+        }
+
         this._events[eventType].push(callback);
         return callback;
     }

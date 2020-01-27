@@ -1,6 +1,6 @@
 import Config from "./Config.js";
 import BetterMixer from "../BetterMixer.js";
-import { observeNewElements } from "../Utility/Util.js";
+import { observeNewElements } from "../Utility/Promise.js";
 import { ConfigMap } from "./DefaultConfigs.js";
 
 const SRC = (document.getElementById('BetterMixer-module') as HTMLScriptElement).src;

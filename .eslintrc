@@ -41,7 +41,8 @@
         "no-fallthrough": "warn",
         "@typescript-eslint/no-use-before-define": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
-        "no-dupe-class-members": "off"
+        "no-dupe-class-members": "off",
+        "no-constant-condition": "off"
     },
     "env": {
         "webextensions": true,

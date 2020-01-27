@@ -1,5 +1,5 @@
 import Config from "../Configs/Config.js";
-import { waitFor } from "../Utility/Util.js";
+import { waitFor } from "../Utility/Promise.js";
 import BetterMixer from "../BetterMixer.js";
 import DropdownConfig from "../Configs/DropdownConfig.js";
 
