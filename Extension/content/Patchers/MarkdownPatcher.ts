@@ -98,11 +98,16 @@ export const patchMessageMarkdown = (message: ChatMessage) =>
         if (originalContents.children.length > 0) {
             return;
         }
+        
         const newContents = originalContents.cloneNode(true) as HTMLElement;
         patchElementMarkdown(newContents, passes);
         newContents.classList.add('bettermixer-markdown');
-        originalContents.setAttribute('bettermixer-markdown-original', "");
         originalContents.parentElement!.insertBefore(newContents, originalContents);
+
+        const originalContentsWrapper = document.createElement('span');
+        originalContents.parentElement!.insertBefore(originalContentsWrapper, originalContents);
+        originalContentsWrapper.appendChild(originalContents);
+        originalContentsWrapper.classList.add('bettermixer-markdown-original');
     }); 
 
 const patchElementMarkdown = (element: HTMLElement, passes: Pass[], existingReplacements: HTMLElement[] = []) => {
