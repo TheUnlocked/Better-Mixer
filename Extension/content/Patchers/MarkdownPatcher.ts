@@ -14,22 +14,22 @@ const regexWithFallback = (attept: [string, string], fallback: [string, string])
 };
 
 /* Original RegEx expressions */
-// const inlineCodeRegex = /(?<!\\)(?:\\{2})*`(.+?)`/u;
-// const underlineRegex = /(?<!\\)(?:\\{2})*_{2}(?!_)(.+?)(?<!\\)(?:\\{2})*_{2}/u;
-// const boldRegex = /(?<!\\)(?:\\{2})*\*{2}(?!\*)(.+?)(?<!\\)(?:\\{2})*\*{2}/u;
-// const italicsRegex = /(?<!\\)(?:\\{2})*(?:_(.+?)(?<!\\)(?:\\{2})*_|\*(.+?)(?<!\\)(?:\\{2})*\*)/u;
+// const inlineCodeRegex = /(?<!\\)(?:\\{2})*`(.+?)`/us;
+// const underlineRegex = /(?<!\\)(?:\\{2})*_{2}(?!_)(.+?)(?<!\\)(?:\\{2})*_{2}/us;
+// const boldRegex = /(?<!\\)(?:\\{2})*\*{2}(?!\*)(.+?)(?<!\\)(?:\\{2})*\*{2}/us;
+// const italicsRegex = /(?<!\\)(?:\\{2})*(?:_(.+?)(?<!\\)(?:\\{2})*_|\*(.+?)(?<!\\)(?:\\{2})*\*)/us;
 
 const inlineCodeRegex = regexWithFallback(
-    ['(?<!\\\\)(?:\\\\{2})*`(.+?)`', 'u'],
+    ['(?<!\\\\)(?:\\\\{2})*`(.+?)`', 'us'],
     ['`(.+?)`', 'u']);
 const underlineRegex = regexWithFallback(
-    ['(?<!\\\\)(?:\\\\{2})*_{2}(?!_)(.+?)(?<!\\\\)(?:\\\\{2})*_{2}', 'u'],
+    ['(?<!\\\\)(?:\\\\{2})*_{2}(?!_)(.+?)(?<!\\\\)(?:\\\\{2})*_{2}', 'us'],
     ['_{2}(?!_)(.+?)_{2}', 'u']);
 const boldRegex = regexWithFallback(
-    ['(?<!\\\\)(?:\\{2})*\\*{2}(?!\\*)(.+?)(?<!\\\\)(?:\\\\{2})*\\*{2}', 'u'],
+    ['(?<!\\\\)(?:\\{2})*\\*{2}(?!\\*)(.+?)(?<!\\\\)(?:\\\\{2})*\\*{2}', 'us'],
     ['\\*{2}(?!\\*)(.+?)\\*{2}', 'u']);
 const italicsRegex = regexWithFallback(
-    ['(?<!\\\\)(?:\\\\{2})*(?:_(.+?)(?<!\\\\)(?:\\\\{2})*_|\\*(.+?)(?<!\\\\)(?:\\\\{2})*\\*)', 'u'],
+    ['(?<!\\\\)(?:\\\\{2})*(?:_(.+?)(?<!\\\\)(?:\\\\{2})*_|\\*(.+?)(?<!\\\\)(?:\\\\{2})*\\*)', 'us'],
     ['_(.+?)_|\\*(.+?)\\*', 'u']);
 
 type Pass = {
@@ -98,7 +98,7 @@ export const patchMessageMarkdown = (message: ChatMessage) =>
         if (originalContents.children.length > 0) {
             return;
         }
-        
+
         const newContents = originalContents.cloneNode(true) as HTMLElement;
         patchElementMarkdown(newContents, passes);
         newContents.classList.add('bettermixer-markdown');
