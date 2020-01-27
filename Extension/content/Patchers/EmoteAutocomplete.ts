@@ -1,5 +1,5 @@
 import EmoteSet from "../EmoteSet.js";
-import { fetchJson } from "../Utility/Util.js";
+import { fetchJson } from "../Utility/Promise.js";
 import Emote, { VanillaEmote } from "../Emote.js";
 import Chat from "../Chat.js";
 import BetterMixer from "../BetterMixer.js";

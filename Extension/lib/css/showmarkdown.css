@@ -2,7 +2,7 @@
     display: unset;
 }
 
-code.bettermixer-markdown {
+.bettermixer-markdown code {
     font-family: monospace;
     background-color: rgba(0, 0, 0, 0.4);
     padding: 1px 3px;

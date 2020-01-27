@@ -30,8 +30,8 @@ export const parseMessageEmotes = (plugin: BetterMixer, message: ChatMessage, em
             const emote = emotes[word];
             if (emote) {
                 // End the text element if you find an emote
-                const newText = textElement.cloneNode();
-                newText.textContent = textBuilder;
+                const newText = textElement.cloneNode() as HTMLElement;
+                newText.innerHTML = textBuilder;
                 messageBuilder.push(newText);
                 textBuilder = " ";
                 // Push the emote
@@ -45,8 +45,8 @@ export const parseMessageEmotes = (plugin: BetterMixer, message: ChatMessage, em
         }
         // Finish the text buffer, if one exists
         if (textBuilder) {
-            const newText = textElement.cloneNode();
-            newText.textContent = textBuilder;
+            const newText = textElement.cloneNode() as HTMLElement;
+            newText.innerHTML = textBuilder;
             messageBuilder.push(newText);
             textBuilder = " ";
         }

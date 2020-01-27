@@ -1,7 +1,7 @@
 import BetterMixer from "../BetterMixer.js";
 import EmoteSet from "../EmoteSet.js";
 import ChatMessage from "../ChatMessage.js";
-import { waitFor, observeNewElements, executeInOrder } from "../Utility/Util.js";
+import { waitFor, observeNewElements, executeInOrder } from "../Utility/Promise.js";
 import { patchEmoteDialog } from "./EmoteDialogPatcher.js";
 import { parseMessageEmotes } from "./EmoteDisplayPatcher.js";
 import { patchSettingsDialog } from "./SettingsDialogPatcher.js";

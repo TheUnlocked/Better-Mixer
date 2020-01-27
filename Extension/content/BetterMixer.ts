@@ -12,7 +12,7 @@ import BrowseFiltersConfig from "./Configs/BrowseFiltersConfig.js";
 import ColorConfig from "./Configs/ColorConfig.js";
 import BotDetectionConfig from "./Configs/BotDetectionConfig.js";
 import StringConfig from "./Configs/StringConfig.js";
-import { fetchJson, waitFor, observeNewElements } from "./Utility/Util.js";
+import { fetchJson, waitFor, observeNewElements } from "./Utility/Promise.js";
 import DropdownConfig from "./Configs/DropdownConfig.js";
 import { BetterMixerEvent, EventMap, GatherMap } from "./BetterMixerEvent.js";
 

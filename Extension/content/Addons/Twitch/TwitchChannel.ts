@@ -1,7 +1,7 @@
 import BetterMixer from "../../BetterMixer.js";
 import TwitchAddon from "./TwitchAddon.js";
 import Channel from "../../Channel.js";
-import { fetchJson } from "../../Utility/Util.js";
+import { fetchJson } from "../../Utility/Promise.js";
 
 export default class TwitchChannel {
     twitch: TwitchAddon;

@@ -2,7 +2,7 @@ import Channel from "./Channel.js";
 import ChatMessage from "./ChatMessage.js";
 import BetterMixer from "./BetterMixer.js";
 import Badge from "./Badge.js";
-import { observeNewElements } from "./Utility/Util.js";
+import { observeNewElements } from "./Utility/Promise.js";
 import User from "./User.js";
 import { GatherBadgesEvent, GatherBadgesResult } from "./BetterMixerEvent.js";
 

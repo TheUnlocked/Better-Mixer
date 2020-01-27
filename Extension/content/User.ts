@@ -1,5 +1,5 @@
 import Badge from "./Badge.js";
-import { fetchJson } from "./Utility/Util.js";
+import { fetchJson } from "./Utility/Promise.js";
 import BetterMixer from "./BetterMixer.js";
 
 export default class User {

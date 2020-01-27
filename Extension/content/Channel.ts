@@ -1,7 +1,7 @@
 import BetterMixer from "./BetterMixer.js";
 import Chat from "./Chat.js";
 import User from "./User.js";
-import { fetchJson } from "./Utility/Util.js";
+import { fetchJson } from "./Utility/Promise.js";
 import FFZChannel from "./Addons/FFZ/FFZChannel.js";
 import BTTVChannel from "./Addons/BTTV/BTTVChannel.js";
 import TwitchChannel from "./Addons/Twitch/TwitchChannel.js";

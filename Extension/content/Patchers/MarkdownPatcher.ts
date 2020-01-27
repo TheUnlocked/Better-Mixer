@@ -1,84 +1,117 @@
 import ChatMessage from "../ChatMessage.js";
+import { findMin } from "../Utility/Functional.js";
+import { sliceMany } from "../Utility/String.js";
 
-const inlineCodeRegex = /(?<!\\)(?:\\{2})*`(.*?)`/gu;
-const underlineRegex = /(?<!\\)(?:\\{2})*_{2}(?!_)(.*?)(?<!\\)(?:\\{2})*_{2}/gu;
-const boldRegex = /(?<!\\)(?:\\{2})*\*{2}(?!\*)(.*?)(?<!\\)(?:\\{2})*\*{2}/gu;
-const italicsRegex = /(?<!\\)(?:\\{2})*(?:_(.*?)(?<!\\)(?:\\{2})*_|\*(.*?)(?<!\\)(?:\\{2})*\*)/gu;
+const inlineCodeRegex = /(?<!\\)(?:\\{2})*`(.+?)`/us;
+const underlineRegex = /(?<!\\)(?:\\{2})*_{2}(?!_)(.+?)(?<!\\)(?:\\{2})*_{2}/us;
+const boldRegex = /(?<!\\)(?:\\{2})*\*{2}(?!\*)(.+?)(?<!\\)(?:\\{2})*\*{2}/us;
+const italicsRegex = /(?<!\\)(?:\\{2})*(?:_(.+?)(?<!\\)(?:\\{2})*_|\*(.+?)(?<!\\)(?:\\{2})*\*)/us;
 
-const passes: [RegExp, (...matches: string[]) => string | HTMLElement][] = [
-    [
-        inlineCodeRegex,
-        (_, inner) => {
-            const newText = document.createElement('code');
-            newText.innerText = inner;
-            return newText;
-        }
-    ],
-    [
-        underlineRegex,
-        (_, inner) => `<span style="text-decoration: underline;">${inner}</span>`
-    ],
-    [
-        boldRegex,
-        (_, inner) => `<span style="font-weight: bold;">${inner}</span>`
-    ],
-    [
-        italicsRegex,
-        (_, innerUnderscore, innerAsterisk) => `<span style="font-style: italic;">${innerUnderscore || innerAsterisk}</span>`
-    ]
+type Pass = {
+    regex: RegExp;
+    fix: (...matches: string[]) => string | HTMLElement;
+    allowInside: Pass[] | 'any';
+    priority: number;
+};
+
+const codePass: Pass = {
+    regex: inlineCodeRegex,
+    fix: (_, inner) => {
+        const newText = document.createElement('code');
+        newText.innerText = inner;
+        return newText;
+    },
+    allowInside: [],
+    priority: 2
+};
+
+const underlinePass: Pass = {
+    regex: underlineRegex,
+    fix: (_, inner) => {
+        const newText = document.createElement('span');
+        newText.innerText = inner;
+        newText.style.textDecoration = 'underline';
+        return newText;
+    },
+    allowInside: 'any',
+    priority: 1
+};
+
+const boldPass: Pass = {
+    regex: boldRegex,
+    fix: (_, inner) => {
+        const newText = document.createElement('span');
+        newText.innerText = inner;
+        newText.style.fontWeight = 'bold';
+        return newText;
+    },
+    allowInside: 'any',
+    priority: 1
+};
+
+const italicsPass: Pass = {
+    regex: italicsRegex,
+    fix: (_, innerUnderscore, innerAsterisk) => {
+        const newText = document.createElement('span');
+        newText.innerText = innerUnderscore || innerAsterisk;
+        newText.style.fontStyle = 'italic';
+        return newText;
+    },
+    allowInside: 'any',
+    priority: 0
+};
+
+const passes: Pass[] = [
+    codePass,
+    underlinePass,
+    boldPass,
+    italicsPass
 ];
 
-export const patchMessageMarkdown = (message: ChatMessage) => {
-    const parts = [...message.element.querySelectorAll('span:not([class])')] as HTMLElement[];
+export const patchMessageMarkdown = (message: ChatMessage) =>
+    message.element.querySelectorAll('[class*="messageContent"] > span:not([class*="username"])').forEach(originalContents => {
+        const newContents = originalContents.cloneNode(true) as HTMLElement;
+        patchElementMarkdown(newContents, passes);
+        newContents.classList.add('bettermixer-markdown');
+        originalContents.classList.add('bettermixer-markdown-original');
+        originalContents.parentElement!.insertBefore(newContents, originalContents);
+    }); 
 
-    for (const part of parts) {
-        let subParts: (string | HTMLElement)[] = [part.innerText];
-        for (const pass of passes) {
-            const newSubParts: (string | HTMLElement)[] = [];
-            for (const piece of subParts) {
-                if (typeof piece === 'string') {
-                    let buffer = "";
-                    let finishedIndex = 0;
-                    for (const match of piece.matchAll(pass[0])) {
-                        buffer += piece.slice(finishedIndex, match.index);
-                        
-                        const converted = pass[1](...match);
-                        if (typeof converted === 'string') {
-                            buffer += converted;
-                        }
-                        else {
-                            if (buffer !== "") {
-                                newSubParts.push(buffer);
-                                buffer = "";
-                            }
-                            newSubParts.push(converted);
-                        }
-
-                        finishedIndex = match.index! + match[0].length;
-                    }
-                    buffer += piece.slice(finishedIndex);
-                    if (buffer !== "") {
-                        newSubParts.push(buffer);
-                    }
-                }
-                else {
-                    newSubParts.push(piece);
-                }
-            }
-            subParts = newSubParts;
+const patchElementMarkdown = (element: HTMLElement, passes: Pass[], existingReplacements: HTMLElement[] = []) => {
+    let str = element.innerText;
+    const replacements: HTMLElement[] = [...existingReplacements];
+    
+    while (true) {
+        if (passes.length === 0) {
+            break;
         }
-        subParts.map(x => {
-            if (typeof x === 'string') {
-                const clone = part.cloneNode() as HTMLElement;
-                clone.innerHTML = x;
-                clone.classList.add('bettermixer-markdown');
-                return clone;
-            }
-            x.classList.add('bettermixer-markdown');
-            return x;
-        }).forEach(x => {
-            part.parentElement!.insertBefore(x, part);
-        });
-        part.classList.add('bettermixer-markdown-original');
+        
+        const [bestPass, bestMatch] = findMin(
+            passes.map((x): [Pass, RegExpMatchArray | null] => [x, str.match(x.regex)]),
+            x => x[1] === null ? str.length : x[1].index! - x[0].priority * str.length)!;
+
+        if (!bestMatch) {
+            break;
+        }
+
+        const replacement = bestPass.fix(...bestMatch);
+        if (typeof replacement === 'string') {
+            str = str.slice(0, bestMatch.index) + replacement + str.slice(bestMatch.index! + bestMatch[0].length);
+        }
+        else {
+            str = str.slice(0, bestMatch.index) + `\0${replacements.length}\0` + str.slice(bestMatch.index! + bestMatch[0].length);
+            replacements.push(replacement);
+            patchElementMarkdown(replacement, bestPass.allowInside === 'any' ? passes : bestPass.allowInside, replacements);
+        }
     }
+
+    const sliceIndexes = [...str.matchAll(/\0(\d+?)\0/g)].map(match => [match.index!, match.index! + match[0].length]).flat(1);
+    element.childNodes.forEach(x => x.remove());
+    sliceMany(str, sliceIndexes).map(x => {
+        const match = x.match(/\0(\d+?)\0/);
+        if (match) {
+            return replacements[+match[1]];
+        }
+        return [new Text(x)];
+    }).flat(1).forEach(x => element.appendChild(x));
 };

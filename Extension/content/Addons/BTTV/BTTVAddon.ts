@@ -3,7 +3,7 @@ import BetterMixer from "../../BetterMixer.js";
 import TwitchChannel from "../Twitch/TwitchChannel.js";
 import EmoteSet from "../../EmoteSet.js";
 import Emote from "../../Emote.js";
-import { fetchJson } from "../../Utility/Util.js";
+import { fetchJson } from "../../Utility/Promise.js";
 import { GatherEmotesEvent, GatherEmotesResult } from "Extension/content/BetterMixerEvent.js";
 
 export default class BTTVAddon {
