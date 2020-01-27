@@ -5,7 +5,7 @@ import Chat from "../Chat.js";
 import BetterMixer from "../BetterMixer.js";
 
 export default class EmoteAutocomplete {
-    static vanillaEmoteCache: Emote[] = [];
+    static vanillaEmoteCache: Emote[];
     plugin: BetterMixer;
     chat: Chat;
     showing: boolean;
