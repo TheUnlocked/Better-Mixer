@@ -37,6 +37,7 @@ type Pass = {
     fix: (...matches: string[]) => string | HTMLElement;
     allowInside: Pass[] | 'any';
     priority: number;
+    noSpanWrap?: boolean;
 };
 
 const codePass: Pass = {
@@ -47,6 +48,7 @@ const codePass: Pass = {
         return newText;
     },
     allowInside: [],
+    noSpanWrap: true,
     priority: 2
 };
 
@@ -110,8 +112,8 @@ export const patchMessageMarkdown = (message: ChatMessage) =>
         originalContentsWrapper.classList.add('bettermixer-markdown-original');
     }); 
 
-const patchElementMarkdown = (element: HTMLElement, passes: Pass[], existingReplacements: HTMLElement[] = []) => {
-    let str = element.innerText;
+const patchElementMarkdown = (element: HTMLElement, passes: Pass[], existingReplacements: HTMLElement[] = [], noSpanWrap?: boolean) => {
+    let str = element.innerText.replace(/\n/g, ' ');
     const replacements: HTMLElement[] = [...existingReplacements];
     
     while (true) {
@@ -134,7 +136,11 @@ const patchElementMarkdown = (element: HTMLElement, passes: Pass[], existingRepl
         else {
             str = str.slice(0, bestMatch.index) + `\0${replacements.length}\0` + str.slice(bestMatch.index! + bestMatch[0].length);
             replacements.push(replacement);
-            patchElementMarkdown(replacement, bestPass.allowInside === 'any' ? passes : bestPass.allowInside, replacements);
+            patchElementMarkdown(
+                replacement,
+                bestPass.allowInside === 'any' ? passes : bestPass.allowInside,
+                replacements,
+                bestPass.noSpanWrap);
         }
     }
 
@@ -144,6 +150,9 @@ const patchElementMarkdown = (element: HTMLElement, passes: Pass[], existingRepl
         const match = x.match(/\0(\d+?)\0/);
         if (match) {
             return replacements[+match[1]];
+        }
+        if (noSpanWrap) {
+            return new Text(x);
         }
         const containerSpan = document.createElement('span');
         containerSpan.innerText = x;

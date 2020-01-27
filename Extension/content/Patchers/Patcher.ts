@@ -20,6 +20,8 @@ export default class Patcher {
         this.plugin = plugin;
         this.registerRenderType('message');
 
+        // Process markdown
+        this.addRenderPass('message', message => patchMessageMarkdown(message));
         // Parse emotes
         this.addRenderPass('message', message => parseMessageEmotes(this.plugin, message));
         // Add link previews
@@ -74,8 +76,6 @@ export default class Patcher {
                 authorElement.insertBefore(preceedingBadge, authorElement.firstChild);
             }
         });
-        // Process markdown
-        this.addRenderPass('message', message => patchMessageMarkdown(message));
 
         if (!this._emotesAddedListener) {
             this._emotesAddedListener = this.plugin.addEventListener('emotesAdded', event => {
