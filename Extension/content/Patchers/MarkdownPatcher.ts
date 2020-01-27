@@ -2,10 +2,10 @@ import ChatMessage from "../ChatMessage.js";
 import { findMin } from "../Utility/Functional.js";
 import { sliceMany } from "../Utility/String.js";
 
-const inlineCodeRegex = /(?<!\\)(?:\\{2})*`(.+?)`/us;
-const underlineRegex = /(?<!\\)(?:\\{2})*_{2}(?!_)(.+?)(?<!\\)(?:\\{2})*_{2}/us;
-const boldRegex = /(?<!\\)(?:\\{2})*\*{2}(?!\*)(.+?)(?<!\\)(?:\\{2})*\*{2}/us;
-const italicsRegex = /(?<!\\)(?:\\{2})*(?:_(.+?)(?<!\\)(?:\\{2})*_|\*(.+?)(?<!\\)(?:\\{2})*\*)/us;
+const inlineCodeRegex = /(?<!\\)(?:\\{2})*`(.+?)`/u;
+const underlineRegex = /(?<!\\)(?:\\{2})*_{2}(?!_)(.+?)(?<!\\)(?:\\{2})*_{2}/u;
+const boldRegex = /(?<!\\)(?:\\{2})*\*{2}(?!\*)(.+?)(?<!\\)(?:\\{2})*\*{2}/u;
+const italicsRegex = /(?<!\\)(?:\\{2})*(?:_(.+?)(?<!\\)(?:\\{2})*_|\*(.+?)(?<!\\)(?:\\{2})*\*)/u;
 
 type Pass = {
     regex: RegExp;
