@@ -2,6 +2,7 @@ import EmoteSet from "../EmoteSet.js";
 import BetterMixer from "../BetterMixer.js";
 import ChatMessage from "../ChatMessage.js";
 import Emote from "../Emote.js";
+import { RAW_TEXT_STRING_QUERY_SELECTOR } from "../Utility/Constants.js";
 
 export const parseMessageEmotes = (plugin: BetterMixer, message: ChatMessage, emoteSets?: EmoteSet[]) => {
     const emoteGatherEventData = {
@@ -13,7 +14,7 @@ export const parseMessageEmotes = (plugin: BetterMixer, message: ChatMessage, em
         .reduce((acc: Emote[], val) => !val ? acc : val instanceof EmoteSet ? acc.concat(val.emotes) : acc.concat(val), []);
     const emotes = emoteList.reduce((result, value) => { result[value.name] = value; return result; }, {} as {[emoteName: string]: Emote});
 
-    const textPieces = [...message.element.querySelectorAll('span:not([class*="emote"])')];
+    const textPieces = [...message.element.querySelectorAll(RAW_TEXT_STRING_QUERY_SELECTOR)] as HTMLElement[];
     let textBuilder = "";
     for (const textElement of textPieces) {
         // If the text piece is an actual html element, skip it.
@@ -22,7 +23,7 @@ export const parseMessageEmotes = (plugin: BetterMixer, message: ChatMessage, em
         }
 
         // Break it up into text pieces, and check each piece for an emote
-        const words = textElement.innerHTML.trim().split(" ");
+        const words = textElement.innerText.trim().split(" ");
         const messageBuilder = [];
 
         // Buffer used to retain non-emote text
@@ -46,7 +47,7 @@ export const parseMessageEmotes = (plugin: BetterMixer, message: ChatMessage, em
         // Finish the text buffer, if one exists
         if (textBuilder) {
             const newText = textElement.cloneNode() as HTMLElement;
-            newText.innerHTML = textBuilder;
+            newText.innerText = textBuilder;
             messageBuilder.push(newText);
             textBuilder = " ";
         }
