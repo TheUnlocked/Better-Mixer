@@ -192,6 +192,6 @@ b-language-selector bui-icon.icon-web[icon="InternetWithController"] {
 }
 
 /* Markdown */
-[bettermixer-markdown] {
+.bettermixer-markdown {
     display: none;
 }

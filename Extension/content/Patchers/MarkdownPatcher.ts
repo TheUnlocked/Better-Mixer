@@ -100,7 +100,7 @@ export const patchMessageMarkdown = (message: ChatMessage) =>
         }
         const newContents = originalContents.cloneNode(true) as HTMLElement;
         patchElementMarkdown(newContents, passes);
-        newContents.setAttribute('bettermixer-markdown', "");
+        newContents.classList.add('bettermixer-markdown');
         originalContents.setAttribute('bettermixer-markdown-original', "");
         originalContents.parentElement!.insertBefore(newContents, originalContents);
     }); 
@@ -140,6 +140,8 @@ const patchElementMarkdown = (element: HTMLElement, passes: Pass[], existingRepl
         if (match) {
             return replacements[+match[1]];
         }
-        return [new Text(x)];
+        const containerSpan = document.createElement('span');
+        containerSpan.innerText = x;
+        return [containerSpan];
     }).flat(1).forEach(x => element.appendChild(x));
 };

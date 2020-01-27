@@ -1,8 +1,8 @@
-[bettermixer-markdown] {
+.bettermixer-markdown {
     display: unset;
 }
 
-[bettermixer-markdown] code {
+.bettermixer-markdown code {
     font-family: monospace;
     background-color: rgba(0, 0, 0, 0.4);
     padding: 1px 3px;
