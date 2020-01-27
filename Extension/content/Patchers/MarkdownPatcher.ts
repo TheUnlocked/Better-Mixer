@@ -2,10 +2,34 @@ import ChatMessage from "../ChatMessage.js";
 import { findMin } from "../Utility/Functional.js";
 import { sliceMany } from "../Utility/String.js";
 
-const inlineCodeRegex = /(?<!\\)(?:\\{2})*`(.+?)`/u;
-const underlineRegex = /(?<!\\)(?:\\{2})*_{2}(?!_)(.+?)(?<!\\)(?:\\{2})*_{2}/u;
-const boldRegex = /(?<!\\)(?:\\{2})*\*{2}(?!\*)(.+?)(?<!\\)(?:\\{2})*\*{2}/u;
-const italicsRegex = /(?<!\\)(?:\\{2})*(?:_(.+?)(?<!\\)(?:\\{2})*_|\*(.+?)(?<!\\)(?:\\{2})*\*)/u;
+// Firefox doesn't like lookbehind, so we need to provide a fallback
+const regexWithFallback = (attept: [string, string], fallback: [string, string]) => {
+    try {
+        return new RegExp(attept[0], attept[1]);
+    }
+    catch {
+        return new RegExp(fallback[0], fallback[1]);
+    }
+};
+
+/* Original RegEx expressions */
+// const inlineCodeRegex = /(?<!\\)(?:\\{2})*`(.+?)`/u;
+// const underlineRegex = /(?<!\\)(?:\\{2})*_{2}(?!_)(.+?)(?<!\\)(?:\\{2})*_{2}/u;
+// const boldRegex = /(?<!\\)(?:\\{2})*\*{2}(?!\*)(.+?)(?<!\\)(?:\\{2})*\*{2}/u;
+// const italicsRegex = /(?<!\\)(?:\\{2})*(?:_(.+?)(?<!\\)(?:\\{2})*_|\*(.+?)(?<!\\)(?:\\{2})*\*)/u;
+
+const inlineCodeRegex = regexWithFallback(
+    ['(?<!\\\\)(?:\\\\{2})*`(.+?)`', 'u'],
+    ['`(.+?)`', 'u']);
+const underlineRegex = regexWithFallback(
+    ['(?<!\\\\)(?:\\\\{2})*_{2}(?!_)(.+?)(?<!\\\\)(?:\\\\{2})*_{2}', 'u'],
+    ['_{2}(?!_)(.+?)_{2}', 'u']);
+const boldRegex = regexWithFallback(
+    ['(?<!\\\\)(?:\\{2})*\\*{2}(?!\\*)(.+?)(?<!\\\\)(?:\\\\{2})*\\*{2}', 'u'],
+    ['\\*{2}(?!\\*)(.+?)\\*{2}', 'u']);
+const italicsRegex = regexWithFallback(
+    ['(?<!\\\\)(?:\\\\{2})*(?:_(.+?)(?<!\\\\)(?:\\\\{2})*_|\\*(.+?)(?<!\\\\)(?:\\\\{2})*\\*)', 'u'],
+    ['_(.+?)_|\\*(.+?)\\*', 'u']);
 
 type Pass = {
     regex: RegExp;

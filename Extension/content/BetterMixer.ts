@@ -114,8 +114,7 @@ export default class BetterMixer {
 
         const markdownConfig = new StylesheetToggleConfig(
             this.injectStylesheet("lib/css/showmarkdown.css"),
-            'BETA_show_markdown', 'Render Markdown Effects', '', false, true);
-        Object.defineProperty(markdownConfig, 'superText', { get: () => "BETA" });
+            'show_markdown', 'Render Markdown Effects', '', true, true);
         this.configuration.registerConfig(markdownConfig);
 
         this.configuration.registerConfig(new StylesheetToggleConfig(
