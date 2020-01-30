@@ -35,7 +35,19 @@ export const executeInOrder = async (functions: (() => any)[]) => {
     }
 };
 
-export const observeNewElements = (selector: string, parent: Node, callback: (element: HTMLElement) => void) => {
+export const observeNewElements = (selector: string, parent: Node, callback: (element: HTMLElement) => void, applyToExisting = false) => {
+    if (applyToExisting) {
+        if (parent instanceof HTMLElement) {
+            for (const match of parent.querySelectorAll(selector)) {
+                try {
+                    callback(match as HTMLElement);
+                }
+                catch (error) {
+                    console.error(error);
+                }
+            }
+        }
+    }
     const observer = new MutationObserver(muts => {
         const matches = [];
         for (const mut of muts) {

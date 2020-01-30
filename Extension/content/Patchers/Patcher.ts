@@ -182,6 +182,18 @@ export default class Patcher {
         // Handle MixPlay auto off
         loadMixplayStartClosedPatch(this.plugin);
 
+        // Handle Banner Replacement
+        observeNewElements('img[src*="bettermixerenabled="]', document.body, _img => {
+            const img = _img as HTMLImageElement;
+            const query = img.src.slice(img.src.indexOf('?'));
+            if (query) {
+                const params = new URLSearchParams(query);
+                if (params.get('bettermixerenabled')) {
+                    img.src = atob(params.get('bettermixerenabled')!);
+                }
+            }
+        }, true);
+
         // Handle Browse > Filters > Save Filters
         this.plugin.addEventListener('pageLoad', async () => {
             if (document.location.pathname.startsWith("/browse")) {
