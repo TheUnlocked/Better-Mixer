@@ -85,7 +85,7 @@ export default class BetterMixer {
 
         const botColorDetectionConfig = new BotDetectionConfig();
         const botColorRegexConfig = new StringConfig(
-            'botcolor_regex', 'Bot Username RegExp', '', 'Bot(?![a-z])|bot$');
+            'botcolor_regex', 'Bot Username RegExp', '', 'Bot(?![a-z])|[Bb][Oo][Tt]$');
         Object.defineProperty(botColorRegexConfig, 'hidden', { get: () => botColorDetectionConfig.state !== "custom" });
         const botColorConfig = new ColorConfig('botcolor', 'Bot Color', '', '#d37110');
         Object.defineProperty(botColorConfig, 'hidden', { get: () => botColorDetectionConfig.state === "off" });
