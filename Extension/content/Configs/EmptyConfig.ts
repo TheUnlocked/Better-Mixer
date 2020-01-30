@@ -1,31 +1,35 @@
 import Config from "./Config.js";
 
-export default class BrowseFiltersConfig extends Config<string> {
-    queryParams: string;
+export default class EmptyConfig<T> extends Config<T> {
+    _name: string;
+    _state: T;
+    _default: T;
 
-    constructor() {
+    constructor(name: string, defaultValue: T) {
         super();
-        this.queryParams = "";
+        this._name = name;
+        this._default = defaultValue;
+        this._state = defaultValue;
     }
 
     // The name used internally
     get configName() {
-        return "browse_filters";
+        return this._name;
     }
 
     // Set the config state
     set state(state) {
-        this.queryParams = state;
+        this._state = state;
     }
 
     // Get the config state
     get state() {
-        return this.queryParams;
+        return this._state;
     }
 
     // The state to be held before the config is modified
     get defaultState() {
-        return "";
+        return this._default;
     }
 
     // The type of config, currently unused as configs can only be booleans

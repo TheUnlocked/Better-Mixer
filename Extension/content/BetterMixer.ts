@@ -8,7 +8,7 @@ import Channel from "./Channel.js";
 import Patcher from "./Patchers/Patcher.js";
 import User from "./User.js";
 import Badge from "./Badge.js";
-import BrowseFiltersConfig from "./Configs/BrowseFiltersConfig.js";
+import EmptyConfig from "./Configs/EmptyConfig.js";
 import ColorConfig from "./Configs/ColorConfig.js";
 import BotDetectionConfig from "./Configs/BotDetectionConfig.js";
 import StringConfig from "./Configs/StringConfig.js";
@@ -133,7 +133,8 @@ export default class BetterMixer {
             this.injectStylesheet("lib/css/hidechatresizer.css"),
             'hide_chat_resizer', 'Disable Chat Resizer', '', false, true));
 
-        this.configuration.registerConfig(new BrowseFiltersConfig());
+        this.configuration.registerConfig(new EmptyConfig('browse_filters', ''));
+        this.configuration.registerConfig(new EmptyConfig('mixplay_start_closed', false));
 
         this.reload();
 

@@ -195,3 +195,8 @@ b-language-selector bui-icon.icon-web[icon="InternetWithController"] {
 .bettermixer-markdown {
     display: none;
 }
+
+/* Disable MixPlay on start */
+.bettermixer-toggle-start-interactive-closed {
+    padding: 0 12px !important;
+}

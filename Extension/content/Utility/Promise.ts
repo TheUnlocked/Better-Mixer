@@ -27,6 +27,8 @@ export const waitFor = (pred: () => any, _options?: { delay?: number; maxAttempt
     loop();
 });
 
+export const sleep = (time: number): Promise<void> => new Promise(resolve => setTimeout(resolve, time));
+
 export const executeInOrder = async (functions: (() => any)[]) => {
     for (const func of functions) {
         await func();

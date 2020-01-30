@@ -79,9 +79,10 @@ export default class ConfigurationManager {
         config.update();
     }
 
-    saveConfig() {
+    saveConfig(_configs?: string[]) {
+        const configs = _configs ? _configs : Object.keys(this._configs);
         this.plugin.postToContent({
-            message: 'setConfigs', data: Object.keys(this._configs).reduce((result, value) => {
+            message: 'setConfigs', data: configs.reduce((result, value) => {
                 result[value] = this._configs[value].state;
                 return result;
             }, {} as {[configName: string]: any})
@@ -100,15 +101,17 @@ export default class ConfigurationManager {
         return this._configs[configName];
     }
 
-    getConfigAsync<C extends keyof ConfigMap>(configName: C, callback: (config: Config<ConfigMap[C]>) => void): void;
-    getConfigAsync<T>(configName: string, callback: (config: Config<T>) => void): void;
-    getConfigAsync(configName: string, callback: (Config: Config<any>) => void) {
-        if (this._recvconfigs) {
-            callback(this._configs[configName]);
-        }
-        else {
-            (this._configs[configName] as Config<any> & {__cb?: ((config: Config<any>) => void)[]}).__cb!.push(callback);
-        }
+    async getConfigAsync<C extends keyof ConfigMap>(configName: C): Promise<Config<ConfigMap[C]>>;
+    async getConfigAsync<T>(configName: string): Promise<Config<T>>;
+    getConfigAsync(configName: string): Promise<Config<any>> {
+        return new Promise(resolve => {
+            if (this._recvconfigs) {
+                resolve(this._configs[configName]);
+            }
+            else {
+                (this._configs[configName] as Config<any> & {__cb?: ((config: Config<any>) => void)[]}).__cb!.push(resolve);
+            }
+        });
     }
 
     getAllConfigs() {

@@ -1,7 +1,7 @@
 import BetterMixer from "../BetterMixer.js";
 import EmoteSet from "../EmoteSet.js";
 import ChatMessage from "../ChatMessage.js";
-import { waitFor, observeNewElements, executeInOrder } from "../Utility/Promise.js";
+import { waitFor, observeNewElements, executeInOrder, sleep } from "../Utility/Promise.js";
 import { patchEmoteDialog } from "./EmoteDialogPatcher.js";
 import { parseMessageEmotes } from "./EmoteDisplayPatcher.js";
 import { patchSettingsDialog } from "./SettingsDialogPatcher.js";
@@ -9,6 +9,7 @@ import { loadLinkPreview } from "./LinkPreview.js";
 import EmoteAutocomplete from "./EmoteAutocomplete.js";
 import { EmotesAddedEvent } from "../BetterMixerEvent.js";
 import { patchMessageMarkdown } from "./MarkdownPatcher.js";
+import { loadMixplayStartClosedPatch } from "./MixplayStartClosed.js";
 
 export default class Patcher {
     plugin: BetterMixer;
@@ -178,36 +179,38 @@ export default class Patcher {
             }
         });
 
+        // Handle MixPlay auto off
+        loadMixplayStartClosedPatch(this.plugin);
+
         // Handle Browse > Filters > Save Filters
-        this.plugin.addEventListener('pageLoad', () => {
+        this.plugin.addEventListener('pageLoad', async () => {
             if (document.location.pathname.startsWith("/browse")) {
-                this.plugin.configuration.getConfigAsync('browse_filters', async (filterConfig) => {    
-                    const browseBaseUrl = "https://mixer.com" + document.location.pathname;
-                    if (document.location.href === browseBaseUrl && !document.querySelector('b-browse-filters.visible') && filterConfig.state !== "") {
-                        document.location.href = browseBaseUrl + "?" + filterConfig.state;
-                    }
+                const filterConfig = await this.plugin.configuration.getConfigAsync('browse_filters');
+                const browseBaseUrl = "https://mixer.com" + document.location.pathname;
+                if (document.location.href === browseBaseUrl && !document.querySelector('b-browse-filters.visible') && filterConfig.state !== "") {
+                    document.location.href = browseBaseUrl + "?" + filterConfig.state;
+                }
 
-                    let filtersWindow!: HTMLElement;
-                    await waitFor(() =>
-                        (filtersWindow = document.querySelector('b-browse-filters') as HTMLElement) &&
-                        !filtersWindow.querySelector('button.bettermixer-save-filters'));
+                let filtersWindow!: HTMLElement;
+                await waitFor(() =>
+                    (filtersWindow = document.querySelector('b-browse-filters') as HTMLElement) &&
+                    !filtersWindow.querySelector('button.bettermixer-save-filters'));
 
-                    const resetFiltersButton = filtersWindow.querySelector('button.reset-filters')!;
-                    const saveFiltersButton = resetFiltersButton.cloneNode(true) as HTMLElement;
-                    saveFiltersButton.classList.remove('reset-filters');
-                    saveFiltersButton.classList.add('bettermixer-save-filters');
-                    saveFiltersButton.querySelector('div > span > span')!.textContent = "Save Filters";
-                    filtersWindow.insertBefore(saveFiltersButton, resetFiltersButton);
+                const resetFiltersButton = filtersWindow.querySelector('button.reset-filters')!;
+                const saveFiltersButton = resetFiltersButton.cloneNode(true) as HTMLElement;
+                saveFiltersButton.classList.remove('reset-filters');
+                saveFiltersButton.classList.add('bettermixer-save-filters');
+                saveFiltersButton.querySelector('div > span > span')!.textContent = "Save Filters";
+                filtersWindow.insertBefore(saveFiltersButton, resetFiltersButton);
 
-                    //Patcher.addTooltip(saveFiltersButton, 'The "Games" and "Share Controller" filters are currently not supported.');
+                //Patcher.addTooltip(saveFiltersButton, 'The "Games" and "Share Controller" filters are currently not supported.');
 
-                    saveFiltersButton.addEventListener('click', () => {
-                        if (window.location.href.includes('?'))
-                            filterConfig.state = window.location.href.split('?')[1];
-                        else
-                            filterConfig.state = "";
-                        this.plugin.configuration.saveConfig();
-                    });
+                saveFiltersButton.addEventListener('click', () => {
+                    if (window.location.href.includes('?'))
+                        filterConfig.state = window.location.href.split('?')[1];
+                    else
+                        filterConfig.state = "";
+                    this.plugin.configuration.saveConfig();
                 });
             }
         });
@@ -263,16 +266,24 @@ export default class Patcher {
         }
     }
 
-    static addTooltip(element: HTMLElement, text: string) {
+    static addTooltip(element: HTMLElement, text: string, offset?: { x?: string; y?: string }) {
         element.addEventListener('mouseover', () => {
+            let xOffset = '0px';
+            let yOffset = '0px';
+            if (offset) {
+                xOffset = offset.x ? offset.x : xOffset;
+                yOffset = offset.y ? offset.y : yOffset;
+            }
+
             const tooltip = document.createElement('div');
             document.body.appendChild(tooltip); // This needs to happen first to make sure tooltip.clientWidth works correctly.
 
             tooltip.textContent = text;
             const rect = element.getBoundingClientRect();
             tooltip.classList.add('bettermixer-tooltip');
-            tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.clientWidth / 2) + "px";
-            tooltip.style.top = document.documentElement.scrollTop + rect.top - 24 + "px";
+
+            tooltip.style.left = `calc(${xOffset} + ${rect.left + (rect.width / 2) - (tooltip.clientWidth / 2)}px)`;
+            tooltip.style.top = `calc(${yOffset} + ${document.documentElement.scrollTop + rect.top - 24}px)`;
             tooltip.style.pointerEvents = "none";
 
             let scrollEvent: (event: Event) => void;

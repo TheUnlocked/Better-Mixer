@@ -147,15 +147,18 @@ const patchElementMarkdown = (element: HTMLElement, passes: Pass[], existingRepl
     const sliceIndexes = [...str.matchAll(/\0(\d+?)\0/g)].map(match => [match.index!, match.index! + match[0].length]).flat(1);
     element.childNodes.forEach(x => x.remove());
     sliceMany(str, sliceIndexes).map(x => {
+        if (x === "") {
+            return undefined;
+        }
         const match = x.match(/\0(\d+?)\0/);
         if (match) {
             return replacements[+match[1]];
         }
-        if (noSpanWrap) {
+        else if (noSpanWrap) {
             return new Text(x);
         }
         const containerSpan = document.createElement('span');
         containerSpan.innerText = x;
-        return [containerSpan];
-    }).flat(1).forEach(x => element.appendChild(x));
+        return containerSpan;
+    }).filter(x => x).forEach(x => element.appendChild(x!));
 };

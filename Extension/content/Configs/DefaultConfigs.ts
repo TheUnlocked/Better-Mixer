@@ -9,4 +9,5 @@ export interface ConfigMap {
     'hide_progression': boolean;
     'hide_chat_resizer': boolean;
     'browse_filters': string;
+    'mixplay_start_closed': boolean;
 }
