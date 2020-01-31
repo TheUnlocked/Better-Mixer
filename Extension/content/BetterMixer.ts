@@ -44,6 +44,7 @@ export default class BetterMixer {
         
         for (const eventName of [
             'load',
+            'beforeChannelLoad',
             'channelLoad',
             'chatFinishLoad',
             'chatStartLoad',

@@ -37,6 +37,7 @@ export default class Channel {
     constructor(plugin: BetterMixer, channelName: string) {
         this.plugin = plugin;
         this.channelName = channelName;
+        this.plugin.dispatchEvent('beforeChannelLoad', this, this);
         this.init();
     }
 
@@ -76,6 +77,7 @@ export default class Channel {
 
             this.chat = new Chat(this);
             this.plugin.dispatchEvent('chatStartLoad', this.chat, this);
+            this.plugin.dispatchEvent('channelLoad', this, this);
             this.plugin.log(`Loaded channel '${this.channelName}'`, BetterMixer.LogType.INFO);
         } catch (err) {
             this.plugin.log(`${err.message}: Failed to get channel ${this.channelName}`, BetterMixer.LogType.ERROR);

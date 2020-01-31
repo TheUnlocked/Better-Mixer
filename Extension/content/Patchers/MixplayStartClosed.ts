@@ -5,18 +5,21 @@ import Patcher from "./Patcher.js";
 export const loadMixplayStartClosedPatch = (plugin: BetterMixer) => {
     let activeChannel = plugin.focusedChannel;
     let cleared = false;
+    let closeLock = false;
+    
     plugin.addEventListener('pageLoad', () => {
-        cleared = false;
-        activeChannel = undefined;
+        closeLock = false;
     });
-    observeNewElements('.toggle-interactive:not(.bettermixer-toggle-start-interactive-closed)', document.documentElement, async button => {
+
+    const closeMixplay = async (button: HTMLElement) => {
         if (activeChannel !== plugin.focusedChannel) {
             cleared = false;
             activeChannel = plugin.focusedChannel;
         }
-        else if (cleared) {
+        if (cleared || closeLock) {
             return;
         }
+        closeLock = true;
         const startClosed = await plugin.configuration.getConfigAsync('mixplay_start_closed');
 
         if (!document.querySelector('.bettermixer-toggle-start-interactive-closed')) {
@@ -69,7 +72,21 @@ export const loadMixplayStartClosedPatch = (plugin: BetterMixer) => {
                         break;
                     }
                 }
+                cleared = true;
+            }
+        }
+        closeLock = false;
+    };
+
+    plugin.addEventListener('beforeChannelLoad', event => {
+        if (cleared && !plugin.activeChannels.includes(event.data!)) {
+            cleared = false;
+            activeChannel = undefined;
+            if (document.querySelector('.toggle-interactive:not(.bettermixer-toggle-start-interactive-closed)')) {
+                closeMixplay(document.querySelector('.toggle-interactive:not(.bettermixer-toggle-start-interactive-closed)') as HTMLElement);
             }
         }
     });
+    
+    observeNewElements('.toggle-interactive:not(.bettermixer-toggle-start-interactive-closed)', document.documentElement, closeMixplay);
 };

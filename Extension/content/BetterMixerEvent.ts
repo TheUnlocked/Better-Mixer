@@ -13,6 +13,7 @@ export interface BetterMixerEvent<EventData> {
 }
 
 export type LoadEvent = BetterMixerEvent<LoadEventData>;
+export type BeforeChannelLoadEvent = BetterMixerEvent<BeforeChannelLoadEventData>;
 export type ChannelLoadEvent = BetterMixerEvent<ChannelLoadEventData>;
 export type ChatStartLoadEvent = BetterMixerEvent<ChatStartLoadEventData>;
 export type ChatFinishLoadEvent = BetterMixerEvent<ChatFinishLoadEventData>;
@@ -27,7 +28,8 @@ export type GatherBadgesEvent = BetterMixerEvent<GatherBadgesEventData>;
 
 // `unknown` is used for currently unimplemented events.
 export type LoadEventData = unknown;
-export type ChannelLoadEventData = unknown;
+export type BeforeChannelLoadEventData = Channel;
+export type ChannelLoadEventData = Channel;
 export type ChatStartLoadEventData = Chat;
 export type ChatFinishLoadEventData = Chat;
 export type UserLoadEventData = unknown;
@@ -58,6 +60,7 @@ export type GatherBadgesResult = Badge[];
 
 export interface EventMap {
     'load': LoadEventData;
+    'beforeChannelLoad': ChannelLoadEventData;
     'channelLoad': ChannelLoadEventData;
     'chatStartLoad': ChatStartLoadEventData;
     'chatFinishLoad': ChatFinishLoadEventData;
