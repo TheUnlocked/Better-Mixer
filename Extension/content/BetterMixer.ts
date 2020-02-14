@@ -131,6 +131,10 @@ export default class BetterMixer {
             'hide_progression', 'Hide Fan Progression', '', false, true));
 
         this.configuration.registerConfig(new StylesheetToggleConfig(
+            this.injectStylesheet("lib/css/hideconfetti.css"),
+            'hide_confetti', 'Hide Confetti-like Effects', '', false, true));
+
+        this.configuration.registerConfig(new StylesheetToggleConfig(
             this.injectStylesheet("lib/css/hidechatresizer.css"),
             'hide_chat_resizer', 'Disable Chat Resizer', '', false, true));
 
