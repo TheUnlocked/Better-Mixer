@@ -19,7 +19,8 @@
   "content_scripts": [
     {
       "matches": ["https://mixer.com/*"],
-      "js": ["content.js"]
+      "js": ["content.js"],
+      "all_frames": true
     }
   ],
 
