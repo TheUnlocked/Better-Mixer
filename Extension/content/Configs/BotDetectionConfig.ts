@@ -13,7 +13,7 @@ export default class BotDetectionConfig extends DropdownConfig {
     // Updates the configuration effect
     update() {
         for (const element of document.querySelectorAll('b-channel-chat-section .bettermixer-role-bot[class*="Username"]') as NodeListOf<HTMLElement>) {
-            element.style.color = element.__bettermixerMixerColor;
+            element.style.color = element.__bettermixerMixerColor ?? "";
         }
         if (this.state !== "off") {
             const regexConfig = BetterMixer.instance.configuration.getConfig("botcolor_regex");
