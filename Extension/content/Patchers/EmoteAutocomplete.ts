@@ -1,5 +1,5 @@
 import EmoteSet from "../EmoteSet.js";
-import { fetchJson } from "../Utility/Promise.js";
+import { fetchJson, waitFor } from "../Utility/Promise.js";
 import Emote, { VanillaEmote } from "../Emote.js";
 import Chat from "../Chat.js";
 import BetterMixer from "../BetterMixer.js";
@@ -38,6 +38,7 @@ export default class EmoteAutocomplete {
         }
 
         this.vanillaEmotes = [];
+        await waitFor(() => this.plugin.user);
         await this.plugin.user!.populateUser();
         const fetch1 = fetchJson(`https://mixer.com/api/v1/channels/${this.chat.channel.id}/emoticons?user=${this.plugin.user!.id}`)
             .then((data: {

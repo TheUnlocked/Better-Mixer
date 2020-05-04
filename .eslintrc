@@ -42,7 +42,8 @@
         "@typescript-eslint/no-use-before-define": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
         "no-dupe-class-members": "off",
-        "no-constant-condition": "off"
+        "no-constant-condition": "off",
+        "no-redeclare": "off"
     },
     "env": {
         "webextensions": true,
@@ -63,6 +64,7 @@
         "React": "readonly",
         "ReactDOM": "readonly",
         "mixerUi": "readonly",
-        "__bettermixer_poly": "readonly"
+        "__bettermixer_poly": "readonly",
+        "__COMPILER_INLINE": "readonly"
     }
 }

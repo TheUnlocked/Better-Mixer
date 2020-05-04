@@ -82,7 +82,7 @@ export default class BetterMixer {
             window.onpopstate = (e: PopStateEvent) => BetterMixer.instance.reload();
         })(window.history);
 
-        this.injectStylesheet("lib/css/inject.css").disabled = false;
+        this.injectStylesheet(__COMPILER_INLINE('stylesheet', 'lib/css/inject.css')).disabled = false;
 
         const botColorDetectionConfig = new BotDetectionConfig();
         const botColorRegexConfig = new StringConfig(
@@ -110,32 +110,32 @@ export default class BetterMixer {
         this.configuration.registerConfig(linkPreviewConfig);
 
         this.configuration.registerConfig(new StylesheetToggleConfig(
-            this.injectStylesheet("lib/css/movebadges.css"),
+            this.injectStylesheet(__COMPILER_INLINE('stylesheet', 'lib/css/movebadges.css')),
             'move_badges', 'Show Badges Before Username', '', true, true));
 
         const markdownConfig = new StylesheetToggleConfig(
-            this.injectStylesheet("lib/css/showmarkdown.css"),
+            this.injectStylesheet(__COMPILER_INLINE('stylesheet', 'lib/css/showmarkdown.css')),
             'show_markdown', 'Render Markdown Effects', '', true, true);
         this.configuration.registerConfig(markdownConfig);
 
         this.configuration.registerConfig(new StylesheetToggleConfig(
-            this.injectStylesheet("lib/css/hideanimatedemotes.css"),
+            this.injectStylesheet(__COMPILER_INLINE('stylesheet', 'lib/css/hideanimatedemotes.css')),
             'show_emotes_animated', 'Show Animated Emotes', '', true, false));
 
         this.configuration.registerConfig(new StylesheetToggleConfig(
-            this.injectStylesheet("lib/css/hideavatars.css"),
+            this.injectStylesheet(__COMPILER_INLINE('stylesheet', 'lib/css/hideavatars.css')),
             'hide_avatars', 'Hide Avatars', '', false, true));
 
         this.configuration.registerConfig(new StylesheetToggleConfig(
-            this.injectStylesheet("lib/css/hideprogression.css"),
+            this.injectStylesheet(__COMPILER_INLINE('stylesheet', 'lib/css/hideprogression.css')),
             'hide_progression', 'Hide Fan Progression', '', false, true));
 
         this.configuration.registerConfig(new StylesheetToggleConfig(
-            this.injectStylesheet("lib/css/hideconfetti.css"),
+            this.injectStylesheet(__COMPILER_INLINE('stylesheet', 'lib/css/hideconfetti.css')),
             'hide_confetti', 'Hide Confetti-like Effects', '', false, true));
 
         this.configuration.registerConfig(new StylesheetToggleConfig(
-            this.injectStylesheet("lib/css/hidechatresizer.css"),
+            this.injectStylesheet(__COMPILER_INLINE('stylesheet', 'lib/css/hidechatresizer.css')),
             'hide_chat_resizer', 'Disable Chat Resizer', '', false, true));
 
         this.configuration.registerConfig(new EmptyConfig('browse_filters', ''));
@@ -166,6 +166,7 @@ export default class BetterMixer {
                 badges[badge.id] = new Badge(badge.name, badge.src);
             }
             this.addEventListener('gatherBadges', event => {
+                
                 const userBadges = [];
 
                 for (const group of data.groups) {
@@ -312,10 +313,18 @@ export default class BetterMixer {
         }
     }
 
-    injectStylesheet(file: string) {
-        const injection = document.createElement('link');
-        injection.rel = 'stylesheet';
-        injection.href = BASE_URL + file;
+    private injectStylesheet(file: string) {
+        let injection: HTMLLinkElement | HTMLStyleElement;
+        if (__COMPILER_INLINE('target') === 'script') {
+            injection = document.createElement('style');
+            injection.innerText = file;
+        }
+        else {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = BASE_URL + file;
+            injection = link;
+        }
         injection.disabled = true;
         document.head.appendChild(injection);
         return injection;

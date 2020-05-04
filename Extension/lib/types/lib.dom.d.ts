@@ -1,0 +1,3 @@
+interface HTMLStyleElement {
+    disabled: boolean;
+}

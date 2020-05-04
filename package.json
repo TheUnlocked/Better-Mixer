@@ -5,12 +5,15 @@
   "scripts": {
     "lint": "eslint -c .eslintrc ./Extension/**/*.{ts,js}",
     "lint:fix": "eslint -c .eslintrc ./Extension/**/*.{ts,js} --fix",
-    "serve:firefox": "web-ext run --source-dir ./build/",
+    "serve:firefox": "web-ext run --start-url mixer.com --source-dir ./build/",
+    "serve:chrome": "web-ext run -t chromium --start-url mixer.com --source-dir ./build/",
     "package": "npm run build && web-ext build --source-dir ./build/",
     "clean": "gulp clean",
-    "build:dev": "tsc --inlineSourceMap --inlineSources --sourceRoot \"/\" && gulp",
-    "build": "npm run clean && tsc && gulp",
-    "watch": "concurrently --raw \"gulp watch\" \"tsc --inlineSourceMap --inlineSources --sourceRoot \"/\" --watch\""
+    "build:dev": "ttsc --inlineSourceMap --inlineSources --sourceRoot \"/\" && gulp",
+    "build": "npm run clean && ttsc && gulp",
+    "build:script": "npm run clean && ttsc -p tsconfig.script.json && gulp",
+    "watch": "concurrently --raw \"gulp watch\" \"ttsc --inlineSourceMap --inlineSources --sourceRoot \"/\" --watch\"",
+    "watch:script": "concurrently --raw \"gulp watch\" \"ttsc -p tsconfig.script.json --inlineSourceMap --inlineSources --sourceRoot \"/\" --watch\""
   },
   "devDependencies": {
     "@types/chrome": "0.0.91",
@@ -19,7 +22,7 @@
     "@typescript-eslint/eslint-plugin": "^2.23.0",
     "@typescript-eslint/parser": "^2.23.0",
     "babel-eslint": "^10.1.0",
-    "concurrently": "^5.1.0",
+    "concurrently": "^5.2.0",
     "del": "^5.1.0",
     "eslint": "^6.6.0",
     "eslint-plugin-babel": "^5.3.0",
@@ -27,8 +30,10 @@
     "gulp": "^4.0.2",
     "gulp-cli": "^2.2.0",
     "gulp-replace": "^1.0.0",
+    "ts-node": "^8.10.1",
+    "ttypescript": "^1.5.10",
     "typescript": "^3.8.3",
-    "web-ext": "^4.1.0"
+    "web-ext": "^4.2.0"
   },
   "repository": {
     "type": "git",

@@ -1,7 +1,7 @@
 import Config from "./Config.js";
 
 export default class StylesheetToggleConfig extends Config<boolean> {
-    private _element: HTMLLinkElement;
+    private _element: HTMLLinkElement | HTMLStyleElement;
     private _configName: string;
     private _displayText: string;
     private _descriptionText: string;
@@ -9,7 +9,7 @@ export default class StylesheetToggleConfig extends Config<boolean> {
     private _enabledState: boolean;
     private _state: boolean;
 
-    constructor(element: HTMLLinkElement, configName: string, displayText: string, descriptionText = "", defaultState = false, enabledState = true) {
+    constructor(element: HTMLLinkElement | HTMLStyleElement, configName: string, displayText: string, descriptionText = "", defaultState = false, enabledState = true) {
         super();
 
         this._element = element;
