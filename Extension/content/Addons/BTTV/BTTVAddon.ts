@@ -28,7 +28,7 @@ export default class BTTVAddon {
                     code: string;
                     imageType: string;
                 }[];
-            } = await fetchJson('https://api.betterttv.net/2/emotes');
+            } = await fetchJson('https://api.betterttv.net/3/cached/emotes/global');
             for (const emote of data.emotes) {
                 const animated = ['gif'].includes(emote.imageType);
                 this.globalEmotes.addEmote(new Emote(emote.code, `https:${data.urlTemplate.replace('{{id}}', emote.id).replace('{{image}}', '3x')}`, 28, 28, animated));

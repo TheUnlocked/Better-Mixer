@@ -27,17 +27,33 @@ export default class BTTVChannel {
     }
 
     async init() {
-        await waitFor(() => this.twitch.login);
+        await waitFor(() => this.twitch.id);
 
         /* Backwards Compatibility */
         if (!this.channel.channelSettings.bttv || this.channel.channelSettings.bttv.sync) {
             try {
-                const data = await fetchJson(`https://api.betterttv.net/2/channels/${this.twitch.login}`);
+                type BTTVEmote = {
+                    id: string;
+                    code: string;
+                    imageType: 'gif' | 'png';
+                    user: {
+                        id: string;
+                        name: string;
+                        displayName: string;
+                        providerId: string;
+                    };
+                };
+                const data: {
+                    id: string;
+                    bots: string[];
+                    channelEmotes: BTTVEmote[];
+                    sharedEmotes: BTTVEmote[];
+                } = await fetchJson(`https://api.betterttv.net/3/cached/users/twitch/${this.twitch.id}`);
                 if (this.cancelLoad) return;
 
-                for (const emote of data.emotes) {
+                for (const emote of data.channelEmotes.concat(data.sharedEmotes)) {
                     const animated = ['gif'].includes(emote.imageType);
-                    this.emotes.addEmote(new Emote(emote.code, `https:${data.urlTemplate.replace('{{id}}', emote.id).replace('{{image}}', '3x')}`, 28, 28, animated));
+                    this.emotes.addEmote(new Emote(emote.code, `https://cdn.betterttv.net/emote/${emote.id}/3x`, 28, 28, animated));
                 }
                 
                 this._gatherEmotes = event => {
