@@ -16,7 +16,8 @@ import { fetchJson, waitFor, observeNewElements } from "./Utility/Promise.js";
 import DropdownConfig from "./Configs/DropdownConfig.js";
 import { BetterMixerEvent, EventMap, GatherMap } from "./BetterMixerEvent.js";
 
-const SRC: string = (document.getElementById('BetterMixer-module') as HTMLImageElement).src;
+const COMPILE_TARGET = __COMPILER_INLINE('target');
+const SRC = COMPILE_TARGET === 'script' ? 'better_mixer_user_script' : (document.getElementById('BetterMixer-module') as HTMLImageElement).src;
 const BASE_URL = SRC.split('/').slice(0, -2).join('/') + '/';
 
 export default class BetterMixer {
@@ -315,18 +316,20 @@ export default class BetterMixer {
 
     private injectStylesheet(file: string) {
         let injection: HTMLLinkElement | HTMLStyleElement;
-        if (__COMPILER_INLINE('target') === 'script') {
+        if (COMPILE_TARGET === 'script') {
             injection = document.createElement('style');
             injection.innerText = file;
+            document.head.appendChild(injection);
+            injection.disabled = true;
         }
         else {
             const link = document.createElement('link');
             link.rel = 'stylesheet';
             link.href = BASE_URL + file;
             injection = link;
+            injection.disabled = true;
+            document.head.appendChild(injection);
         }
-        injection.disabled = true;
-        document.head.appendChild(injection);
         return injection;
     }
 

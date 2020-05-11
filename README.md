@@ -58,8 +58,15 @@ npm run watch
 # for the smoothest experience
 npm run serve:firefox
 
+# Start Chrome with the extension installed
+# The advice for serve:firefox still applies
+npm run serve:chrome
+
 # Build and package extension
 npm run package
+
+# Build and package the extension as a user script
+npm run package:script
 ```
 
 # Development Environment

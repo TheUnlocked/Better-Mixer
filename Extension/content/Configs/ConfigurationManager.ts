@@ -3,7 +3,7 @@ import BetterMixer from "../BetterMixer.js";
 import { observeNewElements } from "../Utility/Promise.js";
 import { ConfigMap } from "./DefaultConfigs.js";
 
-const SRC = (document.getElementById('BetterMixer-module') as HTMLScriptElement).src;
+const SRC = __COMPILER_INLINE('target') === 'script' ? 'better_mixer_user_script' : (document.getElementById('BetterMixer-module') as HTMLImageElement).src;
 
 export default class ConfigurationManager {
     plugin: BetterMixer;

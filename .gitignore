@@ -3,6 +3,7 @@
 Extension.zip
 node_modules
 web-ext-artifacts/
+user-script-artifacts/
 build/
 .tsbuildinfo
 Promo/Banners/ai/
