@@ -11,13 +11,10 @@ export default class TwitchChannel {
     id?: number;
     displayName?: string;
 
-    private _requestConfig: { headers: { [header: string]: string } };
-
     constructor(parent: TwitchAddon, channel: Channel, usernameOrId: string | number) {
         this.twitch = parent;
         this.plugin = parent.plugin;
         this.channel = channel;
-        this._requestConfig = { headers: { "Client-ID": "k2dxpcz1dl6fe771vzcsl1bx324osz" } };
 
         if (typeof usernameOrId === 'string') {
             this._loadByUserName(usernameOrId);
@@ -30,7 +27,7 @@ export default class TwitchChannel {
     async _loadByUserName(username: string) {
         this.login = username;
         try {
-            this._successHandler(await fetchJson(`https://api.twitch.tv/helix/users?login=${username}`, this._requestConfig));
+            this._successHandler(await fetchJson(`https://bettermixer.web.app/api/v1/twitch-user-info?username=${username}`));
         } catch (err) {
             this.plugin.log(`${err.message}: Failed to obtain ID from Twitch username.`, BetterMixer.LogType.WARN);
         }
@@ -39,30 +36,19 @@ export default class TwitchChannel {
     async _loadByUserId(id: number) {
         this.id = id;
         try {
-            this._successHandler(await fetchJson(`https://api.twitch.tv/helix/users?id=${id}`, this._requestConfig));
+            this._successHandler(await fetchJson(`https://bettermixer.web.app/api/v1/twitch-user-info?id=${id}`));
         } catch (err) {
             this.plugin.log(`${err.message}: Failed to obtain Twitch user information from provided data.`, BetterMixer.LogType.WARN);
         }
     }
 
     _successHandler(data: {
-        /* eslint-disable camelcase */
-        data: {
-            id: string;
-            login: string;
-            display_name: string;
-            type: string;
-            broadcaster_type: string;
-            description: string;
-            profile_image_url: string;
-            offline_image_url: string;
-            view_count: number;
-        }[];
-        /* eslint-enable camelcase */
+        id: string;
+        username: string;
     }) {
-        this.login = data.data[0].login;
-        this.id = +data.data[0].id;
-        this.displayName = data.data[0].display_name;
+        this.login = data.username;
+        this.id = +data.id;
+        this.displayName = data.username;
         this.plugin.log(`Loaded Twitch user information for ${this.displayName}.`, BetterMixer.LogType.INFO);
     }
 

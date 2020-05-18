@@ -1,6 +1,6 @@
 {
   "name": "better-mixer",
-  "version": "3.1.4",
+  "version": "3.1.6",
   "description": "Improvements to Mixer, similar to FFZ for Twitch.",
   "scripts": {
     "lint": "eslint -c .eslintrc ./Extension/**/*.{ts,js}",
