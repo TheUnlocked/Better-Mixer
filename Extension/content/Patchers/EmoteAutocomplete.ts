@@ -40,49 +40,73 @@ export default class EmoteAutocomplete {
         this.vanillaEmotes = [];
         await waitFor(() => this.plugin.user);
         await this.plugin.user!.populateUser();
-        const fetch1 = fetchJson(`https://mixer.com/api/v1/channels/${this.chat.channel.id}/emoticons?user=${this.plugin.user!.id}`)
-            .then((data: {
+
+        type EmoteGroupMeta = {[emoteName: string]: { x: number; y: number; width: number; height: number }};
+
+        const addEmotes = async (
+            emoteTable: EmoteGroupMeta,
+            spritesheetUrl: string
+        ) => new Promise(resolve => {
+            const spritesheet = new Image();
+            spritesheet.src = spritesheetUrl;
+            spritesheet.addEventListener('load', () => {
+                const emotes = Object.entries(emoteTable)
+                    .map(emote => new VanillaEmote(
+                        emote[0],
+                        spritesheetUrl,
+                        { x: emote[1].x / 2, y: emote[1].y / 2 },
+                        { width: emote[1].width / 2, height: emote[1].height / 2 },
+                        { width: spritesheet.naturalWidth / 2, height: spritesheet.naturalHeight / 2 }
+                    ));
+                this.vanillaEmotes.push(...emotes);
+                this.plugin.log(`Loaded ${emotes.length} vanilla global emotes`);
+                resolve();
+            });
+        });
+
+        const userEmoteFetch = fetchJson(`https://mixer.com/api/v1/channels/${this.chat.channel.id}/emoticons?user=${this.plugin.user!.id}`)
+            .then(async (data: {
                 url: string;
                 channelId: number;
-                emoticons: {[emoteName: string]: {
-                    x: number;
-                    y: number;
-                    width: number;
-                    height: number;
-                };};
+                emoticons: EmoteGroupMeta;
             }[]) => {
                 for (const emoteGroup of data) {
                     const src = emoteGroup.url;
-                    const emotes = Object.entries(emoteGroup.emoticons)
-                        .map(emote => new VanillaEmote(emote[0], src, emote[1]));
-                    this.vanillaEmotes.push(...emotes);
-                    this.plugin.log(`Loaded ${emotes.length} vanilla user emotes`);
+                    await addEmotes(emoteGroup.emoticons, src);
                 }
             })
             .catch(() => this.plugin.log("Failed to load vanilla user emotes", BetterMixer.LogType.WARN));
-        const fetch2 = fetchJson("https://mixer.com/_latest/assets/emoticons/manifest.json")
-            .then((data: {[packName: string]: {
+        
+        let globalEmoteVersion: string | undefined;
+
+        const globalEmoteFetch = fetchJson("https://mixer.com/api/v2/mega/schema?authed=false")
+            .then(async (schema: { id: string; name: string; url: string }[]) => {
+                let globalEmoteUrl = "https://mixer.com/_latest/assets/emoticons/manifest.json";
+                const chatSourceUrl = schema.find(x => x.name === "@mixer/chat-client")?.url;
+                if (chatSourceUrl) {
+                    globalEmoteVersion = (await (await fetch(chatSourceUrl)).text()).match(/_static\/emotes\/(.*?)"/)?.[1];
+                    if (globalEmoteVersion) {
+                        globalEmoteUrl = `https://mixer.com/_static/emotes/${globalEmoteVersion}/emoticons/manifest.json`;
+                    }
+                }
+                return await fetchJson(globalEmoteUrl);
+            })
+            .then(async (data: {[packName: string]: {
                 name: string;
                 default: boolean;
                 authors: string[];
-                emoticons: {[emoteName: string]: {
-                    x: number;
-                    y: number;
-                    width: number;
-                    height: number;
-                };};
+                emoticons: EmoteGroupMeta;
             };}) => {
                 for (const emoteGroupName in data) {
-                    const src = `https://mixer.com/_latest/assets/emoticons/${emoteGroupName}.png`;
-                    const emoteGroup = data[emoteGroupName];
-                    const emotes = Object.entries(emoteGroup.emoticons)
-                        .map(emote => new VanillaEmote(emote[0], src, emote[1]));
-                    this.vanillaEmotes.push(...emotes);
-                    this.plugin.log(`Loaded ${emotes.length} vanilla global emotes`);
+                    let src = `https://mixer.com/_latest/assets/emoticons/${emoteGroupName}.png`;
+                    if (globalEmoteVersion) {
+                        src = `https://static.mixer.com/emotes/${globalEmoteVersion}/emoticons/${emoteGroupName}.png`;
+                    }
+                    await addEmotes(data[emoteGroupName].emoticons, src);
                 }
             })
             .catch(() => this.plugin.log("Failed to load vanilla global emotes", BetterMixer.LogType.WARN));
-        fetch1.finally(() => fetch2.finally(() => {
+        userEmoteFetch.finally(() => globalEmoteFetch.finally(() => {
             EmoteAutocomplete.vanillaEmoteCache = this.vanillaEmotes;         
             this.reloadCache();
         }));

@@ -57,10 +57,19 @@ export default class Emote {
 }
 
 export class VanillaEmote extends Emote {
-    position: any;
-    constructor(name: string, spritesheet: string, position: {width: number; height: number}) {
-        super(name, spritesheet, position.width, position.height, false);
+    position: {x: number; y: number};
+    spritesheetSize: {width: number; height: number};
+
+    constructor(
+        name: string,
+        spritesheet: string,
+        position: {x: number; y: number},
+        size: {width: number; height: number},
+        spritesheetSize: {width: number; height: number}
+    ) {
+        super(name, spritesheet, size.width, size.height, false);
         this.position = position;
+        this.spritesheetSize = spritesheetSize;
     }
 
     get element(): never {
@@ -72,6 +81,7 @@ export class VanillaEmote extends Emote {
         image.style.backgroundImage = `url(${this.image})`;
         image.style.backgroundPositionX = `${-this.position.x}px`;
         image.style.backgroundPositionY = `${-this.position.y}px`;
+        image.style.backgroundSize = `${this.spritesheetSize.width}px ${this.spritesheetSize.height}px`;
         image.style.width = `${this.width}px`;
         image.style.height = `${this.height}px`;
         return image;
