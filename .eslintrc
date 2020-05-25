@@ -63,7 +63,7 @@
         "BetterMixer": "writable",
         "React": "readonly",
         "ReactDOM": "readonly",
-        "mixerUi": "readonly",
+        "mds": "readonly",
         "__bettermixer_poly": "readonly",
         "__COMPILER_INLINE": "readonly"
     }

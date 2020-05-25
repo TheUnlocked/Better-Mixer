@@ -9,34 +9,34 @@ type ToggleProps = {
 };
 type ColorPickerProps = {
     label: string;
-    fallback: string;
     value: string;
-    onChange(v: string): void;
+    onChange(this: ColorPickerProps, v: string): void;
 };
 type SelectProps = {
     label: string;
     options: {key: string; value: string}[];
-    value: string;
-    onChange(v: string): void;
-    children(p: {key: string; value: string}): React.ReactNode;
+    selectedOptionKey: string;
+    onValueChange(v: { key: string; value: string }): void;
+    menuContainer: HTMLDivElement;
+    // children(p: {key: string; value: string}): React.ReactNode;
 };
 type TextInputProps = {
     label: string;
     value: string;
-    onChange(v: string): void;
+    onValueChange(v: string): void;
 };
 type IconProps = {
-    set?: string;
-    icon: string;
-    title?: string;
-    size?: string;
-    style?: string;
+    // set?: string;
+    // icon: string;
+    // title?: string;
+    // size?: string;
+    // style?: string;
 };
 
-declare const mixerUi: {
-    SimpleColorPicker: React.ComponentClass<ColorPickerProps>;
-    Select: React.ComponentClass<SelectProps>;
-    BuiTextInput: React.ComponentClass<TextInputProps>;
-    Toggle: React.ComponentClass<ToggleProps>;
-    BuiIcon: React.ComponentClass<IconProps>;
+declare const mds: {
+    MdsColorPicker: React.ComponentClass<ColorPickerProps>;
+    MdsDropdown: React.ComponentClass<SelectProps>;
+    MdsInput: React.ComponentClass<TextInputProps>;
+    MdsToggle: React.ComponentClass<ToggleProps>;
+    MdsChevronupIcon: React.ComponentClass<IconProps>;
 };

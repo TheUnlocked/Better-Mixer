@@ -27,10 +27,7 @@ export const loadMixplayStartClosedPatch = (plugin: BetterMixer) => {
             startClosedButton.classList.add('bettermixer-toggle-start-interactive-closed', 'toggle-interactive');
             startClosedButton.setAttribute(button.getAttributeNames().find(x => x.includes('ngcontent'))!, '');
             startClosedButton.classList.toggle('open', !startClosed.state);
-            ReactDOM.render(React.createElement(mixerUi.BuiIcon, {
-                set: "mixer",
-                icon: "ChevronUp"
-            }), startClosedButton);
+            ReactDOM.render(React.createElement(mds.MdsChevronupIcon, {}), startClosedButton);
             Patcher.addTooltip(startClosedButton, "Open MixPlay by Default", { y: '10px' });
             button.after(startClosedButton);
 

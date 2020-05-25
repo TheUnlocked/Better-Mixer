@@ -8,9 +8,12 @@ export const patchSettingsDialog = async (plugin: BetterMixer, settingsDialogEle
 
     const configSection = settingsDialogElement.querySelector('section') as HTMLElement;
 
-    const label = configSection.firstChild!.cloneNode();
+    const configGroup = document.createElement('div');
+    configSection.appendChild(configGroup);
+
+    const label = configSection.querySelectorAll('h2')![1].cloneNode();
     label.textContent = "Better Mixer Preferences";
-    configSection.appendChild(label);
+    configGroup.appendChild(label);
 
     const exampleToggle = configSection.querySelector('[class*="control"][class*="toggle"]') as HTMLElement;
 
@@ -37,7 +40,7 @@ export const patchSettingsDialog = async (plugin: BetterMixer, settingsDialogEle
                     break;
 
                 case Config.ConfigTypeEnum.DROPDOWN:
-                    configElement = makeDropdownMenu(config as DropdownConfig, setTempState);
+                    configElement = makeDropdownMenu(config as DropdownConfig, configGroup, setTempState);
                     break;
 
                 case Config.ConfigTypeEnum.STRING:
@@ -64,7 +67,7 @@ export const patchSettingsDialog = async (plugin: BetterMixer, settingsDialogEle
     }
 
     // Save
-    settingsDialogElement.querySelector('button[data-variant="primary"]')!.addEventListener('click', e => {
+    settingsDialogElement.querySelector('button[name="Save"]')!.addEventListener('click', e => {
         for (const configData of configsData) {
             if (configData.newState !== undefined) {
                 configData.config.state = configData.newState;
@@ -79,7 +82,7 @@ export const patchSettingsDialog = async (plugin: BetterMixer, settingsDialogEle
 const makeToggleSwitch = (config: Config<any>, setTempState: (newState: any) => void, example: HTMLElement) => {
     const toggleHolder = document.createElement('div');
                 
-    ReactDOM.render(React.createElement(mixerUi.Toggle, {
+    ReactDOM.render(React.createElement(mds.MdsToggle, {
         checked: config.state,
         onChange: function(e) {
             this.checked = !this.checked;
@@ -102,9 +105,8 @@ const makeColorPicker = (config: Config<string>, setTempState: (newState: string
     const colorHolder = document.createElement('div');
     const colorLengths = [3, 4, 6, 8];
 
-    ReactDOM.render(React.createElement(mixerUi.SimpleColorPicker, {
+    const colorPickerElt = React.createElement(mds.MdsColorPicker, {
         label: config.displayText,
-        fallback: '#d37110',
         value: config.state,
         onChange: v => {
             if (v.match(/^#[a-fA-F0-9]*$/) && colorLengths.includes(v.length - 1)) {
@@ -114,8 +116,11 @@ const makeColorPicker = (config: Config<string>, setTempState: (newState: string
             else {
                 setTempState(undefined);
             }
+            ReactDOM.render(React.cloneElement(colorPickerElt, { value: v }), colorHolder);
         }
-    }), colorHolder);
+    });
+
+    ReactDOM.render(colorPickerElt, colorHolder);
 
     if (config.superText) {
         const superText = document.createElement('span');
@@ -127,18 +132,19 @@ const makeColorPicker = (config: Config<string>, setTempState: (newState: string
     return colorHolder.children[0] as HTMLElement;
 };
 
-const makeDropdownMenu = (config: DropdownConfig, setTempState: (newState: string | undefined) => void) => {
+const makeDropdownMenu = (config: DropdownConfig, container: HTMLDivElement, setTempState: (newState: string | undefined) => void) => {
     const dropdownHolder = document.createElement('div');
                 
-    ReactDOM.render(React.createElement(mixerUi.Select, {
+    ReactDOM.render(React.createElement(mds.MdsDropdown, {
         label: config.displayText,
         options: config.options.map(x => ({key: x, value: config.getDisplayFromOption(x)})),
-        value: config.state,
-        children: e => React.createElement("div", { className: BetterMixer.ClassNames.TEXTITEM }, e.value),
-        onChange: v => {
-            setTempState(v);
-            config.updateImmediate(v);
-        }
+        selectedOptionKey: config.state,
+        // children: e => React.createElement("div", { className: BetterMixer.ClassNames.TEXTITEM }, e.value),
+        onValueChange: (v: { key: string; value: string }) => {
+            setTempState(v.key);
+            config.updateImmediate(v.key);
+        },
+        menuContainer: container
     }), dropdownHolder);
 
     if (config.superText) {
@@ -154,10 +160,10 @@ const makeDropdownMenu = (config: DropdownConfig, setTempState: (newState: strin
 const makeStringInput = (config: Config<string>, setTempState: (newState: string | undefined) => void) => {
     const stringInputHolder = document.createElement('div');
 
-    ReactDOM.render(React.createElement(mixerUi.BuiTextInput, {
+    ReactDOM.render(React.createElement(mds.MdsInput, {
         label: config.displayText,
         value: config.state,
-        onChange: (v: string) => {
+        onValueChange: (v: string) => {
             setTempState(v);
             config.updateImmediate(v);
         }

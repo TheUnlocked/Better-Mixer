@@ -31,7 +31,9 @@ export default class BotDetectionConfig extends DropdownConfig {
     }
 
     updateImmediate(newState: string) {
-        (document.querySelector('[bettermixer-config-name="botcolor_regex"]') as HTMLElement).hidden = newState !== "custom";
-        (document.querySelector('[bettermixer-config-name="botcolor"]') as HTMLElement).hidden = newState === "off";
+        const regexConfigOption = document.querySelector('[bettermixer-config-name="botcolor_regex"]');
+        const colorConfigOption = document.querySelector('[bettermixer-config-name="botcolor"]');
+        if (regexConfigOption) (document.querySelector('[bettermixer-config-name="botcolor_regex"]') as HTMLElement).hidden = newState !== "custom";
+        if (colorConfigOption) (document.querySelector('[bettermixer-config-name="botcolor"]') as HTMLElement).hidden = newState === "off";
     }
 }
